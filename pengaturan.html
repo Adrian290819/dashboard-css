@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan Admin - CSS Dashboard</title>
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="global.css">
+    <script src="sidebar-loader.js"></script>
+    <style>
+</style>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    
+    <div class="main-content">
+        <div class="header">
+            <div id="notificationContainer"></div>
+            <button class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1><i class="fas fa-cog"></i> Pengaturan Admin</h1>
+            <div class="header-actions">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Cari pengaturan...">
+                </div>
+               
+                <div class="user-profile">
+                    <img id="profileImage" src="https://ui-avatars.com/api/?name=Admin&background=4361ee&color=fff" alt="Profile">
+                    <div class="user-info">
+                        <h4 id="profileName">Admin</h4>
+                        <p>Customer Service Support</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+         <div class="content-wrapper">
+            <div class="breadcrumb">
+                <a href="index.html"><i class="fas fa-home"></i> Dashboard</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Pengaturan</span>
+            </div>
+            
+            <div class="settings-container">
+                <!-- Kolom kiri -->
+                <div class="left-column">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-user-circle"></i> Profil Admin</h2>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="profile-picture text-center">
+                                <div class="profile-img-container mx-auto">
+                                    <img id="profileImageMain" src="https://ui-avatars.com/api/?name=Admin&background=4361ee&color=fff" alt="Profile" class="profile-img">
+                                    <button class="change-img-btn" id="changeImageBtn">
+                                        <i class="fas fa-camera"></i>
+                                    </button>
+                                    <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                                </div>
+                                
+                                <div class="profile-info mt-3">
+                                    <h3 id="profileNameMain" class="profile-name">Admin</h3>
+                                    <p class="profile-role text-muted">Super Master</p>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="adminName" class="form-label">Nama Admin</label>
+                                <input type="text" id="adminName" class="form-input" placeholder="Masukkan nama admin">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="adminEmail" class="form-label">Email</label>
+                                <input type="email" id="adminEmail" class="form-input" placeholder="admin@example.com">
+                            </div>
+                            
+                            <button id="saveProfileBtn" class="btn btn-primary w-100">
+                                <i class="fas fa-save"></i> Simpan Perubahan
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-bell"></i> Notifikasi</h2>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="notification-item">
+                                <div class="notification-info">
+                                    <div class="notification-title">Notifikasi Email</div>
+                                    <div class="notification-desc text-muted">Kirim notifikasi melalui email</div>
+                                </div>
+                                <label class="form-switch">
+                                    <input type="checkbox" id="emailNotifications" checked>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="notification-item">
+                                <div class="notification-info">
+                                    <div class="notification-title">Notifikasi Browser</div>
+                                    <div class="notification-desc text-muted">Tampilkan notifikasi di browser</div>
+                                </div>
+                                <label class="form-switch">
+                                    <input type="checkbox" id="browserNotifications" checked>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="notification-item">
+                                <div class="notification-info">
+                                    <div class="notification-title">Pengingat Harian</div>
+                                    <div class="notification-desc text-muted">Kirim pengingat tugas harian</div>
+                                </div>
+                                <label class="form-switch">
+                                    <input type="checkbox" id="dailyReminders">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <button id="saveNotificationsBtn" class="btn btn-primary w-100 mt-3">
+                                <i class="fas fa-save"></i> Simpan Pengaturan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="right-column">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-palette"></i> Tampilan</h2>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label class="form-label">Pilih Tema</label>
+                                <div class="theme-options grid grid-cols-2 gap-3">
+                                    <div class="theme-option active" data-theme="light">
+                                        <div class="theme-preview light-theme-preview rounded-md"></div>
+                                        <div class="theme-name text-center mt-2">Light Mode</div>
+                                    </div>
+                                    <div class="theme-option" data-theme="dark">
+                                        <div class="theme-preview dark-theme-preview rounded-md"></div>
+                                        <div class="theme-name text-center mt-2">Dark Mode</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="languageSelect" class="form-label">Bahasa</label>
+                                <select id="languageSelect" class="form-select">
+                                    <option value="id">Bahasa Indonesia</option>
+                                    <option value="en">English</option>
+                                    <option value="ja">日本語</option>
+                                </select>
+                            </div>
+                            
+                            <button id="saveAppearanceBtn" class="btn btn-primary w-100">
+                                <i class="fas fa-save"></i> Simpan Pengaturan
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-lock"></i> Keamanan</h2>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="currentPassword" class="form-label">Password Saat Ini</label>
+                                <input type="password" id="currentPassword" class="form-input" placeholder="Masukkan password saat ini">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newPassword" class="form-label">Password Baru</label>
+                                <input type="password" id="newPassword" class="form-input" placeholder="Masukkan password baru">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="confirmPassword" class="form-label">Konfirmasi Password Baru</label>
+                                <input type="password" id="confirmPassword" class="form-input" placeholder="Konfirmasi password baru">
+                            </div>
+                            
+                            <button id="changePasswordBtn" class="btn btn-primary w-100">
+                                <i class="fas fa-key"></i> Ubah Password
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card danger-zone">
+                        <div class="card-header">
+                            <h2 class="card-title danger-title"><i class="fas fa-exclamation-triangle"></i> Zona Berbahaya</h2>
+                        </div>
+                        
+                        <div class="card-body">
+                            <p class="danger-text">
+                                Menghapus akun akan menghapus semua data yang terkait dengan akun ini secara permanen. 
+                                Tindakan ini tidak dapat dibatalkan.
+                            </p>
+                            
+                            <button id="deleteAccountBtn" class="btn btn-danger w-100">
+                                <i class="fas fa-trash-alt"></i> Hapus Akun
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Pengaturan berhasil disimpan</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load data dari localStorage jika ada
+            loadSavedSettings();
+            
+            // Event listener untuk upload gambar
+            document.getElementById('changeImageBtn').addEventListener('click', function() {
+                document.getElementById('imageUpload').click();
+            });
+            
+            document.getElementById('imageUpload').addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        document.getElementById('profileImage').src = event.target.result;
+                        document.getElementById('profileImageMain').src = event.target.result;
+                        // Simpan ke localStorage
+                        localStorage.setItem('adminProfileImage', event.target.result);
+                        showToast('Foto profil berhasil diubah');
+                    }
+                    
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            });
+            
+            // Simpan pengaturan profil
+            document.getElementById('saveProfileBtn').addEventListener('click', function() {
+    const adminName = document.getElementById('adminName').value;
+    const adminEmail = document.getElementById('adminEmail').value;
+    const adminRole = "Customer Service Support"; // Atau ambil dari input jika ada
+    
+    if (adminName.trim() === '') {
+        showToast('Nama admin tidak boleh kosong', 'error');
+        return;
+    }
+    
+    // Simpan ke localStorage
+    localStorage.setItem('adminName', adminName);
+    localStorage.setItem('adminEmail', adminEmail);
+    localStorage.setItem('adminRole', adminRole);
+    
+    // Update tampilan nama
+    updateProfileDisplay(adminName, adminRole);
+    
+    showToast('Profil berhasil diperbarui');
+});
+function updateProfileDisplay(name, role) {
+    document.getElementById('profileName').textContent = name;
+    document.getElementById('profileNameMain').textContent = name;
+    
+    // Perbarui juga elemen profil lainnya jika ada
+    const roleElements = document.querySelectorAll('.profile-role, .user-info p');
+    roleElements.forEach(el => {
+        el.textContent = role;
+    });
+}
+            
+            // Simpan pengaturan notifikasi
+            document.getElementById('saveNotificationsBtn').addEventListener('click', function() {
+                const emailNotifications = document.getElementById('emailNotifications').checked;
+                const browserNotifications = document.getElementById('browserNotifications').checked;
+                const dailyReminders = document.getElementById('dailyReminders').checked;
+                
+                // Simpan ke localStorage
+                localStorage.setItem('emailNotifications', emailNotifications);
+                localStorage.setItem('browserNotifications', browserNotifications);
+                localStorage.setItem('dailyReminders', dailyReminders);
+                
+                showToast('Pengaturan notifikasi berhasil disimpan');
+            });
+            
+            // Pengaturan tema
+            const themeOptions = document.querySelectorAll('.theme-option');
+            themeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    themeOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const theme = this.getAttribute('data-theme');
+                    document.documentElement.setAttribute('data-theme', theme);
+                    localStorage.setItem('theme', theme);
+                    
+                    // Update juga di sidebar loader
+                    if (typeof SidebarLoader !== 'undefined') {
+                        const sidebarLoader = new SidebarLoader();
+                        sidebarLoader.loadTheme();
+                    }
+                });
+            });
+            
+            // Simpan pengaturan tampilan
+            document.getElementById('saveAppearanceBtn').addEventListener('click', function() {
+                const language = document.getElementById('languageSelect').value;
+                localStorage.setItem('language', language);
+                
+                showToast('Pengaturan tampilan berhasil disimpan');
+            });
+            
+            // Ubah password
+            document.getElementById('changePasswordBtn').addEventListener('click', function() {
+                const currentPassword = document.getElementById('currentPassword').value;
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (!currentPassword || !newPassword || !confirmPassword) {
+                    showToast('Semua field password harus diisi', 'error');
+                    return;
+                }
+                
+                if (newPassword !== confirmPassword) {
+                    showToast('Password baru dan konfirmasi password tidak cocok', 'error');
+                    return;
+                }
+                
+                // Simulasi perubahan password
+                setTimeout(function() {
+                    // Reset form
+                    document.getElementById('currentPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                    
+                    showToast('Password berhasil diubah');
+                }, 1000);
+            });
+            
+            // Hapus akun
+            document.getElementById('deleteAccountBtn').addEventListener('click', function() {
+                if (confirm('Apakah Anda yakin ingin menghapus akun? Tindakan ini tidak dapat dibatalkan.')) {
+                    // Simulasi penghapusan akun
+                    setTimeout(function() {
+                        localStorage.clear();
+                        window.location.href = 'login.html';
+                    }, 1500);
+                }
+            });
+            
+            // Fungsi untuk memuat pengaturan yang disimpan
+            function loadSavedSettings() {
+                // Load profil
+                const savedName = localStorage.getItem('adminName');
+                const savedEmail = localStorage.getItem('adminEmail');
+                const savedImage = localStorage.getItem('adminProfileImage');
+                
+                if (savedName) {
+                    document.getElementById('adminName').value = savedName;
+                    document.getElementById('profileName').textContent = savedName;
+                    document.getElementById('profileNameMain').textContent = savedName;
+                }
+                
+                if (savedEmail) {
+                    document.getElementById('adminEmail').value = savedEmail;
+                }
+                
+                if (savedImage) {
+                    document.getElementById('profileImage').src = savedImage;
+                    document.getElementById('profileImageMain').src = savedImage;
+                }
+                
+                // Load notifikasi
+                const emailNotif = localStorage.getItem('emailNotifications');
+                const browserNotif = localStorage.getItem('browserNotifications');
+                const dailyReminders = localStorage.getItem('dailyReminders');
+                
+                if (emailNotif !== null) {
+                    document.getElementById('emailNotifications').checked = emailNotif === 'true';
+                }
+                
+                if (browserNotif !== null) {
+                    document.getElementById('browserNotifications').checked = browserNotif === 'true';
+                }
+                
+                if (dailyReminders !== null) {
+                    document.getElementById('dailyReminders').checked = dailyReminders === 'true';
+                }
+                
+                // Load bahasa
+                const language = localStorage.getItem('language');
+                if (language) {
+                    document.getElementById('languageSelect').value = language;
+                }
+                
+                // Load tema yang aktif
+                const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+                document.querySelector(`.theme-option[data-theme="${currentTheme}"]`).classList.add('active');
+            }
+            
+            // Fungsi untuk menampilkan toast notifikasi
+            function showToast(message, type = 'success') {
+                const toast = document.getElementById('toast');
+                const toastMessage = document.getElementById('toastMessage');
+                
+                toastMessage.textContent = message;
+                
+                // Ubah warna berdasarkan type
+                if (type === 'error') {
+                    toast.style.borderLeft = '4px solid var(--danger)';
+                    toast.querySelector('i').className = 'fas fa-exclamation-circle';
+                    toast.querySelector('i').style.color = 'var(--danger)';
+                } else {
+                    toast.style.borderLeft = '4px solid var(--success)';
+                    toast.querySelector('i').className = 'fas fa-check-circle';
+                    toast.querySelector('i').style.color = 'var(--success)';
+                }
+                
+                toast.classList.add('show');
+                
+                // Sembunyikan setelah 3 detik
+                setTimeout(function() {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+        });
+    </script>
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            --success-gradient: linear-gradient(135deg, #4cc9f0 0%, #4361ee 100%);
+            --warning-gradient: linear-gradient(135deg, #f72585 0%, #7209b7 100%);
+            --info-gradient: linear-gradient(135deg, #4895ef 0%, #3f37c9 100%);
+            --completed-color: #10b981;
+            --pending-color: #f59e0b;
+            --overdue-color: #ef4444;
+        }
+
+        .main-content {
+            padding: var(--space-lg);
+            background-color: var(--bg-secondary);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+        /* Custom styles specific to settings page */
+        .settings-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-lg);
+            margin-top: var(--space-lg);
+        }
+        
+        @media (max-width: 992px) {
+            .settings-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .profile-img-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+        }
+        
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+        }
+        
+        .change-img-btn {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .theme-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-sm);
+        }
+        
+        .theme-option {
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: var(--space-sm);
+            cursor: pointer;
+            text-align: center;
+            transition: all var(--transition-fast);
+        }
+        
+        .theme-option:hover, .theme-option.active {
+            border-color: var(--primary);
+        }
+        
+        .theme-option.active {
+            background-color: var(--primary-light);
+        }
+        
+        .theme-preview {
+            width: 100%;
+            height: 60px;
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--space-xs);
+        }
+        
+        .light-theme-preview {
+            background: linear-gradient(to right, var(--gray-100) 70%, var(--white) 30%);
+            border: 1px solid var(--border-color);
+        }
+        
+        .dark-theme-preview {
+            background: linear-gradient(to right, var(--gray-900) 70%, var(--gray-800) 30%);
+            border: 1px solid var(--border-color);
+        }
+        
+        .notification-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-md) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        
+        .danger-zone {
+            border: 1px solid var(--danger);
+            background-color: rgba(231, 76, 60, 0.05);
+        }
+        
+        .danger-title {
+            color: var(--danger);
+        }
+        
+        .danger-text {
+            color: var(--text-secondary);
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            z-index: var(--z-modal);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+            border-left: 4px solid var(--success);
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .toast i {
+            margin-right: var(--space-sm);
+        }
+    </style>
+</body>
+</html>

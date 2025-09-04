@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar Template</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --info: #4895ef;
+            --warning: #f72585;
+            --danger: #e63946;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --background: #f5f7fb;
+            --card-bg: #ffffff;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --border-color: #e2e8f0;
+            --sidebar-width: 280px;
+            --sidebar-collapsed-width: 80px;
+            --header-height: 80px;
+            --transition-speed: 0.3s;
+        }
+
+        [data-theme="dark"] {
+            --background: #1a202c;
+            --card-bg: #2d3748;
+            --text-primary: #f7fafc;
+            --text-secondary: #cbd5e0;
+            --border-color: #4a5568;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            transition: background-color var(--transition-speed);
+            overflow-x: hidden;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            transition: width var(--transition-speed);
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 1000;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed .sidebar-header h2 span {
+            display: none;
+        }
+
+        .toggle-sidebar {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-category {
+            padding: 15px 20px 10px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed .menu-category {
+            display: none;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-item.active {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-right: 4px solid white;
+        }
+
+        .menu-item i {
+            width: 24px;
+            margin-right: 12px;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .menu-item .menu-text {
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed .menu-item .menu-text {
+            display: none;
+        }
+
+        .has-submenu .submenu-toggle {
+            transition: transform 0.3s;
+        }
+
+        .has-submenu.active .submenu-toggle {
+            transform: rotate(90deg);
+        }
+
+        .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .submenu.active {
+            max-height: 500px;
+        }
+
+        .submenu .menu-item {
+            padding-left: 56px;
+            font-size: 14px;
+        }
+
+        .sidebar.collapsed .submenu .menu-item {
+            padding-left: 20px;
+        }
+
+        .sidebar.collapsed .submenu .menu-text {
+            display: none;
+        }
+
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin: 20px auto;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar.collapsed .theme-toggle {
+            margin: 20px 12px;
+        }
+
+        /* Main content area */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: margin-left var(--transition-speed);
+        }
+
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        .header {
+            height: var(--header-height);
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            margin-right: 20px;
+            display: none;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Demo content */
+        .content {
+            padding: 30px;
+            max-width: 1200px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+        }
+
+        .card h2 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .card p {
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive styles */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: var(--sidebar-width);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .main-content.expanded {
+                margin-left: 0;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .sidebar.collapsed {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.collapsed.active {
+                transform: translateX(0);
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-tasks"></i> <span>CSS Dashboard</span></h2>
+            <button class="toggle-sidebar" id="toggleSidebar">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="menu-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span class="menu-text">Dashboard</span>
+            </div>
+            
+            <div class="menu-category">Reports</div>
+            
+            <div class="menu-item has-submenu">
+                <i class="fas fa-chart-line"></i>
+                <span class="menu-text">Reports</span>
+                <i class="fas fa-chevron-right submenu-toggle"></i>
+            </div>
+            <div class="submenu">
+                <div class="menu-item active">
+                    <i class="fas fa-file-alt"></i>
+                    <span class="menu-text">Pending Reports</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span class="menu-text">Solved Reports</span>
+                </div>
+            </div>
+            
+            <div class="menu-category">Management</div>
+            
+            <div class="menu-item has-submenu">
+                <i class="fas fa-tools"></i>
+                <span class="menu-text">Maintenance</span>
+                <i class="fas fa-chevron-right submenu-toggle"></i>
+            </div>
+            <div class="submenu">
+                <div class="menu-item">
+                    <i class="fas fa-clock"></i>
+                    <span class="menu-text">Pending</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-check-double"></i>
+                    <span class="menu-text">Completed</span>
+                </div>
+            </div>
+
+            <div class="menu-item has-submenu">
+                <i class="fas fa-rocket"></i>
+                <span class="menu-text">Releases</span>
+                <i class="fas fa-chevron-right submenu-toggle"></i>
+            </div>
+            <div class="submenu">
+                <div class="menu-item">
+                    <i class="fas fa-cog"></i>
+                    <span class="menu-text">New Features</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-gamepad"></i>
+                    <span class="menu-text">New Games</span>
+                </div>
+            </div>
+            
+            <div class="menu-category">Performance</div>
+            
+            <div class="menu-item has-submenu">
+                <i class="fas fa-star"></i>
+                <span class="menu-text">KPI Points</span>
+                <i class="fas fa-chevron-right submenu-toggle"></i>
+            </div>
+            <div class="submenu">
+                <div class="menu-item">
+                    <i class="fas fa-lightbulb"></i>
+                    <span class="menu-text">Ideas & Suggestions</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-search"></i>
+                    <span class="menu-text">Research</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-comment-dots"></i>
+                    <span class="menu-text">Chat Response</span>
+                </div>
+            </div>
+            
+            <div class="menu-category">Operations</div>
+            
+            <div class="menu-item">
+                <i class="fas fa-comments"></i>
+                <span class="menu-text">Pending Discussions</span>
+            </div>
+            
+            <div class="menu-item">
+                <i class="fas fa-users"></i>
+                <span class="menu-text">Weekly Meetings</span>
+            </div>
+            
+            <div class="menu-item">
+                <i class="fas fa-globe"></i>
+                <span class="menu-text">Domain List</span>
+            </div>
+            
+            <div class="menu-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Shift Schedule</span>
+            </div>
+            
+            <div class="menu-item">
+                <i class="fas fa-shield-alt"></i>
+                <span class="menu-text">Phishing Alerts</span>
+            </div>
+            
+            <div class="menu-item" style="margin-top: 30px;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Logout</span>
+            </div>
+            
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1><i class="fas fa-tachometer-alt"></i> Dashboard Overview</h1>
+        </div>
+        
+        <div class="content">
+            <div class="card fade-in">
+                <h2>Selamat Datang di Dashboard</h2>
+                <p>Ini adalah contoh halaman dashboard dengan sidebar yang responsif. Sidebar dapat diperkecil dan diperbesar sesuai kebutuhan.</p>
+            </div>
+            
+            <div class="card fade-in" style="animation-delay: 0.2s;">
+                <h2>Cara Menggunakan</h2>
+                <p>1. Klik tombol <i class="fas fa-chevron-left"></i> di sidebar untuk mengecilkan/memperbesar sidebar</p>
+                <p>2. Klik tombol <i class="fas fa-bars"></i> di header untuk membuka/menutup sidebar pada perangkat mobile</p>
+                <p>3. Klik ikon bulan/matahari untuk mengganti tema gelap/terang</p>
+            </div>
+            
+            <div class="card fade-in" style="animation-delay: 0.4s;">
+                <h2>Fitur Sidebar</h2>
+                <p>✓ Responsif untuk desktop dan mobile</p>
+                <p>✓ Mode terang dan gelap</p>
+                <p>✓ Submenu yang dapat diperluas</p>
+                <p>✓ Status aktif untuk item menu</p>
+                <p>✓ Animasi halus</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fungsi untuk toggle sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const toggleIcon = document.getElementById('toggleSidebar').querySelector('i');
+            
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+            
+            if (sidebar.classList.contains('collapsed')) {
+                toggleIcon.classList.remove('fa-chevron-left');
+                toggleIcon.classList.add('fa-chevron-right');
+            } else {
+                toggleIcon.classList.remove('fa-chevron-right');
+                toggleIcon.classList.add('fa-chevron-left');
+            }
+            
+            // Simpan status sidebar
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        }
+        
+        // Fungsi untuk toggle sidebar di mobile
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+        
+        // Fungsi untuk toggle theme
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            const themeIcon = document.getElementById('themeToggle').querySelector('i');
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            if (newTheme === 'dark') {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        }
+        
+        // Fungsi untuk inisialisasi sidebar
+        function initSidebar() {
+            // Load status sidebar
+            const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            if (isSidebarCollapsed) {
+                const sidebar = document.getElementById('sidebar');
+                const mainContent = document.getElementById('mainContent');
+                const toggleIcon = document.getElementById('toggleSidebar').querySelector('i');
+                
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('expanded');
+                toggleIcon.classList.remove('fa-chevron-left');
+                toggleIcon.classList.add('fa-chevron-right');
+            }
+            
+            // Load theme
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const themeIcon = document.getElementById('themeToggle').querySelector('i');
+            
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            
+            if (savedTheme === 'dark') {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+            
+            // Setup event listeners
+            document.getElementById('toggleSidebar').addEventListener('click', toggleSidebar);
+            document.getElementById('menuToggle').addEventListener('click', toggleMobileSidebar);
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            
+            // Setup submenu toggle
+            const hasSubmenuItems = document.querySelectorAll('.has-submenu');
+            hasSubmenuItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('submenu-toggle')) {
+                        return;
+                    }
+                    
+                    this.classList.toggle('active');
+                    const submenu = this.nextElementSibling;
+                    submenu.classList.toggle('active');
+                });
+            });
+            
+            // Setup menu item clicks
+            const menuItems = document.querySelectorAll('.menu-item:not(.has-submenu)');
+            menuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Hapus active class dari semua item
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    // Tambahkan active class ke item yang diklik
+                    this.classList.add('active');
+                });
+            });
+        }
+        
+        // Inisialisasi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', initSidebar);
+    </script>
+</body>
+</html> 

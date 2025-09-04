@@ -1,0 +1,1903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Completed Maintenance - CSS Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
+    <link rel="stylesheet" href="global.css">
+    <style>
+            /* ========== VARIABEL CSS YANG DIPERLUKAN ========== */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            --success-gradient: linear-gradient(135deg, #4cc9f0 0%, #4361ee 100%);
+            --warning-gradient: linear-gradient(135deg, #f72585 0%, #7209b7 100%);
+            --info-gradient: linear-gradient(135deg, #4895ef 0%, #3f37c9 100%);
+        }
+
+        /* ========== PERBAIKAN UTAMA UNTUK LAYOUT ========== */
+        .main-content {
+            padding: var(--space-lg);
+            background-color: var(--bg-secondary);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        /* ========== PERBAIKAN STATISTIC CARDS ========== */
+        .maintenance-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .maintenance-stat-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .maintenance-stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .maintenance-stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+        }
+
+        .maintenance-stat-card.completed::before {
+            background: var(--success-gradient);
+        }
+
+        .maintenance-stat-card.this-week::before {
+            background: var(--info-gradient);
+        }
+
+        .maintenance-stat-card.this-month::before {
+            background: var(--warning-gradient);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-md);
+        }
+
+        .stat-title {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stat-icon.completed {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .stat-icon.this-week {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--info);
+        }
+
+        .stat-icon.this-month {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .stat-icon.average-time {
+            background-color: rgba(139, 92, 246, 0.1);
+            color: var(--purple);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+            line-height: 1;
+        }
+
+        .stat-description {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+        }
+
+        /* ========== PERBAIKAN CHART SECTION ========== */
+        .chart-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .chart-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .chart-container {
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Custom styles for charts */
+        .custom-bar-chart {
+            display: flex;
+            height: 200px;
+            align-items: flex-end;
+            gap: 15px;
+            padding: 0 10px;
+            justify-content: space-around;
+        }
+        
+        .bar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+        }
+        
+        .bar {
+            width: 30px;
+            background: var(--primary-gradient);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease;
+        }
+        
+        .bar-label {
+            margin-top: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        
+        .bar-value {
+            margin-bottom: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .custom-pie-chart {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        
+        .pie-segment {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%, 50% 100%);
+            border-radius: 50%;
+            transform-origin: center;
+        }
+        
+        .pie-center {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background: var(--card-bg);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--text-primary);
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+        
+        .empty-chart {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-tertiary);
+            font-style: italic;
+        }
+
+        /* ========== PERBAIKAN FILTER SECTION ========== */
+        .maintenance-filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+            padding: var(--space-lg);
+            background-color: var(--card-bg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+
+        .filter-group label {
+            font-size: var(--text-xs);
+            font-weight: var(--font-semibold);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-select {
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            font-size: var(--text-sm);
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+            height: 42px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        /* ========== PERBAIKAN ACTION BUTTONS ========== */
+        .maintenance-actions {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: var(--space-xs);
+            background: var(--bg-secondary);
+            padding: var(--space-xs);
+            border-radius: var(--radius-md);
+        }
+
+        .view-toggle .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .view-toggle .btn-icon.active,
+        .view-toggle .btn-icon:hover {
+            background: var(--card-bg);
+            color: var(--primary);
+            box-shadow: var(--shadow-xs);
+        }
+
+        /* ========== PERBAIKAN TABLE ========== */
+        .activities-section {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            margin-bottom: var(--space-xl);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin: 0;
+        }
+
+        .section-actions {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .maintenance-table-container {
+            overflow-x: auto;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            margin-bottom: var(--space-lg);
+        }
+
+        .maintenance-table {
+            margin: 0;
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 900px;
+        }
+
+        .maintenance-table th {
+            padding: var(--space-md) var(--space-lg);
+            background: var(--table-header-bg);
+            font-weight: var(--font-semibold);
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            font-size: var(--text-xs);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            text-align: left;
+            position: sticky;
+            top: 0;
+        }
+
+        .maintenance-table td {
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: var(--text-sm);
+            vertical-align: middle;
+            line-height: 1.5;
+        }
+
+        .maintenance-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .maintenance-table tr:hover {
+            background-color: var(--hover-color);
+            transition: background-color var(--transition-fast);
+        }
+
+        /* Perbaikan untuk Priority Badges */
+        .priority-high, .priority-medium, .priority-low {
+            padding: 6px 12px;
+            border-radius: var(--radius-full);
+            font-size: var(--text-xs);
+            font-weight: var(--font-semibold);
+            display: inline-block;
+            text-align: center;
+            min-width: 80px;
+            letter-spacing: 0.3px;
+        }
+
+        .priority-high {
+            background-color: var(--danger-light);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .priority-medium {
+            background-color: var(--warning-light);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .priority-low {
+            background-color: var(--success-light);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        /* Perbaikan untuk Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: var(--space-xs);
+            justify-content: flex-start;
+            flex-wrap: nowrap;
+        }
+
+        .btn-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: var(--text-sm);
+            padding: 0;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .btn-icon.view {
+            background: var(--info-light);
+            color: var(--info);
+        }
+
+        .btn-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+            opacity: 0.9;
+        }
+
+        /* ========== PERBAIKAN EMPTY STATE ========== */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-xl) var(--space-lg);
+            background-color: var(--card-bg);
+            border-radius: var(--radius-lg);
+            border: 2px dashed var(--border-color);
+            margin: var(--space-lg) 0;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--text-tertiary);
+            margin-bottom: var(--space-md);
+        }
+
+        .empty-state h3 {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .empty-state p {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-lg);
+        }
+
+        /* ========== PERBAIKAN PAGINATION ========== */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+            padding: var(--space-md) 0;
+        }
+
+        .page-numbers {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            font-weight: var(--font-medium);
+        }
+
+        /* ========== PERBAIKAN MODAL ========== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: var(--z-modal);
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-normal);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            transform: translateY(20px);
+            transition: transform var(--transition-normal);
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            transition: background-color var(--transition-fast);
+        }
+
+        .modal-close:hover {
+            background-color: var(--hover-color);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: var(--space-lg);
+        }
+
+        .modal-footer {
+            padding: var(--space-lg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-sm);
+        }
+
+        /* Form input static (readonly) */
+        .form-input-static {
+            padding: var(--space-sm) 0;
+            color: var(--text-primary);
+            font-size: var(--text-sm);
+            line-height: var(--leading-normal);
+            min-height: 20px;
+        }
+
+        /* Time tracking styles */
+        .time-tracking {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+            background: var(--bg-secondary);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+        }
+
+        .time-track-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-xs) 0;
+        }
+
+        .time-track-label {
+            font-weight: var(--font-medium);
+            color: var(--text-secondary);
+        }
+
+        .time-track-value {
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+        }
+
+
+        /* ========== ANIMATIONS ========== */
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ========== RESPONSIVE ADJUSTMENTS ========== */
+        @media (max-width: 1024px) {
+            .chart-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .maintenance-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: var(--space-md);
+            }
+            
+            .header {
+                padding: var(--space-md);
+            }
+            
+            .maintenance-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .maintenance-filters {
+                grid-template-columns: 1fr;
+            }
+            
+            .maintenance-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .view-toggle {
+                align-self: center;
+            }
+            
+            .maintenance-table th, 
+            .maintenance-table td {
+                padding: var(--space-sm) var(--space-md);
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-sm);
+            }
+            
+            .chart-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-sm);
+            }
+            
+            .chart-header .filter-select {
+                width: 100%;
+            }
+            
+            .custom-bar-chart {
+                gap: 8px;
+            }
+            
+            .bar {
+                width: 20px;
+            }
+            
+            .bar-label {
+                font-size: 10px;
+            }
+            
+            .custom-pie-chart {
+                width: 140px;
+                height: 140px;
+            }
+            
+            .pie-center {
+                width: 50px;
+                height: 50px;
+                font-size: var(--text-xs);
+            }
+            
+            .modal {
+                width: 95%;
+                margin: var(--space-md);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .maintenance-table {
+                min-width: 100%;
+            }
+            
+            .maintenance-table th:nth-child(3),
+            .maintenance-table td:nth-child(3),
+            .maintenance-table th:nth-child(6),
+            .maintenance-table td:nth-child(6) {
+                display: none;
+            }
+            
+            .pagination {
+                flex-direction: column;
+                gap: var(--space-sm);
+            }
+        }
+
+        /* Custom scrollbar for table container */
+        .maintenance-table-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .maintenance-table-container::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+            border-radius: var(--radius-full);
+        }
+
+        .maintenance-table-container::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: var(--radius-full);
+        }
+
+        .maintenance-table-container::-webkit-scrollbar-thumb:hover {
+            background: var(--scrollbar-thumb-hover);
+        }
+
+        /* Hover effects for table rows */
+        .maintenance-table tr {
+            transition: background-color var(--transition-fast), transform var(--transition-fast);
+        }
+
+        .maintenance-table tr:hover {
+            background-color: var(--hover-color);
+            transform: translateX(4px);
+        }
+
+        /* Improved focus states for accessibility */
+        .btn-icon:focus,
+        .filter-select:focus,
+        .modal-close:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar-container">
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <div id="notificationContainer"></div>
+            <button class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1><i class="fas fa-check-double"></i> Completed Maintenance</h1>
+            
+            <div class="header-actions">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search completed tasks..." id="completedSearch">
+                </div>
+                
+                
+                
+                <div class="user-profile">
+                    <img class="profile-img" src="https://iili.io/Fpiva7S.png" alt="Profile" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iMjAiIGZpbGw9IiM0MzYxRUUiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDExQzE0LjIwOTEgMTEgMTYgOS4yMDkxIDE2IDdDMTYgNC43OTA4NiAxNC4yMDkxIDMgMTIgM0M5Ljc5MDg2IDMgOCA0Ljc5MDg2IDggN0M4IDkuMjA5MSA5Ljc5MDg2IDExIDEyIDExWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTYgMTlDNiAxNi43OTA5IDcuNzkwODYgMTUgMTAgMTVIMTVDMTcuMjA5MSAxNSAxOSAxNi43OTA5IDE5IDE5VjIwQzE5IDIxLjEwNDYgMTguMTA0NiAyMiAxNyAyMkg4QzYuODk1NDMgMjIgNiAyMS4xMDQ2IDYgMjBWMTlaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+'">
+                    <div class="user-info">
+                        <h4>Nama Masing Masing</h4>
+                        <p>Customer Service Support</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="maintenance-stats">
+            <div class="maintenance-stat-card fade-in" style="animation-delay: 0.1s;">
+                <div class="stat-header">
+                    <h3 class="stat-title">Total Completed</h3>
+                     <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="totalCompleted">0</div>
+                <div class="stat-description">Tasks completed to date</div>
+            </div>
+            
+            <div class="maintenance-stat-card fade-in" style="animation-delay: 0.2s;">
+                <div class="stat-header">
+                    <h3 class="stat-title">Completed This Week</h3>
+                     <div class="stat-icon">
+                        <i class="fas fa-calendar-week"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="completedThisWeek">0</div>
+                <div class="stat-description">Tasks completed this week</div>
+            </div>
+            
+            <div class="maintenance-stat-card fade-in" style="animation-delay: 0.3s;">
+                <div class="stat-header">
+                    <h3 class="stat-title">Completed This Month</h3>
+                     <div class="stat-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="completedThisMonth">0</div>
+                <div class="stat-description">Tasks completed this month</div>
+            </div>
+            
+            <div class="maintenance-stat-card fade-in" style="animation-delay: 0.4s;">
+                <div class="stat-header">
+                    <h3 class="stat-title">Average Completion Time</h3>
+                     <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="averageCompletionTime">0</div>
+                <div class="stat-description">Average days to complete</div>
+            </div>
+        </div>
+        
+        <!-- Chart Section -->
+        <div class="chart-section">
+            <div class="chart-card fade-in" style="animation-delay: 0.5s;">
+                <div class="chart-header">
+                    <h3 class="chart-title">Completion Trends</h3>
+                    <select class="filter-select" id="trendsTimeRange" style="width: auto;">
+                        <option>Last 7 Days</option>
+                        <option>Last 30 Days</option>
+                        <option>Last 90 Days</option>
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <!-- Custom Bar Chart -->
+                    <div class="custom-bar-chart" id="completionTrendsChart">
+                        <div class="empty-chart">No data available</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-card fade-in" style="animation-delay: 0.6s;">
+                <div class="chart-header">
+                    <h3 class="chart-title">Tasks by Category</h3>
+                    <select class="filter-select" id="categoryTimeRange" style="width: auto;">
+                        <option>All Time</option>
+                        <option>This Month</option>
+                        <option>This Week</option>
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <!-- Custom Pie Chart -->
+                    <div class="custom-pie-chart" id="tasksByCategoryChart">
+                        <div class="empty-chart">No data available</div>
+                    </div>
+                    
+                    <div class="chart-legend" id="categoryLegend"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="maintenance-filters">
+            <div class="filter-group">
+                <label for="categoryFilter">Category</label>
+                <select id="categoryFilter" class="filter-select">
+                    <option value="all">All Categories</option>
+                    <option value="server">Server Maintenance</option>
+                    <option value="database">Database</option>
+                    <option value="application">Application</option>
+                    <option value="security">Security</option>
+                    <option value="hardware">Hardware</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="priorityFilter">Priority</label>
+                <select id="priorityFilter" class="filter-select">
+                    <option value="all">All Priorities</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="timeFilter">Completion Time</label>
+                <select id="timeFilter" class="filter-select">
+                    <option value="all">All Time</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                    <option value="quarter">This Quarter</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="sortFilter">Sort By</label>
+                <select id="sortFilter" class="filter-select">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="priority">Priority</option>
+                    <option value="category">Category</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="maintenance-actions">
+            <button class="btn btn-primary" id="exportBtn">
+                <i class="fas fa-download"></i> Export CSV
+            </button>
+            
+            <button class="btn btn-outline" id="printBtn">
+                <i class="fas fa-print"></i> Print Report
+            </button>
+            
+            <button class="btn btn-outline" id="refreshBtn">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            
+            <div style="flex: 1;"></div>
+            
+            <div class="view-toggle">
+                <button class="btn btn-icon active" id="tableViewBtn" title="Table View">
+                    <i class="fas fa-table"></i>
+                </button>
+                <button class="btn btn-icon" id="cardViewBtn" title="Card View">
+                    <i class="fas fa-th-large"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="activities-section fade-in" style="animation-delay: 0.7s;">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-list"></i> Completed Tasks</h2>
+                <div class="section-actions">
+                    <span id="tasksCount">0 tasks</span>
+                </div>
+            </div>
+            
+            <div class="maintenance-table-container">
+                <table class="maintenance-table" id="completedTable">
+                    <thead>
+                        <tr>
+                            <th>Task ID</th>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Priority</th>
+                            <th>Completed Date</th>
+                            <th>Completion Time</th>
+                            <th>Assigned To</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="completedTableBody">
+                        <!-- Data will be loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="noTasks" class="empty-state" style="display: none;">
+                <i class="fas fa-check-circle"></i>
+                <h3>No Completed Tasks</h3>
+                <p>You haven't completed any maintenance tasks yet.</p>
+                <button class="btn btn-primary" onclick="window.location.href='maintenance.html'">
+                    <i class="fas fa-tools"></i> View Pending Tasks
+                </button>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="pagination" id="pagination" style="display: none;">
+                <button class="btn btn-outline" id="prevPage">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                <div class="page-numbers">
+                    <span>Page <span id="currentPage">1</span> of <span id="totalPages">1</span></span>
+                </div>
+                <button class="btn btn-outline" id="nextPage">
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Details Modal -->
+    <div class="modal-overlay" id="viewModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Task Details</h3>
+                <button class="modal-close" id="closeViewModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Title</label>
+                    <p id="viewTitle" class="form-input-static"></p>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                    <p id="viewCategory" class="form-input-static"></p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Priority</label>
+                        <p id="viewPriority" class="form-input-static"></p>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Due Date</label>
+                        <p id="viewDueDate" class="form-input-static"></p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Completed Date</label>
+                        <p id="viewCompletedDate" class="form-input-static"></p>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Created Date</label>
+                        <p id="viewCreatedDate" class="form-input-static"></p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Assigned To</label>
+                        <p id="viewAssignedTo" class="form-input-static"></p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <p id="viewDescription" class="form-input-static"></p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <p id="viewNotes" class="form-input-static"></p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Time Tracking</label>
+                    <div class="time-tracking">
+                        <div class="time-track-item">
+                            <span class="time-track-label">Estimated Time:</span>
+                            <span class="time-track-value" id="viewEstimatedTime">N/A</span>
+                        </div>
+                        <div class="time-track-item">
+                            <span class="time-track-label">Actual Time:</span>
+                            <span class="time-track-value" id="viewActualTime">N/A</span>
+                        </div>
+                        <div class="time-track-item">
+                            <span class="time-track-label">Efficiency:</span>
+                            <span class="time-track-value" id="viewEfficiency">N/A</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="closeViewBtn">Close</button>
+                <button class="btn btn-primary" id="exportTaskBtn">
+                    <i class="fas fa-file-export"></i> Export Task Details
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="confirmModalTitle">Confirm Action</h3>
+                <button class="modal-close" id="closeConfirmModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmModalMessage">Are you sure you want to perform this action?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelConfirmBtn">Cancel</button>
+                <button class="btn btn-primary" id="confirmActionBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+<script src="sidebar-loader.js"></script>
+<script src="user-profile.js"></script>
+<script src="notifications.js"></script>
+
+<script>
+    // ========== KONSTAN DAN VARIABEL GLOBAL ==========
+    const TASKS_PER_PAGE = 10;
+    let currentPage = 1;
+    let currentTasks = [];
+    let currentView = 'table';
+
+    // Mapping halaman - DIPERBAIKI: Konsisten dengan maintenance.html
+    const pageMapping = {
+        'Dashboard': 'index.html',
+        'Pending Reports': 'pending-reports.html',
+        'Solved Reports': 'solved-report.html',
+        'Pending': 'maintenance.html',
+        'Completed': 'completed-report.html',
+        'New Features': 'data-produk.html',
+        'New Games': 'data-produk.html',
+        'Ideas & Suggestions': 'statistik-penjualan.html',
+        'Research': 'statistik-penjualan.html',
+        'Chat Response': 'statistik-penjualan.html',
+        'Pending Discussions': 'pending-reports.html',
+        'Weekly Meetings': 'pending-reports.html',
+        'Domain List': 'data-produk.html',
+        'Shift Schedule': 'pengaturan.html',
+        'Phishing Alerts': 'pengaturan.html',
+        'Logout': 'login.html'
+    };
+
+    // Inisialisasi data maintenance jika belum ada - DITAMBAHKAN
+    function initializeMaintenanceData() {
+        if (!localStorage.getItem('maintenanceTasks')) {
+            // Jika tidak ada data, buat array kosong
+            localStorage.setItem('maintenanceTasks', JSON.stringify([]));
+        }
+    }
+
+    // Function to navigate to page - DIPERBAIKI
+    function navigateToPage(pageName) {
+        const pageUrl = pageMapping[pageName];
+        if (pageUrl) {
+            if (pageName === 'Logout') {
+                localStorage.removeItem('isLoggedIn');
+                // Jangan hapus maintenanceTasks agar data tetap tersedia
+            }
+            window.location.href = pageUrl;
+        } else {
+            console.warn(`No page mapping found for: ${pageName}`);
+            window.location.href = 'index.html';
+        }
+    }
+
+    // Get all maintenance tasks - DIPERBAIKI: Hapus inisialisasi data
+    function getMaintenanceTasks() {
+        initializeMaintenanceData(); // Pastikan data diinisialisasi
+        const tasks = localStorage.getItem('maintenanceTasks');
+        return tasks ? JSON.parse(tasks) : [];
+    }
+
+    // Inisialisasi halaman completed
+    function initCompletedPage() {
+        // Load sidebar
+        const sidebarLoader = new SidebarLoader();
+        sidebarLoader.load();
+
+        // Render UI components
+        renderCompletedTable();
+        updateCompletedStats();
+        renderCharts();
+
+        // Setup general event listeners
+        setupEventListeners();
+
+        // Toggle sidebar functionality
+        const menuToggle = document.querySelector('.menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+
+        if (menuToggle && sidebar && mainContent) {
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('sidebar-collapsed');
+            });
+        }
+    }
+
+    function setupEventListeners() {
+        // Add event listeners
+        document.getElementById('exportBtn').addEventListener('click', exportCompletedTasks);
+        document.getElementById('printBtn').addEventListener('click', printReport);
+        document.getElementById('refreshBtn').addEventListener('click', refreshData);
+        document.getElementById('closeViewBtn').addEventListener('click', closeViewModal);
+        document.getElementById('closeViewModal').addEventListener('click', closeViewModal);
+        document.getElementById('exportTaskBtn').addEventListener('click', exportTaskDetails);
+        
+        // Add event listeners to filters
+        document.getElementById('categoryFilter').addEventListener('change', renderCompletedTable);
+        document.getElementById('priorityFilter').addEventListener('change', renderCompletedTable);
+        document.getElementById('timeFilter').addEventListener('change', renderCompletedTable);
+        document.getElementById('sortFilter').addEventListener('change', renderCompletedTable);
+        
+        // Add event listener to search input
+        document.getElementById('completedSearch').addEventListener('input', renderCompletedTable);
+        
+        // Add event listener for view toggle
+        document.getElementById('tableViewBtn').addEventListener('click', () => switchView('table'));
+        document.getElementById('cardViewBtn').addEventListener('click', () => switchView('card'));
+        
+        // Close modal when clicking outside
+        document.getElementById('viewModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('viewModal')) {
+                closeViewModal();
+            }
+        });
+        
+        // Pagination
+        document.getElementById('prevPage').addEventListener('click', goToPrevPage);
+        document.getElementById('nextPage').addEventListener('click', goToNextPage);
+    }
+
+    // Get only completed tasks
+    function getCompletedTasks() {
+        const tasks = getMaintenanceTasks();
+        return tasks.filter(task => task.status === 'completed');
+    }
+
+    // Format date for display
+    function formatDisplayDate(dateString) {
+        if (!dateString) return 'N/A';
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('en-US', options);
+    }
+
+    // Format time for display
+    function formatDisplayTime(timeString) {
+        if (!timeString) return 'N/A';
+        return timeString;
+    }
+
+    // Calculate completion time in days
+    function getCompletionTimeInDays(dateCreated, dateCompleted) {
+        if (!dateCreated || !dateCompleted) return 0;
+        
+        const created = new Date(dateCreated);
+        const completed = new Date(dateCompleted);
+        const diffTime = Math.abs(completed - created);
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+
+    // Update completed tasks statistics
+    function updateCompletedStats() {
+        const completedTasks = getCompletedTasks();
+        const now = new Date();
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - now.getDay());
+        startOfWeek.setHours(0, 0, 0, 0);
+        
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        
+        // Calculate stats
+        const totalCompleted = completedTasks.length;
+        const completedThisWeek = completedTasks.filter(task => {
+            const completedDate = new Date(task.dateCompleted);
+            return completedDate >= startOfWeek;
+        }).length;
+        
+        const completedThisMonth = completedTasks.filter(task => {
+            const completedDate = new Date(task.dateCompleted);
+            return completedDate >= startOfMonth;
+        }).length;
+        
+        // Calculate average completion time
+        let totalCompletionDays = 0;
+        let tasksWithCompletionTime = 0;
+        
+        completedTasks.forEach(task => {
+            if (task.dateCreated && task.dateCompleted) {
+                totalCompletionDays += getCompletionTimeInDays(task.dateCreated, task.dateCompleted);
+                tasksWithCompletionTime++;
+            }
+        });
+        
+        const averageCompletionTime = tasksWithCompletionTime > 0 
+            ? (totalCompletionDays / tasksWithCompletionTime).toFixed(1) 
+            : 0;
+        
+        // Update DOM
+        document.getElementById('totalCompleted').textContent = totalCompleted;
+        document.getElementById('completedThisWeek').textContent = completedThisWeek;
+        document.getElementById('completedThisMonth').textContent = completedThisMonth;
+        document.getElementById('averageCompletionTime').textContent = averageCompletionTime;
+    }
+
+    // Render completed table
+    function renderCompletedTable() {
+        const tableBody = document.getElementById('completedTableBody');
+        const noTasks = document.getElementById('noTasks');
+        const tasksCount = document.getElementById('tasksCount');
+        const pagination = document.getElementById('pagination');
+        const categoryFilter = document.getElementById('categoryFilter').value;
+        const priorityFilter = document.getElementById('priorityFilter').value;
+        const timeFilter = document.getElementById('timeFilter').value;
+        const sortFilter = document.getElementById('sortFilter').value;
+        const searchTerm = document.getElementById('completedSearch').value.toLowerCase();
+        
+        let tasks = getCompletedTasks();
+        
+        // Apply filters
+        if (categoryFilter !== 'all') {
+            tasks = tasks.filter(task => task.category === categoryFilter);
+        }
+        
+        if (priorityFilter !== 'all') {
+            tasks = tasks.filter(task => task.priority === priorityFilter);
+        }
+        
+        // Apply time filter
+        if (timeFilter !== 'all') {
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            
+            tasks = tasks.filter(task => {
+                const completedDate = new Date(task.dateCompleted);
+                completedDate.setHours(0, 0, 0, 0);
+                
+                switch(timeFilter) {
+                    case 'today':
+                        return completedDate.getTime() === now.getTime();
+                    case 'week':
+                        const startOfWeek = new Date(now);
+                        startOfWeek.setDate(now.getDate() - now.getDay());
+                        return completedDate >= startOfWeek;
+                    case 'month':
+                        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                        return completedDate >= startOfMonth;
+                    case 'quarter':
+                        const currentQuarter = Math.floor(now.getMonth() / 3);
+                        const startOfQuarter = new Date(now.getFullYear(), currentQuarter * 3, 1);
+                        return completedDate >= startOfQuarter;
+                    default:
+                        return true;
+                }
+            });
+        }
+        
+        // Apply search
+        if (searchTerm) {
+            tasks = tasks.filter(task => 
+                task.title.toLowerCase().includes(searchTerm) ||
+                task.description.toLowerCase().includes(searchTerm) ||
+                task.id.toLowerCase().includes(searchTerm) ||
+                task.assignedTo.toLowerCase().includes(searchTerm)
+            );
+        }
+        
+        // Apply sorting
+        switch(sortFilter) {
+            case 'newest':
+                tasks.sort((a, b) => new Date(b.dateCompleted) - new Date(a.dateCompleted));
+                break;
+            case 'oldest':
+                tasks.sort((a, b) => new Date(a.dateCompleted) - new Date(b.dateCompleted));
+                break;
+            case 'priority':
+                const priorityOrder = { 'high': 1, 'medium': 2, 'low': 3 };
+                tasks.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+                break;
+            case 'category':
+                tasks.sort((a, b) => a.category.localeCompare(b.category));
+                break;
+        }
+        
+        // Update tasks count
+        tasksCount.textContent = `${tasks.length} task${tasks.length !== 1 ? 's' : ''}`;
+        
+        // Store current tasks for pagination
+        currentTasks = tasks;
+        
+        if (tasks.length === 0) {
+            tableBody.innerHTML = '';
+            noTasks.style.display = 'block';
+            pagination.style.display = 'none';
+            return;
+        }
+        
+        noTasks.style.display = 'none';
+        
+        // Calculate pagination
+        const totalPages = Math.ceil(tasks.length / TASKS_PER_PAGE);
+        document.getElementById('totalPages').textContent = totalPages;
+        
+        if (currentPage > totalPages) {
+            currentPage = totalPages > 0 ? totalPages : 1;
+        }
+        
+        document.getElementById('currentPage').textContent = currentPage;
+        
+        // Show/hide pagination
+        if (totalPages > 1) {
+            pagination.style.display = 'flex';
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
+        } else {
+            pagination.style.display = 'none';
+        }
+        
+        // Get tasks for current page
+        const startIndex = (currentPage - 1) * TASKS_PER_PAGE;
+        const endIndex = Math.min(startIndex + TASKS_PER_PAGE, tasks.length);
+        const pageTasks = tasks.slice(startIndex, endIndex);
+        
+        // Render table
+        tableBody.innerHTML = '';
+        
+        pageTasks.forEach(task => {
+            const row = document.createElement('tr');
+            
+            // Get priority badge class
+            let priorityClass = '';
+            let priorityText = '';
+            switch(task.priority) {
+                case 'high':
+                    priorityClass = 'priority-high';
+                    priorityText = 'High';
+                    break;
+                case 'medium':
+                    priorityClass = 'priority-medium';
+                    priorityText = 'Medium';
+                    break;
+                case 'low':
+                    priorityClass = 'priority-low';
+                    priorityText = 'Low';
+                    break;
+            }
+            
+            // Format category text
+            let categoryText = '';
+            switch(task.category) {
+                case 'server':
+                    categoryText = 'Server Maintenance';
+                    break;
+                case 'database':
+                    categoryText = 'Database';
+                    break;
+                case 'application':
+                    categoryText = 'Application';
+                    break;
+                case 'security':
+                    categoryText = 'Security';
+                    break;
+                case 'hardware':
+                    categoryText = 'Hardware';
+                    break;
+                default:
+                    categoryText = task.category;
+            }
+            
+            // Calculate completion time
+            const completionTime = getCompletionTimeInDays(task.dateCreated, task.dateCompleted);
+            
+            row.innerHTML = `
+                <td>${task.id}</td>
+                <td>${task.title}</td>
+                <td>${categoryText}</td>
+                <td><span class="${priorityClass}">${priorityText}</span></td>
+                <td>${formatDisplayDate(task.dateCompleted)}</td>
+                <td>${completionTime} day${completionTime !== 1 ? 's' : ''}</td>
+                <td>${task.assignedTo}</td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn-icon view" data-id="${task.id}" title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
+            
+            tableBody.appendChild(row);
+        });
+        
+        // Add event listeners to action buttons
+        document.querySelectorAll('.btn-icon.view').forEach(btn => {
+            btn.addEventListener('click', () => viewTaskDetails(btn.dataset.id));
+        });
+    }
+
+    // View task details
+    function viewTaskDetails(taskId) {
+        const tasks = getMaintenanceTasks();
+        const task = tasks.find(t => t.id === taskId);
+        
+        if (task) {
+            // Format category text
+            let categoryText = '';
+            switch(task.category) {
+                case 'server':
+                    categoryText = 'Server Maintenance';
+                    break;
+                case 'database':
+                    categoryText = 'Database';
+                    break;
+                case 'application':
+                    categoryText = 'Application';
+                    break;
+                case 'security':
+                    categoryText = 'Security';
+                    break;
+                case 'hardware':
+                    categoryText = 'Hardware';
+                    break;
+                default:
+                    categoryText = task.category;
+            }
+            
+            // Format priority text
+            let priorityText = '';
+            switch(task.priority) {
+                case 'high':
+                    priorityText = 'High';
+                    break;
+                case 'medium':
+                    priorityText = 'Medium';
+                    break;
+                case 'low':
+                    priorityText = 'Low';
+                    break;
+            }
+            
+            // Calculate completion time
+            const completionTime = getCompletionTimeInDays(task.dateCreated, task.dateCompleted);
+            
+            // Calculate efficiency if estimated and actual time are available
+            let efficiency = 'N/A';
+            if (task.estimatedTime && task.actualTime) {
+                // Simple calculation for demonstration
+                const estimatedHours = parseFloat(task.estimatedTime);
+                const actualHours = parseFloat(task.actualTime);
+                
+                if (estimatedHours > 0 && actualHours > 0) {
+                    efficiency = Math.round((estimatedHours / actualHours) * 100) + '%';
+                }
+            }
+            
+            // Populate view modal
+            document.getElementById('viewTitle').textContent = task.title;
+            document.getElementById('viewCategory').textContent = categoryText;
+            document.getElementById('viewPriority').textContent = priorityText;
+            document.getElementById('viewDueDate').textContent = formatDisplayDate(task.dueDate);
+            document.getElementById('viewCompletedDate').textContent = formatDisplayDate(task.dateCompleted);
+            document.getElementById('viewCreatedDate').textContent = formatDisplayDate(task.dateCreated);
+            document.getElementById('viewAssignedTo').textContent = task.assignedTo;
+            document.getElementById('viewDescription').textContent = task.description || 'No description provided';
+            document.getElementById('viewNotes').textContent = task.notes || 'No notes provided';
+            document.getElementById('viewEstimatedTime').textContent = formatDisplayTime(task.estimatedTime);
+            document.getElementById('viewActualTime').textContent = formatDisplayTime(task.actualTime);
+            document.getElementById('viewEfficiency').textContent = efficiency;
+            
+            // Show the modal
+            document.getElementById('viewModal').classList.add('active');
+        }
+    }
+
+    // Close view modal
+    function closeViewModal() {
+        document.getElementById('viewModal').classList.remove('active');
+    }
+
+    // Switch between table and card view
+    function switchView(viewType) {
+        currentView = viewType;
+        
+        if (viewType === 'table') {
+            document.getElementById('tableViewBtn').classList.add('active');
+            document.getElementById('cardViewBtn').classList.remove('active');
+            // Implement table view
+        } else {
+            document.getElementById('tableViewBtn').classList.remove('active');
+            document.getElementById('cardViewBtn').classList.add('active');
+            // Implement card view
+        }
+        
+        renderCompletedTable();
+    }
+
+    // Go to previous page
+    function goToPrevPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            renderCompletedTable();
+        }
+    }
+
+    // Go to next page
+    function goToNextPage() {
+        const totalPages = Math.ceil(currentTasks.length / TASKS_PER_PAGE);
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderCompletedTable();
+        }
+    }
+
+    // Export completed tasks
+    function exportCompletedTasks() {
+        showNotification('Export functionality would be implemented here.', 'info');
+    }
+
+    // Print report
+    function printReport() {
+        window.print();
+    }
+
+    // Refresh data
+    function refreshData() {
+        renderCompletedTable();
+        updateCompletedStats();
+        renderCharts();
+        showNotification('Completed tasks refreshed.', 'success');
+    }
+
+    // Export task details
+    function exportTaskDetails() {
+        showNotification('Task export functionality would be implemented here.', 'info');
+    }
+
+    // Render charts with real data
+    function renderCharts() {
+        renderCompletionTrendsChart();
+        renderTasksByCategoryChart();
+    }
+
+    // Render completion trends chart with real data
+    function renderCompletionTrendsChart() {
+        const chartContainer = document.getElementById('completionTrendsChart');
+        const timeRange = document.getElementById('trendsTimeRange').value;
+        
+        // Get completed tasks
+        const completedTasks = getCompletedTasks();
+        
+        // Calculate tasks completed in the last 7 days
+        const now = new Date();
+        const dailyCounts = {};
+        
+        // Initialize last 7 days
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date(now);
+            date.setDate(now.getDate() - i);
+            const dateKey = date.toISOString().split('T')[0];
+            dailyCounts[dateKey] = 0;
+        }
+        
+        // Count completed tasks by day
+        completedTasks.forEach(task => {
+            if (task.dateCompleted) {
+                const completedDate = new Date(task.dateCompleted);
+                const dateKey = completedDate.toISOString().split('T')[0];
+                
+                if (dailyCounts.hasOwnProperty(dateKey)) {
+                    dailyCounts[dateKey]++;
+                }
+            }
+        });
+        
+        // Prepare chart data
+        const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const chartData = [];
+        
+        Object.keys(dailyCounts).forEach(dateKey => {
+            const date = new Date(dateKey);
+            const dayName = daysOfWeek[date.getDay()];
+            chartData.push({
+                label: dayName,
+                value: dailyCounts[dateKey]
+            });
+        });
+        
+        const maxValue = Math.max(...chartData.map(item => item.value), 1); // Ensure at least 1 to avoid division by zero
+        
+        chartContainer.innerHTML = '';
+        
+        chartData.forEach(item => {
+            const barHeight = maxValue > 0 ? (item.value / maxValue) * 180 : 0;
+            
+            const barContainer = document.createElement('div');
+            barContainer.className = 'bar-container';
+            
+            barContainer.innerHTML = `
+                <div class="bar-value">${item.value}</div>
+                <div class="bar" style="height: ${barHeight}px"></div>
+                <div class="bar-label">${item.label}</div>
+            `;
+            
+            chartContainer.appendChild(barContainer);
+        });
+    }
+
+    // Render tasks by category chart with real data
+    function renderTasksByCategoryChart() {
+        const chartContainer = document.getElementById('tasksByCategoryChart');
+        const legendContainer = document.getElementById('categoryLegend');
+        const timeRange = document.getElementById('categoryTimeRange').value;
+        
+        // Get completed tasks
+        const completedTasks = getCompletedTasks();
+        
+        // Count tasks by category
+        const categoryCounts = {};
+        completedTasks.forEach(task => {
+            if (!categoryCounts[task.category]) {
+                categoryCounts[task.category] = 0;
+            }
+            categoryCounts[task.category]++;
+        });
+        
+        // Define colors for categories
+        const categoryColors = {
+            'server': '#4361ee',
+            'database': '#3a0ca3',
+            'application': '#7209b7',
+            'security': '#f72585',
+            'hardware': '#4cc9f0',
+            'network': '#4895ef',
+            'backup': '#3f37c9'
+        };
+        
+        // Format category names
+        const categoryNames = {
+            'server': 'Server Maintenance',
+            'database': 'Database',
+            'application': 'Application',
+            'security': 'Security',
+            'hardware': 'Hardware',
+            'network': 'Network',
+            'backup': 'Backup'
+        };
+        
+        // Prepare chart data
+        const chartData = [];
+        Object.keys(categoryCounts).forEach(category => {
+            chartData.push({
+                category: categoryNames[category] || category,
+                value: categoryCounts[category],
+                color: categoryColors[category] || '#6c757d'
+            });
+        });
+        
+        const total = chartData.reduce((sum, item) => sum + item.value, 0);
+        
+        chartContainer.innerHTML = '';
+        legendContainer.innerHTML = '';
+        
+        if (total === 0) {
+            chartContainer.innerHTML = '<div class="empty-chart">No data available</div>';
+            return;
+        }
+        
+        // Create pie chart
+        let cumulativePercentage = 0;
+        
+        chartData.forEach(item => {
+            const percentage = (item.value / total) * 100;
+            const rotation = cumulativePercentage * 3.6;
+            
+            const segment = document.createElement('div');
+            segment.className = 'pie-segment';
+            segment.style.backgroundColor = item.color;
+            segment.style.transform = `rotate(${rotation}deg)`;
+            segment.style.clipPath = `polygon(50% 50%, 50% 0%, ${cumulativePercentage + percentage > 50 ? '100%' : '50%'} 0%, 100% 100%, 50% 100%)`;
+            
+            chartContainer.appendChild(segment);
+            cumulativePercentage += percentage;
+        });
+        
+        // Add center circle
+        const centerCircle = document.createElement('div');
+        centerCircle.className = 'pie-center';
+        centerCircle.textContent = `${total}`;
+        chartContainer.appendChild(centerCircle);
+        
+        // Create legend
+        chartData.forEach(item => {
+            const legendItem = document.createElement('div');
+            legendItem.className = 'legend-item';
+            
+            legendItem.innerHTML = `
+                <div class="legend-color" style="background-color: ${item.color}"></div>
+                <span>${item.category}: ${item.value}</span>
+            `;
+            
+            legendContainer.appendChild(legendItem);
+        });
+    }
+
+    // Show notification
+    function showNotification(message, type) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        // Add to the page
+        document.body.appendChild(notification);
+        
+        // Show with animation
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 10);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    }
+
+    // ========== INISIALISASI HALAMAN ==========
+    document.addEventListener('DOMContentLoaded', initCompletedPage);
+</script>
+</body>
+</html>

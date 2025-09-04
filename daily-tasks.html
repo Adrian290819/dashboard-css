@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Tasks - Operations</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="global.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            --success-gradient: linear-gradient(135deg, #4cc9f0 0%, #4361ee 100%);
+            --warning-gradient: linear-gradient(135deg, #f72585 0%, #7209b7 100%);
+            --info-gradient: linear-gradient(135deg, #4895ef 0%, #3f37c9 100%);
+            --completed-color: #10b981;
+            --pending-color: #f59e0b;
+            --overdue-color: #ef4444;
+        }
+
+        .main-content {
+            padding: var(--space-lg);
+            background-color: var(--bg-secondary);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Daily Progress Section */
+        .daily-progress {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .progress-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .date-display {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar-container {
+            margin-bottom: var(--space-md);
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xs);
+        }
+
+        .progress-label {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-secondary);
+        }
+
+        .progress-percentage {
+            font-size: var(--text-sm);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-full);
+            transition: width 0.5s ease;
+        }
+
+        .motivational-quote {
+            text-align: center;
+            font-style: italic;
+            color: var(--text-secondary);
+            margin-top: var(--space-md);
+            padding: var(--space-sm);
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            border-left: 3px solid var(--primary);
+        }
+
+        /* Tasks Container */
+        .tasks-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .task-category {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .category-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .category-count {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+        }
+
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: var(--space-sm);
+            border-radius: var(--radius-md);
+            background: var(--bg-secondary);
+            transition: all var(--transition-fast);
+            border: 1px solid transparent;
+        }
+
+        .task-item:hover {
+            background: var(--hover-color);
+            transform: translateX(4px);
+        }
+
+        .task-item.completed {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .task-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border-color);
+            margin-right: var(--space-sm);
+            cursor: pointer;
+            position: relative;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-checkbox:checked {
+            background: var(--completed-color);
+            border-color: var(--completed-color);
+        }
+
+        .task-checkbox:checked::after {
+            content: '✓';
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .task-label {
+            flex: 1;
+            font-size: var(--text-sm);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: color var(--transition-fast);
+        }
+
+        .task-item.completed .task-label {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+        }
+
+        .task-time {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            background: var(--card-bg);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            margin-left: var(--space-xs);
+        }
+
+        /* Add Task Button */
+        .add-task-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-xs);
+            width: 100%;
+            padding: var(--space-sm);
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            margin-top: var(--space-sm);
+        }
+
+        .add-task-btn:hover {
+            background: var(--hover-color);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Completion Animation */
+        @keyframes taskComplete {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .task-item.completed {
+            animation: taskComplete 0.5s ease;
+        }
+
+        /* Celebration Animation */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: var(--completed-color);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                opacity: 1;
+                transform: translateY(-100vh) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .tasks-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .progress-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-sm);
+            }
+            
+            .date-display {
+                align-self: flex-end;
+            }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-xl) var(--space-lg);
+            background-color: var(--card-bg);
+            border-radius: var(--radius-lg);
+            border: 2px dashed var(--border-color);
+            margin: var(--space-lg) 0;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--text-tertiary);
+            margin-bottom: var(--space-md);
+        }
+
+        .empty-state h3 {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .empty-state p {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-lg);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: var(--z-modal);
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-normal);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            transform: translateY(20px);
+            transition: transform var(--transition-normal);
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            transition: background-color var(--transition-fast);
+        }
+
+        .modal-close:hover {
+            background-color: var(--hover-color);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: var(--space-lg);
+        }
+
+        .modal-footer {
+            padding: var(--space-lg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-sm);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: var(--space-md);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: var(--space-xs);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-secondary);
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            font-size: var(--text-sm);
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--hover-color);
+            color: var(--text-primary);
+        }
+        /* Task Actions */
+.task-actions {
+    display: flex;
+    gap: var(--space-xs);
+    margin-left: var(--space-xs);
+}
+
+.task-edit-btn,
+.task-delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--space-xs);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    transition: all var(--transition-fast);
+    opacity: 0.7;
+}
+
+.task-item:hover .task-edit-btn,
+.task-item:hover .task-delete-btn {
+    opacity: 1;
+}
+
+.task-edit-btn:hover {
+    background-color: rgba(79, 70, 229, 0.1);
+    color: var(--primary);
+}
+
+.task-delete-btn:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+}
+    </style>
+</head>
+<body>
+    <!-- Container untuk sidebar yang akan dimuat oleh sidebar-loader.js -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <div id="notificationContainer"></div>
+            <button class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1><i class="fas fa-calendar-check"></i> Daily Tasks</h1>
+            <div class="header-actions">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search tasks..." id="taskSearch">
+                </div>
+                <div class="user-profile">
+                    <img class="profile-img" src="https://iili.io/Fpiva7S.png" alt="Profile">
+                    <div class="user-info">
+                        <h4>Nama Masing Masing</h4>
+                        <p>Customer Service Support</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Daily Progress Section -->
+        <div class="daily-progress fade-in">
+            <div class="progress-header">
+                <h2 class="progress-title"><i class="fas fa-tasks"></i> Today's Progress</h2>
+                <div class="date-display" id="currentDate"></div>
+            </div>
+            
+            <div class="progress-bar-container">
+                <div class="progress-info">
+                    <span class="progress-label">Task Completion</span>
+                    <span class="progress-percentage" id="completionPercentage">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="motivational-quote" id="motivationalQuote">
+                "The secret of getting ahead is getting started." - Mark Twain
+            </div>
+        </div>
+        
+        <!-- Tasks Container -->
+        <div class="tasks-container" id="tasksContainer">
+            <!-- Tasks will be loaded here dynamically -->
+        </div>
+        
+        <!-- Add Task Button -->
+        <div class="text-center">
+            <button class="btn btn-primary" id="addTaskBtn">
+                <i class="fas fa-plus"></i> Add New Task
+            </button>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div class="modal-overlay" id="taskModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Task</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="taskForm">
+                    <div class="form-group">
+                        <label class="form-label" for="taskTitle">Task Title</label>
+                        <input type="text" class="form-input" id="taskTitle" placeholder="Enter task title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="taskCategory">Category</label>
+                        <select class="form-select" id="taskCategory" required>
+                            <option value="">Select a category</option>
+                            <option value="Share Promosi Panel">Share Promosi Panel</option>
+                            <option value="Check Domain">Check Domain</option>
+                            <option value="Check Game">Check Game</option>
+                            <option value="Check Pending">Check Pending</option>
+                            <option value="Check Maintenance">Check Maintenance</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="taskTime">Estimated Time (minutes)</label>
+                        <input type="number" class="form-input" id="taskTime" placeholder="e.g., 30" min="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="taskDescription">Description (optional)</label>
+                        <textarea class="form-input form-textarea" id="taskDescription" placeholder="Add details about this task"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelTask">Cancel</button>
+                <button class="btn btn-primary" id="saveTask">Save Task</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth-check.js"></script>
+    <script src="sidebar-loader.js"></script>
+    <script src="user-profile.js"></script>
+    <script src="notifications.js"></script>
+    
+    <script>
+    // Sample motivational quotes
+    const motivationalQuotes = [
+        "Kalo dia gak care sama lo berati bukan lo yang dia mau !!! - Bang Pengshui",
+    ];
+
+    // Initialize daily tasks
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeDailyTasks();
+        displayCurrentDate();
+        loadTasks();
+        updateProgress();
+        
+        // Set up event listeners
+        document.getElementById('taskSearch').addEventListener('input', searchTasks);
+        document.getElementById('addTaskBtn').addEventListener('click', openTaskModal);
+        document.getElementById('closeModal').addEventListener('click', closeTaskModal);
+        document.getElementById('cancelTask').addEventListener('click', closeTaskModal);
+        document.getElementById('saveTask').addEventListener('click', saveTask);
+        
+        // Close modal when clicking outside
+        document.getElementById('taskModal').addEventListener('click', function(e) {
+            if (e.target === this) closeTaskModal();
+        });
+    });
+
+    // Initialize daily tasks - TIDAK LAGI MENGGUNAKAN SAMPLE DATA
+    function initializeDailyTasks() {
+        // Hanya inisialisasi jika belum ada data
+        if (!localStorage.getItem('dailyTasks')) {
+            localStorage.setItem('dailyTasks', JSON.stringify([]));
+        }
+        
+        // HAPUS: Jangan panggil resetProgressIfNeeded() di sini
+        // resetProgressIfNeeded(); // DIHAPUS
+    }
+
+    // Display current date
+    function displayCurrentDate() {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const today = new Date();
+        document.getElementById('currentDate').textContent = today.toLocaleDateString('en-US', options);
+        
+        // Set a random motivational quote
+        const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+        document.getElementById('motivationalQuote').textContent = randomQuote;
+    }
+
+    // Load tasks from localStorage
+    function loadTasks() {
+        const tasks = JSON.parse(localStorage.getItem('dailyTasks')) || [];
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Filter tasks for today only
+        const todayTasks = tasks.filter(task => task.date === today);
+        
+        // Group tasks by category
+        const tasksByCategory = {};
+        todayTasks.forEach(task => {
+            if (!tasksByCategory[task.category]) {
+                tasksByCategory[task.category] = [];
+            }
+            tasksByCategory[task.category].push(task);
+        });
+        
+        // Display tasks by category
+        const tasksContainer = document.getElementById('tasksContainer');
+        tasksContainer.innerHTML = '';
+        
+        if (Object.keys(tasksByCategory).length === 0) {
+            tasksContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>No Tasks for Today</h3>
+                    <p>You're all caught up! Enjoy your day or add new tasks to get started.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        for (const category in tasksByCategory) {
+            const categoryTasks = tasksByCategory[category];
+            const completedCount = categoryTasks.filter(task => task.completed).length;
+            
+            const categoryElement = document.createElement('div');
+            categoryElement.className = 'task-category fade-in';
+            categoryElement.innerHTML = `
+                <div class="category-header">
+                    <h3 class="category-title">
+                        <i class="fas fa-folder"></i> ${category}
+                    </h3>
+                    <span class="category-count">${completedCount}/${categoryTasks.length}</span>
+                </div>
+                <div class="tasks-list" id="tasks-${category}">
+                    ${renderTaskList(categoryTasks)}
+                </div>
+            `;
+            
+            tasksContainer.appendChild(categoryElement);
+        }
+        
+        // Add event listeners to checkboxes, edit and delete buttons
+        attachTaskListeners();
+    }
+
+    // Render task list for a category
+    function renderTaskList(tasks) {
+        return tasks.map(task => `
+            <div class="task-item ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+                <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''}>
+                <label class="task-label">${task.title}</label>
+                ${task.time ? `<span class="task-time">${task.time}m</span>` : ''}
+                <div class="task-actions">
+                    <button class="task-edit-btn" title="Edit task">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="task-delete-btn" title="Delete task">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Attach event listeners to task checkboxes, edit and delete buttons
+    function attachTaskListeners() {
+        document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const taskId = this.closest('.task-item').dataset.id;
+                const tasks = JSON.parse(localStorage.getItem('dailyTasks')) || [];
+                const taskIndex = tasks.findIndex(task => task.id === taskId);
+                
+                if (taskIndex !== -1) {
+                    tasks[taskIndex].completed = this.checked;
+                    localStorage.setItem('dailyTasks', JSON.stringify(tasks));
+                    
+                    // Update UI
+                    this.closest('.task-item').classList.toggle('completed');
+                    
+                    // Update progress
+                    updateProgress();
+                    
+                    // Show celebration if all tasks are completed
+                    if (this.checked) {
+                        checkAllTasksCompleted();
+                    }
+                }
+            });
+        });
+        
+        // Add event listeners for edit buttons
+        document.querySelectorAll('.task-edit-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const taskId = this.closest('.task-item').dataset.id;
+                editTask(taskId);
+            });
+        });
+        
+        // Add event listeners for delete buttons
+        document.querySelectorAll('.task-delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const taskId = this.closest('.task-item').dataset.id;
+                deleteTask(taskId);
+            });
+        });
+    }
+
+    // Update progress bar and percentage
+    function updateProgress() {
+        const tasks = JSON.parse(localStorage.getItem('dailyTasks')) || [];
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Filter tasks for today only
+        const todayTasks = tasks.filter(task => task.date === today);
+        
+        if (todayTasks.length === 0) {
+            document.getElementById('completionPercentage').textContent = '0%';
+            document.getElementById('progressFill').style.width = '0%';
+            return;
+        }
+        
+        const completedCount = todayTasks.filter(task => task.completed).length;
+        const percentage = Math.round((completedCount / todayTasks.length) * 100);
+        
+        document.getElementById('completionPercentage').textContent = `${percentage}%`;
+        document.getElementById('progressFill').style.width = `${percentage}%`;
+    }
+
+    // Check if all tasks are completed and show celebration
+    function checkAllTasksCompleted() {
+        const tasks = JSON.parse(localStorage.getItem('dailyTasks')) || [];
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Filter tasks for today only
+        const todayTasks = tasks.filter(task => task.date === today);
+        
+        if (todayTasks.length > 0 && todayTasks.every(task => task.completed)) {
+            showCelebration();
+            
+            // Update motivational quote for completion
+            document.getElementById('motivationalQuote').textContent = 
+                "Amazing! You've completed all your tasks for today. Time to celebrate!";
+        }
+    }
+
+    // Show celebration animation
+    function showCelebration() {
+        // Create confetti elements
+        for (let i = 0; i < 50; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = `${Math.random() * 100}%`;
+            confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
+            confetti.style.animation = `confettiFall ${1 + Math.random() * 2}s linear forwards`;
+            document.body.appendChild(confetti);
+            
+            // Remove confetti after animation
+            setTimeout(() => {
+                confetti.remove();
+            }, 3000);
+        }
+        
+        // Show completion message
+        showNotification('Congratulations! You completed all tasks for today!', 'success');
+    }
+
+    // Search tasks
+    function searchTasks() {
+        const searchTerm = this.value.toLowerCase();
+        const taskItems = document.querySelectorAll('.task-item');
+        
+        taskItems.forEach(item => {
+            const taskText = item.querySelector('.task-label').textContent.toLowerCase();
+            if (taskText.includes(searchTerm)) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    // Open task modal
+    function openTaskModal() {
+        document.getElementById('taskModal').classList.add('active');
+    }
+
+    // Close task modal
+    function closeTaskModal() {
+        document.getElementById('taskModal').classList.remove('active');
+        document.getElementById('taskForm').reset();
+        
+        // Reset edit state
+        document.querySelector('.modal-title').textContent = 'Add New Task';
+        document.getElementById('saveTask').textContent = 'Save Task';
+        delete document.getElementById('saveTask').dataset.editId;
+    }
+
+    // Save new task or update existing task
+    function saveTask() {
+        const title = document.getElementById('taskTitle').value.trim();
+        const category = document.getElementById('taskCategory').value;
+        const time = document.getElementById('taskTime').value;
+        const description = document.getElementById('taskDescription').value.trim();
+        const isEditing = document.getElementById('saveTask').dataset.editId;
+        
+        if (!title || !category) {
+            showNotification('Please fill in all required fields', 'error');
+            return;
+        }
+        
+        const tasks = JSON.parse(localStorage.getItem('dailyTasks')) || [];
+        
+        if (isEditing) {
+            // Update existing task
+            const taskIndex = tasks.findIndex(task => task.id === isEditing);
+            if (taskIndex !== -1) {
+                tasks[taskIndex].title = title;
+                tasks[taskIndex].category = category;
+                tasks[taskIndex].time = time ? parseInt(time) : null;
+                tasks[taskIndex].description = description || null;
+            }
+        } else {
+            // Add new task
+            const newTask = {
+                id: 'task-' + Date.now(),
+                title,
+                category,
+                completed: false,
+                time: time ? parseInt(time) : null,
+                description: description || null,
+                date: new Date().toISOString().split('T')[0]
+            };
+            tasks.push(newTask);
+        }
+        
+        localStorage.setItem('dailyTasks', JSON.stringify(tasks));
+        
+        closeTaskModal();
+        loadTasks();
+        updateProgress();
+        
+        showNotification(`Task ${isEditing ? 'updated' : 'added'} successfully!`, 'success');
+    }
+
+    // Edit task
+    function editTask(taskId) {
+        const tasks = JSON.parse(localStorage.getItem('dailyTasks')) || [];
+        const taskIndex = tasks.findIndex(task => task.id === taskId);
+        
+        if (taskIndex !== -1) {
+            const task = tasks[taskIndex];
+            
+            // Fill the form with task data
+            document.getElementById('taskTitle').value = task.title;
+            document.getElementById('taskCategory').value = task.category;
+            document.getElementById('taskTime').value = task.time || '';
+            document.getElementById('taskDescription').value = task.description || '';
+            
+            // Change modal title and save button text
+            document.querySelector('.modal-title').textContent = 'Edit Task';
+            document.getElementById('saveTask').textContent = 'Update Task';
+            document.getElementById('saveTask').dataset.editId = taskId;
+            
+            // Open modal
+            openTaskModal();
+        }
+    }
+
+    // Delete task
+    function deleteTask(taskId) {
+        if (confirm('Are you sure you want to delete this task?')) {
+            let tasks = JSON.parse(localStorage.getItem('dailyTasks')) || [];
+            tasks = tasks.filter(task => task.id !== taskId);
+            localStorage.setItem('dailyTasks', JSON.stringify(tasks));
+            
+            loadTasks();
+            updateProgress();
+            
+            showNotification('Task deleted successfully!', 'success');
+        }
+    }
+// Fungsi untuk mengecek dan mereset status completion setiap hari
+function resetProgressIfNeeded() {
+        const lastResetDate = localStorage.getItem('lastResetDate');
+        const today = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
+
+        if (lastResetDate !== today) {
+            // Reset progress completion untuk tugas hari ini
+            const tasks = JSON.parse(localStorage.getItem('dailyTasks')) || [];
+            tasks.forEach(task => {
+                if (task.date === today) {
+                    task.completed = false; // Reset task completion status
+                }
+            });
+
+            // Simpan kembali tasks yang sudah direset completion-nya
+            localStorage.setItem('dailyTasks', JSON.stringify(tasks));
+
+            // Simpan tanggal reset hari ini
+            localStorage.setItem('lastResetDate', today);
+            
+            // Update progress bar
+            updateProgress();
+        }
+    }
+
+    // Show notification
+    function showNotification(message, type = 'info') {
+        // You can use your existing notification system here
+        alert(`${type.toUpperCase()}: ${message}`);
+    }
+</script>
+</body>
+</html>

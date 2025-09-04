@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Shift - Sistem Terintegrasi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="global.css">
+    <style>
+    :root {
+            --primary-gradient: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            --success-gradient: linear-gradient(135deg, #4cc9f0 0%, #4361ee 100%);
+            --warning-gradient: linear-gradient(135deg, #f72585 0%, #7209b7 100%);
+            --info-gradient: linear-gradient(135deg, #4895ef 0%, #3f37c9 100%);
+            --game-card-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ========== LAYOUT UTAMA ========== */
+        .main-content {
+            padding: var(--space-lg);
+            background-color: var(--bg-secondary);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .header h1 i {
+            color: var(--primary);
+        }
+
+        /* ========== HEADER ACTIONS ========== */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .search-bar {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 12px;
+            color: var(--text-secondary);
+        }
+
+        .search-bar input {
+            padding: var(--space-sm) var(--space-md) var(--space-sm) 40px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            font-size: var(--text-sm);
+            width: 250px;
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-info h4 {
+            font-size: var(--text-sm);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .user-info p {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* ========== SHIFT HEADER ========== */
+        .shift-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding: var(--space-md) var(--space-lg);
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .shift-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .month-navigation {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .month-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .month-btn:hover {
+            background: var(--hover-color);
+            color: var(--text-primary);
+        }
+
+        .current-month {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            min-width: 150px;
+            text-align: center;
+        }
+
+        /* ========== SHIFT TABLE ========== */
+        .shift-table-container {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            margin-bottom: var(--space-lg);
+            overflow-x: auto;
+        }
+
+        .shift-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        .shift-table th {
+            background: var(--bg-secondary);
+            padding: var(--space-md);
+            text-align: left;
+            font-size: var(--text-sm);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .shift-table td {
+            padding: var(--space-md);
+            border-bottom: 1px solid var(--border-color);
+            font-size: var(--text-sm);
+            color: var(--text-primary);
+        }
+
+        .shift-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .shift-table tr:hover {
+            background-color: var(--hover-color);
+        }
+
+        .time-input {
+            width: 100%;
+            padding: var(--space-xs) var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            font-size: var(--text-sm);
+            transition: border-color var(--transition-fast);
+        }
+
+        .time-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .shift-dropdown {
+            width: 100%;
+            padding: var(--space-xs) var(--space-sm);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            font-size: var(--text-sm);
+            transition: border-color var(--transition-fast);
+            cursor: pointer;
+        }
+
+        .shift-dropdown:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* ========== SHIFT ACTIONS ========== */
+        .shift-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .save-btn {
+            padding: var(--space-md) var(--space-lg);
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            font-weight: var(--font-semibold);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            transition: background-color var(--transition-fast);
+        }
+
+        .save-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* ========== NOTIFICATION ========== */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .notification {
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            box-shadow: var(--shadow-md);
+            animation: slideIn 0.3s ease forwards;
+            max-width: 350px;
+        }
+
+        .notification.success {
+            background: var(--success-light);
+            color: var(--success-dark);
+            border-left: 4px solid var(--success);
+        }
+
+        .notification.error {
+            background: var(--danger-light);
+            color: var(--danger-dark);
+            border-left: 4px solid var(--danger);
+        }
+
+        .notification.info {
+            background: var(--info-light);
+            color: var(--info-dark);
+            border-left: 4px solid var(--info);
+        }
+
+        .notification.hiding {
+            animation: slideOut 0.3s ease forwards;
+        }
+
+        .notification-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: inherit;
+            opacity: 0.7;
+            transition: opacity var(--transition-fast);
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* ========== CONNECTION STATUS ========== */
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            box-shadow: var(--shadow-md);
+            z-index: 999;
+        }
+
+        .status-connected {
+            background: var(--success-light);
+            color: var(--success-dark);
+            border-left: 4px solid var(--success);
+        }
+
+        /* ========== RESPONSIVE ADJUSTMENTS ========== */
+        @media (max-width: 1024px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-md);
+            }
+            
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: var(--space-md);
+            }
+            
+            .shift-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-md);
+            }
+            
+            .month-navigation {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .search-bar input {
+                width: 200px;
+            }
+            
+            .user-info {
+                display: none;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header-actions {
+                flex-direction: column;
+                gap: var(--space-md);
+            }
+            
+            .search-bar {
+                width: 100%;
+            }
+            
+            .search-bar input {
+                width: 100%;
+            }
+            
+            .user-profile {
+                align-self: flex-start;
+            }
+            
+            .shift-table th, 
+            .shift-table td {
+                padding: var(--space-sm);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <button class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+    <div class="main-content">
+        <div class="header">
+            <h1><i class="fas fa-calendar-alt"></i> Jadwal Shift CSS</h1>
+            <div class="header-actions">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Cari karyawan..." id="employeeSearch">
+                </div>
+                <div class="user-profile">
+                    <img class="profile-img" src="https://iili.io/Fpiva7S.png" alt="Profile">
+                    <div class="user-info">
+                        <h4>Adrian Abdul Arif</h4>
+                        <p>Customer Service Support</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+            
+            <div class="shift-header">
+                <h2 class="shift-title">Jadwal Shift Bulanan</h2>
+                <div class="month-navigation">
+                    <button class="month-btn" id="prevMonth">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="current-month" id="currentMonth">Januari 2025</div>
+                    <button class="month-btn" id="nextMonth">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="shift-table-container">
+                <table class="shift-table">
+                    <thead>
+                        <tr>
+                            <th>NO</th>
+                            <th>Nama</th>
+                            <th>Day Off</th>
+                            <th>Time 1-13</th>
+                            <th>Shift</th>
+                            <th>Time 13-31</th>
+                            <th>Shift</th>
+                            <th>Change Shift</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shiftTableBody">
+                        <!-- Data akan diisi secara dinamis -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="shift-actions">
+                <button class="save-btn" id="saveChangesBtn">
+                    <i class="fas fa-save"></i>
+                    Simpan Perubahan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification-container" id="notificationContainer"></div>
+    <script src="sidebar-loader.js"></script>
+    <script src="user-profile.js"></script>
+    <script src="notifications.js"></script>
+    
+    <script>
+        // Data jadwal shift
+        let shiftData = JSON.parse(localStorage.getItem('shiftData')) || [];
+        
+        // Simpan bulan yang sedang aktif di localStorage
+        let currentMonth = parseInt(localStorage.getItem('currentMonth')) || new Date().getMonth();
+        const months = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI', 'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'];
+        const currentYear = new Date().getFullYear();
+        
+        // Data karyawan contoh (dapat diganti dengan data sesungguhnya)
+        const employees = [
+            { id: 1, name: "ADRIAN ABDUL ARIF" },
+            { id: 2, name: "ARIS SETIAWAN" },
+            { id: 3, name: "DANEL" },
+        ];
+
+        // Elemen DOM
+        const shiftTableBody = document.getElementById('shiftTableBody');
+        const currentMonthElement = document.getElementById('currentMonth');
+        const prevMonthBtn = document.getElementById('prevMonth');
+        const nextMonthBtn = document.getElementById('nextMonth');
+        const saveChangesBtn = document.getElementById('saveChangesBtn');
+        const employeeSearch = document.getElementById('employeeSearch');
+        const notificationContainer = document.getElementById('notificationContainer');
+
+        // Inisialisasi data jika belum ada
+        function initializeData() {
+            if (shiftData.length === 0) {
+                employees.forEach(employee => {
+                    for (let i = 0; i < 12; i++) {
+                        shiftData.push({
+                            employeeId: employee.id,
+                            month: i,
+                            dayOff: "06 & 22",
+                            time1: "20:00 - 07:00",
+                            shift1: "NIGHT",
+                            time2: "20:00 - 07:00",
+                            shift2: "NIGHT",
+                            changeShift: "-"
+                        });
+                    }
+                });
+                localStorage.setItem('shiftData', JSON.stringify(shiftData));
+            }
+            
+            // Simpan bulan default ke localStorage
+            localStorage.setItem('currentMonth', currentMonth.toString());
+        }
+
+        // Fungsi untuk menampilkan notifikasi
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+                <button class="notification-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            notificationContainer.appendChild(notification);
+            
+            // Tambahkan event listener untuk tombol close
+            const closeBtn = notification.querySelector('.notification-close');
+            closeBtn.addEventListener('click', function() {
+                closeNotification(notification);
+            });
+            
+            // Hapus notifikasi setelah 5 detik
+            const timeoutId = setTimeout(() => {
+                closeNotification(notification);
+            }, 5000);
+            
+            // Simpan timeout ID untuk bisa dibatalkan jika user menutup manual
+            notification.dataset.timeoutId = timeoutId;
+        }
+
+        function closeNotification(notification) {
+            // Batalkan timeout jika masih ada
+            if (notification.dataset.timeoutId) {
+                clearTimeout(parseInt(notification.dataset.timeoutId));
+            }
+            
+            // Tambahkan animasi keluar
+            notification.classList.add('hiding');
+            
+            // Hapus elemen setelah animasi selesai
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notificationContainer.removeChild(notification);
+                }
+            }, 500);
+        }
+
+        // Render tabel jadwal shift
+        function renderShiftTable() {
+            shiftTableBody.innerHTML = '';
+            currentMonthElement.textContent = `${months[currentMonth]} ${currentYear}`;
+            
+            const currentMonthData = shiftData.filter(item => item.month === currentMonth);
+            
+            employees.forEach((employee, index) => {
+                const employeeData = currentMonthData.find(item => item.employeeId === employee.id) || {};
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${employee.name}</td>
+                    <td>
+                        <input type="text" class="time-input" value="${employeeData.dayOff || ''}" 
+                               data-field="dayOff" data-employee="${employee.id}">
+                    </td>
+                    <td>
+                        <input type="text" class="time-input" value="${employeeData.time1 || ''}" 
+                               data-field="time1" data-employee="${employee.id}">
+                    </td>
+                    <td>
+                        <select class="shift-dropdown" data-field="shift1" data-employee="${employee.id}">
+                            <option value="DAY" ${employeeData.shift1 === 'DAY' ? 'selected' : ''}>DAY</option>
+                            <option value="NIGHT" ${employeeData.shift1 === 'NIGHT' ? 'selected' : ''}>NIGHT</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" class="time-input" value="${employeeData.time2 || ''}" 
+                               data-field="time2" data-employee="${employee.id}">
+                    </td>
+                    <td>
+                        <select class="shift-dropdown" data-field="shift2" data-employee="${employee.id}">
+                            <option value="DAY" ${employeeData.shift2 === 'DAY' ? 'selected' : ''}>DAY</option>
+                            <option value="NIGHT" ${employeeData.shift2 === 'NIGHT' ? 'selected' : ''}>NIGHT</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" class="time-input" value="${employeeData.changeShift || '-'}" 
+                               data-field="changeShift" data-employee="${employee.id}">
+                    </td>
+                `;
+                
+                shiftTableBody.appendChild(row);
+            });
+            
+            // Tambahkan event listeners untuk input fields
+            document.querySelectorAll('.time-input, .shift-dropdown').forEach(input => {
+                input.addEventListener('change', handleInputChange);
+            });
+        }
+
+        // Handle perubahan input
+        function handleInputChange(e) {
+            const field = e.target.dataset.field;
+            const employeeId = parseInt(e.target.dataset.employee);
+            const value = e.target.value;
+            
+            // Cari data yang sesuai
+            const dataIndex = shiftData.findIndex(item => 
+                item.employeeId === employeeId && item.month === currentMonth
+            );
+            
+            if (dataIndex !== -1) {
+                shiftData[dataIndex][field] = value;
+            } else {
+                // Buat data baru jika tidak ditemukan
+                shiftData.push({
+                    employeeId: employeeId,
+                    month: currentMonth,
+                    [field]: value
+                });
+            }
+        }
+
+        // Simpan perubahan ke localStorage
+        function saveChanges() {
+            localStorage.setItem('shiftData', JSON.stringify(shiftData));
+            localStorage.setItem('currentMonth', currentMonth.toString());
+            showNotification('Perubahan jadwal shift berhasil disimpan', 'success');
+            
+            // Tampilkan status koneksi
+            const connectionStatus = document.createElement('div');
+            connectionStatus.className = 'connection-status status-connected';
+            connectionStatus.innerHTML = '<i class="fas fa-check-circle"></i> Data shift terkirim ke sistem';
+            document.body.appendChild(connectionStatus);
+            
+            // Sembunyikan status setelah 3 detik
+            setTimeout(() => {
+                connectionStatus.style.display = 'none';
+            }, 3000);
+        }
+
+        // Fungsi untuk mencari karyawan
+        function searchEmployee() {
+            const searchTerm = employeeSearch.value.toLowerCase();
+            const rows = shiftTableBody.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const nameCell = row.querySelector('td:nth-child(2)');
+                if (nameCell) {
+                    const name = nameCell.textContent.toLowerCase();
+                    if (name.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        // Event Listeners
+        prevMonthBtn.addEventListener('click', () => {
+            if (currentMonth > 0) {
+                currentMonth--;
+                localStorage.setItem('currentMonth', currentMonth.toString());
+                renderShiftTable();
+            }
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            if (currentMonth < 11) {
+                currentMonth++;
+                localStorage.setItem('currentMonth', currentMonth.toString());
+                renderShiftTable();
+            }
+        });
+
+        saveChangesBtn.addEventListener('click', saveChanges);
+        employeeSearch.addEventListener('input', searchEmployee);
+
+        // Inisialisasi
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeData();
+            renderShiftTable();
+        });
+    </script>
+</body>
+</html>

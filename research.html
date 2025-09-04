@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Dashboard - Sistem Terintegrasi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="global.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            --success-gradient: linear-gradient(135deg, #4cc9f0 0%, #4361ee 100%);
+            --warning-gradient: linear-gradient(135deg, #f72585 0%, #7209b7 100%);
+            --info-gradient: linear-gradient(135deg, #4895ef 0%, #3f37c9 100%);
+            --completed-color: #10b981;
+            --pending-color: #f59e0b;
+            --overdue-color: #ef4444;
+        }
+
+        .main-content {
+            padding: var(--space-lg);
+            background-color: var(--bg-secondary);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .search-bar {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 12px;
+            color: var(--text-secondary, #6b7280);
+        }
+
+        .search-bar input {
+            padding: var(--space-sm) var(--space-sm) var(--space-sm) 40px;
+            border: 1px solid var(--border-color, #e5e7eb);
+            border-radius: var(--radius-md);
+            background-color: var(--input-bg, #fff);
+            color: var(--text-primary, #111827);
+            font-size: var(--text-sm);
+            width: 250px;
+        }
+
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--bg-secondary, #f9fafb);
+            transition: background-color var(--transition-fast);
+        }
+
+        .notification-bell:hover {
+            background: var(--hover-color, #e5e7eb);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--overdue-color, #ef4444);
+            color: white;
+            font-size: 10px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-info h4 {
+            margin: 0;
+            font-size: var(--text-sm);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary, #111827);
+        }
+
+        .user-info p {
+            margin: 0;
+            font-size: var(--text-xs);
+            color: var(--text-secondary, #6b7280);
+        }
+
+        .menu-item {
+            background-color: transparent;
+            color: var(--text-primary);
+            padding: 12px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border: none;
+           
+        }
+
+        .menu-item:hover {
+            background-color: var(--hover-color);
+            color: var(--menu-hover-text);
+        }
+
+        .menu-item:hover i,
+        .menu-item:hover .menu-icon {
+            color: var(--menu-hover-text);
+        }
+
+        .menu-item.active {
+            background: var(--success-gradient);
+            color: #fff;
+        }
+        .research-container {
+            background: var(--card-bg, #fff);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color, #e5e7eb);
+            margin-bottom: var(--space-xl);
+        }
+
+        .research-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--border-color, #e5e7eb);
+        }
+
+        .research-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary, #111827);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .research-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .stat-card {
+            background: var(--card-bg, #fff);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color, #e5e7eb);
+            transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .stat-title {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-secondary, #6b7280);
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .stat-content {
+            margin-bottom: var(--space-md);
+        }
+
+        .stat-content h3 {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary, #111827);
+            margin: 0 0 var(--space-xs);
+        }
+
+        .stat-content p {
+            font-size: var(--text-xs);
+            color: var(--text-secondary, #6b7280);
+            margin: 0;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: var(--bg-secondary, #f9fafb);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: var(--radius-full);
+            transition: width 1s ease;
+        }
+
+        .research-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-lg);
+        }
+
+        .research-list {
+            background: var(--bg-secondary, #f9fafb);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            border: 1px solid var(--border-color, #e5e7eb);
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .list-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary, #111827);
+        }
+
+        .add-research-btn {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: var(--space-sm) var(--space-md);
+            font-size: var(--text-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all var(--transition-fast);
+        }
+
+        .add-research-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .research-items {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .research-item {
+            background: var(--card-bg, #fff);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            border: 1px solid var(--border-color, #e5e7eb);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all var(--transition-fast);
+        }
+
+        .research-item:hover {
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-2px);
+        }
+
+        .research-info {
+            flex: 1;
+        }
+
+        .research-name {
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-xs);
+            color: var(--text-primary, #111827);
+        }
+
+        .research-desc {
+            font-size: var(--text-sm);
+            color: var(--text-secondary, #6b7280);
+            margin-bottom: var(--space-xs);
+        }
+
+        .research-date {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary, #9ca3af);
+        }
+
+        .research-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .research-status {
+            padding: 4px 8px;
+            border-radius: var(--radius-full);
+            font-size: var(--text-xs);
+            font-weight: var(--font-medium);
+        }
+
+        .status-completed {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--completed-color, #10b981);
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--pending-color, #f59e0b);
+        }
+
+        .status-overdue {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--overdue-color, #ef4444);
+        }
+
+        .status-nodeadline {
+            background: rgba(156, 163, 175, 0.1);
+            color: var(--text-secondary, #6b7280);
+        }
+
+        .action-btn {
+            padding: 6px;
+            border-radius: var(--radius-md);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary, #6b7280);
+            transition: all var(--transition-fast);
+        }
+
+        .action-btn:hover {
+            background: var(--hover-color, #e5e7eb);
+            color: var(--text-primary, #111827);
+        }
+
+        .research-form {
+            background: var(--bg-secondary, #f9fafb);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            border: 1px solid var(--border-color, #e5e7eb);
+        }
+
+        .form-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary, #111827);
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-md);
+        }
+
+        .form-label {
+            display: block;
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-primary, #111827);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: var(--space-sm);
+            border: 1px solid var(--border-color, #e5e7eb);
+            border-radius: var(--radius-md);
+            background: var(--input-bg, #fff);
+            color: var(--text-primary, #111827);
+            font-size: var(--text-sm);
+            transition: border-color var(--transition-fast);
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary, #4361ee);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-sm);
+            margin-top: var(--space-lg);
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            border: none;
+            transition: all var(--transition-fast);
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary, #f9fafb);
+            color: var(--text-primary, #111827);
+            border: 1px solid var(--border-color, #e5e7eb);
+        }
+
+        .btn-secondary:hover {
+            background: var(--hover-color, #e5e7eb);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .notification {
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            background: var(--card-bg, #fff);
+            border-left: 4px solid var(--primary, #4361ee);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: notificationSlideIn 0.5s ease forwards;
+            max-width: 350px;
+            position: relative;
+        }
+
+        .notification.success {
+            border-left-color: var(--completed-color, #10b981);
+        }
+
+        .notification.error {
+            border-left-color: var(--overdue-color, #ef4444);
+        }
+
+        .notification.info {
+            border-left-color: var(--primary, #4361ee);
+        }
+
+        .notification button.notification-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-left: auto;
+            color: var(--text-secondary, #6b7280);
+            padding: 4px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+
+        .notification button.notification-close:hover {
+            color: var(--text-primary, #111827);
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .notification.hiding {
+            animation: notificationSlideOut 0.5s ease forwards;
+        }
+
+        @keyframes notificationSlideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes notificationSlideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* Style untuk form mode indicator */
+        .form-mode-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .form-mode-indicator .mode-badge {
+            padding: 4px 8px;
+            border-radius: var(--radius-full);
+            font-weight: var(--font-medium);
+        }
+
+        .edit-mode-badge {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--pending-color);
+        }
+
+        .add-mode-badge {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--completed-color);
+        }
+
+        .deadline-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .deadline-toggle input {
+            margin: 0;
+        }
+
+        .deadline-field {
+            display: none;
+        }
+
+        .deadline-field.visible {
+            display: block;
+        }
+
+        @media (max-width: 1024px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-md);
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .search-bar input {
+                width: 200px;
+            }
+
+            .research-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .research-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .header-actions {
+                flex-wrap: wrap;
+                gap: var(--space-sm);
+            }
+
+            .search-bar {
+                order: 3;
+                width: 100%;
+            }
+
+            .search-bar input {
+                width: 100%;
+            }
+
+            .research-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-md);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .research-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-md);
+            }
+
+            .research-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+        
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+        }
+        
+        .status-connected {
+            background: var(--completed-color, #10b981);
+            color: white;
+        }
+        
+        .status-disconnected {
+            background: var(--overdue-color, #ef4444);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <button class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+    <div class="main-content">
+        <div class="header">
+            <h1><i class="fas fa-search"></i> Research Dashboard</h1>
+            <div class="header-actions">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Cari research..." id="researchSearch">
+                </div>
+                <div class="user-profile">
+                    <img class="profile-img" src="https://iili.io/Fpiva7S.png" alt="Profile">
+                    <div class="user-info">
+                        <h4>Adrian Abdul Arif</h4>
+                        <p>Customer Service Support</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="research-container">
+            <div style="display: flex; gap: var(--space-sm); margin-bottom: var(--space-lg);">
+                <button class="menu-item" onclick="window.location.href='kpi-css.html'">
+                    <i class="fas fa-chart-line"></i>
+                    <span>KPI CSS</span>
+                </button>
+                
+                <button class="menu-item" onclick="window.location.href='ide-saran.html'">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>Ideas & Suggestions</span>
+                </button>
+                
+                <button class="menu-item active">
+                    <i class="fas fa-search"></i>
+                    <span>Research</span>
+                </button>
+                
+                <button class="menu-item" onclick="window.location.href='chat-response.html'">
+                    <i class="fas fa-comments"></i>
+                    <span>Chat Response</span>
+                </button>
+            </div>
+            
+            <div class="research-stats">
+                <div class="stat-card fade-in">
+                    <div class="stat-header">
+                        <span class="stat-title">Total Research</span>
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="total-research">0</h3>
+                        <p>Dari target 28 research/bulan</p>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%; background: var(--primary-gradient);"></div>
+                    </div>
+                </div>
+
+                <div class="stat-card fade-in">
+                    <div class="stat-header">
+                        <span class="stat-title">Research Selesai</span>
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="completed-research">0</h3>
+                        <p>Research yang telah diselesaikan</p>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%; background: var(--success-gradient);"></div>
+                    </div>
+                </div>
+
+                <div class="stat-card fade-in">
+                    <div class="stat-header">
+                        <span class="stat-title">Research Tertunda</span>
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="pending-research">0</h3>
+                        <p>Research yang masih dalam proses</p>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%; background: var(--warning-gradient);"></div>
+                    </div>
+                </div>
+
+                <div class="stat-card fade-in">
+                    <div class="stat-header">
+                        <span class="stat-title">KPI Research</span>
+                        <div class="stat-icon">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="kpi-research">0%</h3>
+                        <p>Pencapaian target research</p>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%; background: var(--info-gradient);"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="research-content">
+                <div class="research-list">
+                    <div class="list-header">
+                        <h2 class="list-title">Daftar Research</h2>
+                        <button class="add-research-btn" id="add-research-btn">
+                            <i class="fas fa-plus"></i>
+                            Tambah Research
+                        </button>
+                    </div>
+                    <div class="research-items" id="research-items">
+                        <!-- Research items will be added here dynamically -->
+                    </div>
+                </div>
+
+                <div class="research-form" id="research-form">
+                    <div id="form-mode-indicator" class="form-mode-indicator">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Mode: </span>
+                        <span id="mode-badge" class="mode-badge add-mode-badge">Tambah Baru</span>
+                    </div>
+                    <h2 class="form-title" id="form-main-title">Tambah Research Baru</h2>
+                    <form id="new-research-form">
+                        <input type="hidden" id="edit-research-id" value="">
+                        <div class="form-group">
+                            <label class="form-label" for="research-title">Judul Research*</label>
+                            <input type="text" id="research-title" class="form-input" placeholder="Masukkan judul research" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="research-platform">Platform/Agent*</label>
+                            <input type="text" id="research-platform" class="form-input" placeholder="Nama platform/agent yang diteliti" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="research-category">Kategori*</label>
+                            <select id="research-category" class="form-select" required>
+                                <option value="">Pilih kategori</option>
+                                <option value="platform">Platform</option>
+                                <option value="agent">Agent</option>
+                                <option value="fitur">Fitur</option>
+                                <option value="strategi">Strategi</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="research-description">Deskripsi*</label>
+                            <textarea id="research-description" class="form-textarea" placeholder="Deskripsi research dan temuan" required></textarea>
+                        </div>
+                        
+                        <div class="deadline-toggle">
+                            <input type="checkbox" id="has-deadline">
+                            <label for="has-deadline">Tetapkan deadline</label>
+                        </div>
+                        
+                        <div class="form-group deadline-field" id="deadline-field">
+                            <label class="form-label" for="research-deadline">Deadline</label>
+                            <input type="date" id="research-deadline" class="form-input">
+                        </div>
+                        
+                        <div class="form-group" id="status-field-container" style="display: none;">
+                            <label class="form-label" for="research-status">Status</label>
+                            <select id="research-status" class="form-select">
+                                <option value="pending">Dalam Proses</option>
+                                <option value="completed">Selesai</option>
+                                <option value="overdue">Terlambat</option>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancel-research-btn">Batal</button>
+                            <button type="submit" class="btn btn-primary" id="submit-research-btn">Simpan Research</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    <div class="notification-container" id="notificationContainer"></div>
+    <script src="sidebar-loader.js"></script>
+    <script src="user-profile.js"></script>
+    <script src="notifications.js"></script>
+    
+    <script>
+    // Data Research
+    let researchData = JSON.parse(localStorage.getItem('researchData')) || [];
+    const researchTarget = 28; // Target research per bulan
+    let currentEditIndex = -1; // Indeks research yang sedang diedit
+
+    // Elemen DOM
+    const researchItemsContainer = document.getElementById('research-items');
+    const researchFormElement = document.getElementById('research-form');
+    const newResearchForm = document.getElementById('new-research-form');
+    const addResearchBtn = document.getElementById('add-research-btn');
+    const cancelResearchBtn = document.getElementById('cancel-research-btn');
+    const notificationContainer = document.getElementById('notificationContainer');
+    const researchSearch = document.getElementById('researchSearch');
+    const formModeIndicator = document.getElementById('form-mode-indicator');
+    const modeBadge = document.getElementById('mode-badge');
+    const formMainTitle = document.getElementById('form-main-title');
+    const submitResearchBtn = document.getElementById('submit-research-btn');
+    const statusFieldContainer = document.getElementById('status-field-container');
+    const researchStatusField = document.getElementById('research-status');
+    const editResearchIdField = document.getElementById('edit-research-id');
+    const hasDeadlineCheckbox = document.getElementById('has-deadline');
+    const deadlineField = document.getElementById('deadline-field');
+    const researchDeadlineField = document.getElementById('research-deadline');
+    
+    // Buat elemen status koneksi jika belum ada
+    let connectionStatus = document.getElementById('connectionStatus');
+    if (!connectionStatus) {
+        connectionStatus = document.createElement('div');
+        connectionStatus.id = 'connectionStatus';
+        connectionStatus.className = 'connection-status status-connected';
+        connectionStatus.innerHTML = '<i class="fas fa-check-circle"></i> Terhubung dengan KPI CSS';
+        document.body.appendChild(connectionStatus);
+        
+        // Sembunyikan status koneksi setelah 3 detik
+        setTimeout(() => {
+            connectionStatus.style.display = 'none';
+        }, 3000);
+    }
+
+    // Statistik elements
+    const totalResearchEl = document.getElementById('total-research');
+    const completedResearchEl = document.getElementById('completed-research');
+    const pendingResearchEl = document.getElementById('pending-research');
+    const kpiResearchEl = document.getElementById('kpi-research');
+
+    // Fungsi untuk menampilkan notifikasi
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+            <span>${message}</span>
+            <button class="notification-close">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        
+        notificationContainer.appendChild(notification);
+        
+        // Tambahkan event listener untuk tombol close
+        const closeBtn = notification.querySelector('.notification-close');
+        closeBtn.addEventListener('click', function() {
+            closeNotification(notification);
+        });
+        
+        // Hapus notifikasi setelah 5 detik
+        const timeoutId = setTimeout(() => {
+            closeNotification(notification);
+        }, 5000);
+        
+        // Simpan timeout ID untuk bisa dibatalkan jika user menutup manual
+        notification.dataset.timeoutId = timeoutId;
+    }
+
+    function closeNotification(notification) {
+        // Batalkan timeout jika masih ada
+        if (notification.dataset.timeoutId) {
+            clearTimeout(parseInt(notification.dataset.timeoutId));
+        }
+        
+        // Tambahkan animasi keluar
+        notification.classList.add('hiding');
+        
+        // Hapus elemen setelah animasi selesai
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notificationContainer.removeChild(notification);
+            }
+        }, 500);
+    }
+
+    // Fungsi untuk memperbarui statistik research
+    function updateResearchStats() {
+        const totalResearch = researchData.length;
+        const completedResearch = researchData.filter(item => item.status === 'completed').length;
+        const pendingResearch = researchData.filter(item => item.status === 'pending' || item.status === 'overdue').length;
+        const overdueResearch = researchData.filter(item => item.status === 'overdue').length;
+        const kpiResearch = Math.min(100, Math.round((totalResearch / researchTarget) * 100));
+        
+        // Update elemen statistik
+        totalResearchEl.textContent = totalResearch;
+        completedResearchEl.textContent = completedResearch;
+        pendingResearchEl.textContent = pendingResearch;
+        kpiResearchEl.textContent = `${kpiResearch}%`;
+        
+        // Update progress bars
+        const progressBars = document.querySelectorAll('.progress-fill');
+        if (progressBars.length >= 4) {
+            setTimeout(() => {
+                progressBars[0].style.width = `${Math.min(100, (totalResearch / researchTarget) * 100)}%`;
+                progressBars[1].style.width = `${completedResearch > 0 ? (completedResearch / totalResearch) * 100 : 0}%`;
+                progressBars[2].style.width = `${pendingResearch > 0 ? (pendingResearch / totalResearch) * 100 : 0}%`;
+                progressBars[3].style.width = `${kpiResearch}%`;
+            }, 100);
+        }
+        
+        // Simpan ke localStorage
+        localStorage.setItem('researchData', JSON.stringify(researchData));
+        
+        // Update KPI research dan kirim event ke KPI CSS
+        updateResearchKPI(totalResearch);
+    }
+
+    // Fungsi untuk memperbarui KPI research di halaman KPI CSS
+    function updateResearchKPI(count) {
+        const researchTarget = 28; // Target research per bulan
+        const researchScore = Math.min(100, (count / researchTarget) * 100);
+        
+        // Simpan data research count ke localStorage
+        localStorage.setItem('researchCount', count);
+        
+        // Dispatch event untuk memberi tahu halaman KPI tentang perubahan data research
+        window.dispatchEvent(new CustomEvent('researchDataChanged', { 
+            detail: { researchCount: count } 
+        }));
+        
+        // Tampilkan status koneksi
+        connectionStatus.className = 'connection-status status-connected';
+        connectionStatus.innerHTML = '<i class="fas fa-check-circle"></i> Data research terkirim ke KPI CSS';
+        connectionStatus.style.display = 'flex';
+        
+        // Sembunyikan status setelah 3 detik
+        setTimeout(() => {
+            connectionStatus.style.display = 'none';
+        }, 3000);
+        
+        return researchScore;
+    }
+
+    // Fungsi untuk memeriksa deadline dan update status
+    function checkDeadlines() {
+        const today = new Date();
+        researchData.forEach(research => {
+            // Hanya periksa research yang memiliki deadline
+            if (research.deadline) {
+                const deadline = new Date(research.deadline);
+                if (research.status !== 'completed' && deadline < today) {
+                    research.status = 'overdue';
+                }
+            }
+        });
+        localStorage.setItem('researchData', JSON.stringify(researchData));
+    }
+
+    // Fungsi untuk merender daftar research
+    function renderResearchList() {
+        researchItemsContainer.innerHTML = '';
+        
+        if (researchData.length === 0) {
+            researchItemsContainer.innerHTML = `
+                <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
+                    <i class="fas fa-search" style="font-size: 48px; margin-bottom: 10px;"></i>
+                    <p>Belum ada research. Tambahkan research baru untuk memulai.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        researchData.forEach((research, index) => {
+            const researchItem = document.createElement('div');
+            researchItem.className = 'research-item fade-in';
+            
+            // Tentukan status yang akan ditampilkan
+            let statusText, statusClass;
+            if (research.status === 'completed') {
+                statusText = 'Selesai';
+                statusClass = 'status-completed';
+            } else if (research.status === 'overdue') {
+statusText = 'Terlambat';
+statusClass = 'status-overdue';
+} else if (research.status === 'pending') {
+statusText = 'Dalam Proses';
+statusClass = 'status-pending';
+} else {
+statusText = 'Tidak Ada Deadline';
+statusClass = 'status-nodeadline';
+}
+        // Format tanggal
+        const formattedDate = research.deadline ? 
+            new Date(research.deadline).toLocaleDateString('id-ID', { 
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric' 
+            }) : 'Tidak ada deadline';
+        
+        researchItem.innerHTML = `
+            <div class="research-info">
+                <h3 class="research-name">${research.title}</h3>
+                <p class="research-desc">${research.platform} • ${research.category}</p>
+                <p class="research-date">Deadline: ${formattedDate}</p>
+            </div>
+            <div class="research-actions">
+                <span class="research-status ${statusClass}">${statusText}</span>
+                <button class="action-btn edit-btn" data-index="${index}">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn delete-btn" data-index="${index}">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+        
+        researchItemsContainer.appendChild(researchItem);
+    });
+    
+    // Tambahkan event listeners untuk tombol edit dan delete
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-index'));
+            editResearch(index);
+        });
+    });
+    
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-index'));
+            deleteResearch(index);
+        });
+    });
+}
+
+// Fungsi untuk menambah research baru
+function addResearch(e) {
+    e.preventDefault();
+    
+    const title = document.getElementById('research-title').value;
+    const platform = document.getElementById('research-platform').value;
+    const category = document.getElementById('research-category').value;
+    const description = document.getElementById('research-description').value;
+    const hasDeadline = document.getElementById('has-deadline').checked;
+    const deadline = hasDeadline ? document.getElementById('research-deadline').value : null;
+    const status = document.getElementById('research-status').value || 'pending';
+    
+    // Validasi form
+    if (!title || !platform || !category || !description) {
+        showNotification('Harap isi semua field yang wajib diisi', 'error');
+        return;
+    }
+    
+    // Jika sedang edit mode
+    if (currentEditIndex !== -1) {
+        researchData[currentEditIndex] = {
+            ...researchData[currentEditIndex],
+            title,
+            platform,
+            category,
+            description,
+            deadline,
+            status
+        };
+        
+        showNotification('Research berhasil diperbarui', 'success');
+    } else {
+        // Tambah research baru
+        const newResearch = {
+            id: Date.now(), // ID unik berdasarkan timestamp
+            title,
+            platform,
+            category,
+            description,
+            deadline,
+            status: deadline ? 'pending' : 'no-deadline',
+            createdAt: new Date().toISOString()
+        };
+        
+        researchData.push(newResearch);
+        showNotification('Research berhasil ditambahkan', 'success');
+    }
+    
+    // Reset form dan update UI
+    resetForm();
+    updateResearchStats();
+    renderResearchList();
+}
+
+// Fungsi untuk mengedit research
+function editResearch(index) {
+    const research = researchData[index];
+    currentEditIndex = index;
+    
+    // Isi form dengan data research
+    document.getElementById('research-title').value = research.title;
+    document.getElementById('research-platform').value = research.platform;
+    document.getElementById('research-category').value = research.category;
+    document.getElementById('research-description').value = research.description;
+    document.getElementById('edit-research-id').value = research.id;
+    
+    // Atur deadline
+    if (research.deadline) {
+        document.getElementById('has-deadline').checked = true;
+        deadlineField.classList.add('visible');
+        document.getElementById('research-deadline').value = research.deadline;
+    } else {
+        document.getElementById('has-deadline').checked = false;
+        deadlineField.classList.remove('visible');
+    }
+    
+    // Tampilkan field status
+    statusFieldContainer.style.display = 'block';
+    document.getElementById('research-status').value = research.status;
+    
+    // Ubah mode form ke edit
+    formModeIndicator.style.display = 'flex';
+    modeBadge.textContent = 'Edit';
+    modeBadge.className = 'mode-badge edit-mode-badge';
+    formMainTitle.textContent = 'Edit Research';
+    submitResearchBtn.textContent = 'Perbarui Research';
+    
+    // Scroll ke form
+    researchFormElement.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Fungsi untuk menghapus research
+function deleteResearch(index) {
+    if (confirm('Apakah Anda yakin ingin menghapus research ini?')) {
+        researchData.splice(index, 1);
+        showNotification('Research berhasil dihapus', 'success');
+        
+        // Jika sedang mengedit research yang dihapus, reset form
+        if (currentEditIndex === index) {
+            resetForm();
+        }
+        
+        updateResearchStats();
+        renderResearchList();
+    }
+}
+
+// Fungsi untuk mereset form
+function resetForm() {
+    newResearchForm.reset();
+    currentEditIndex = -1;
+    deadlineField.classList.remove('visible');
+    statusFieldContainer.style.display = 'none';
+    formModeIndicator.style.display = 'none';
+    formMainTitle.textContent = 'Tambah Research Baru';
+    submitResearchBtn.textContent = 'Simpan Research';
+    document.getElementById('edit-research-id').value = '';
+}
+
+// Fungsi untuk mencari research
+function searchResearch() {
+    const searchTerm = researchSearch.value.toLowerCase();
+    
+    if (searchTerm === '') {
+        renderResearchList();
+        return;
+    }
+    
+    const filteredResearch = researchData.filter(research => 
+        research.title.toLowerCase().includes(searchTerm) ||
+        research.platform.toLowerCase().includes(searchTerm) ||
+        research.category.toLowerCase().includes(searchTerm) ||
+        research.description.toLowerCase().includes(searchTerm)
+    );
+    
+    researchItemsContainer.innerHTML = '';
+    
+    if (filteredResearch.length === 0) {
+        researchItemsContainer.innerHTML = `
+            <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
+                <i class="fas fa-search" style="font-size: 48px; margin-bottom: 10px;"></i>
+                <p>Tidak ada research yang sesuai dengan pencarian.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    filteredResearch.forEach((research, index) => {
+        const researchItem = document.createElement('div');
+        researchItem.className = 'research-item fade-in';
+        
+        let statusText, statusClass;
+        if (research.status === 'completed') {
+            statusText = 'Selesai';
+            statusClass = 'status-completed';
+        } else if (research.status === 'overdue') {
+            statusText = 'Terlambat';
+            statusClass = 'status-overdue';
+        } else if (research.status === 'pending') {
+            statusText = 'Dalam Proses';
+            statusClass = 'status-pending';
+        } else {
+            statusText = 'Tidak Ada Deadline';
+            statusClass = 'status-nodeadline';
+        }
+        
+        const formattedDate = research.deadline ? 
+            new Date(research.deadline).toLocaleDateString('id-ID', { 
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric' 
+            }) : 'Tidak ada deadline';
+        
+        researchItem.innerHTML = `
+            <div class="research-info">
+                <h3 class="research-name">${research.title}</h3>
+                <p class="research-desc">${research.platform} • ${research.category}</p>
+                <p class="research-date">Deadline: ${formattedDate}</p>
+            </div>
+            <div class="research-actions">
+                <span class="research-status ${statusClass}">${statusText}</span>
+                <button class="action-btn edit-btn" data-id="${research.id}">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn delete-btn" data-id="${research.id}">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+        
+        researchItemsContainer.appendChild(researchItem);
+    });
+    
+    // Tambahkan event listeners untuk tombol edit dan delete
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const index = researchData.findIndex(item => item.id == id);
+            if (index !== -1) editResearch(index);
+        });
+    });
+    
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const index = researchData.findIndex(item => item.id == id);
+            if (index !== -1) deleteResearch(index);
+        });
+    });
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Periksa deadline saat halaman dimuat
+    checkDeadlines();
+    
+    // Render data research
+    renderResearchList();
+    
+    // Update statistik
+    updateResearchStats();
+    
+    // Setup event listeners
+    newResearchForm.addEventListener('submit', addResearch);
+    addResearchBtn.addEventListener('click', function() {
+        resetForm();
+        researchFormElement.scrollIntoView({ behavior: 'smooth' });
+    });
+    cancelResearchBtn.addEventListener('click', resetForm);
+    researchSearch.addEventListener('input', searchResearch);
+    
+    // Toggle deadline field
+    hasDeadlineCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            deadlineField.classList.add('visible');
+            // Set default deadline to 3 days from now
+            const threeDaysLater = new Date();
+            threeDaysLater.setDate(threeDaysLater.getDate() + 3);
+            researchDeadlineField.value = threeDaysLater.toISOString().split('T')[0];
+        } else {
+            deadlineField.classList.remove('visible');
+        }
+    });
+    
+    // Jika sedang edit mode, tampilkan status field
+    if (currentEditIndex !== -1) {
+        statusFieldContainer.style.display = 'block';
+    }
+});
+
+// Simulasikan notifikasi (dalam aplikasi nyata, ini akan datang dari server)
+setTimeout(() => {
+    document.getElementById('notificationCount').textContent = '3';
+}, 2000);
+</script>
+</body> 
+</html>
+

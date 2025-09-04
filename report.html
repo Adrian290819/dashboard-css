@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Pending - Task Management</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --primary-hover: #3a56d4;
+      --secondary-color: #3f37c9;
+      --danger-color: #f72585;
+      --danger-hover: #e5177b;
+      --success-color: #4cc9f0;
+      --warning-color: #f8961e;
+      --info-color: #4895ef;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-color: #212529;
+      --text-secondary: #6c757d;
+      --border-color: #dee2e6;
+      --hover-color: rgba(0, 0, 0, 0.05);
+      --input-bg: #ffffff;
+      --danger-bg: rgba(247, 37, 133, 0.05);
+      --sidebar-width: 280px;
+      --sidebar-collapsed-width: 80px;
+    }
+
+    [data-theme="dark"] {
+      --primary-color: #4cc9f0;
+      --primary-hover: #3ab4d9;
+      --secondary-color: #4895ef;
+      --danger-color: #f72585;
+      --danger-hover: #e5177b;
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --text-color: #e0e0e0;
+      --text-secondary: #9e9e9e;
+      --border-color: #333333;
+      --hover-color: rgba(255, 255, 255, 0.05);
+      --input-bg: #2d2d2d;
+      --danger-bg: rgba(247, 37, 133, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .dashboard-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--card-bg);
+      border-right: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .sidebar.collapsed {
+      width: var(--sidebar-collapsed-width);
+    }
+
+    .sidebar.collapsed .sidebar-header h2,
+    .sidebar.collapsed nav a span,
+    .sidebar.collapsed .btn-logout span {
+      display: none;
+    }
+
+    .sidebar.collapsed nav a,
+    .sidebar.collapsed .btn-logout {
+      justify-content: center;
+      padding: 15px 0;
+    }
+
+    .sidebar.collapsed nav a i,
+    .sidebar.collapsed .btn-logout i {
+      margin-right: 0;
+      font-size: 1.2rem;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-header h2 {
+      color: var(--primary-color);
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+
+    .sidebar-header h2 i {
+      font-size: 1.5rem;
+    }
+
+    nav {
+      display: flex;
+      flex-direction: column;
+      padding: 15px 0;
+    }
+
+    nav a, .btn-logout {
+      padding: 12px 20px;
+      color: var(--text-color);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      transition: all 0.2s;
+      margin: 2px 0;
+      border-radius: 0 30px 30px 0;
+      position: relative;
+    }
+
+    nav a:hover, .btn-logout:hover {
+      background-color: var(--hover-color);
+      color: var(--primary-color);
+    }
+
+    nav a.active {
+      background-color: rgba(67, 97, 238, 0.1);
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    nav a.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background-color: var(--primary-color);
+      border-radius: 0 4px 4px 0;
+    }
+
+    nav a i, .btn-logout i {
+      margin-right: 12px;
+      font-size: 1rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    .btn-logout {
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .sidebar-footer {
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .theme-button, .hamburger-btn {
+      background: none;
+      border: none;
+      color: var(--text-color);
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 8px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .theme-button:hover, .hamburger-btn:hover {
+      background-color: var(--hover-color);
+    }
+
+    /* Main Content Styles */
+    main {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      padding: 2rem;
+      transition: margin-left 0.3s;
+      background-color: var(--bg-color);
+    }
+
+    .sidebar.collapsed + main {
+      margin-left: var(--sidebar-collapsed-width);
+    }
+
+    header {
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    header h1 {
+      color: var(--primary-color);
+      margin: 0;
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .header-info {
+      display: flex;
+      gap: 1rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* Report Form Styles */
+    .report-form-container {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 1rem;
+      background: var(--input-bg);
+      color: var(--text-color);
+      transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+    }
+
+    textarea.form-control {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-col {
+      flex: 1;
+    }
+
+    .brand-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .brand-option {
+      position: relative;
+    }
+
+    .brand-option input {
+      position: absolute;
+      opacity: 0;
+    }
+
+    .brand-option label {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      background-color: var(--hover-color);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .brand-option input:checked + label {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .brand-option label i {
+      margin-right: 0.5rem;
+    }
+
+    .file-upload {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .file-upload-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    .file-upload-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      border: 2px dashed var(--border-color);
+      border-radius: 8px;
+      background-color: var(--input-bg);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .file-upload-label:hover {
+      border-color: var(--primary-color);
+      background-color: var(--hover-color);
+    }
+
+    .file-upload-label i {
+      font-size: 2rem;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+
+    .file-upload-text {
+      text-align: center;
+    }
+
+    .file-upload-text h4 {
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+    }
+
+    .file-upload-text p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .preview-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .preview-item {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .preview-item button {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background-color: var(--danger-color);
+      color: white;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .preview-item:hover button {
+      opacity: 1;
+    }
+
+    .priority-selector {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .priority-option {
+      flex: 1;
+      position: relative;
+    }
+
+    .priority-option input {
+      position: absolute;
+      opacity: 0;
+    }
+
+    .priority-option label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+      border-radius: 8px;
+      background-color: var(--hover-color);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .priority-option input:checked + label {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .priority-option label i {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-secondary {
+      background-color: var(--text-secondary);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--border-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    /* Pending Reports List */
+    .reports-list {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border-color);
+    }
+
+    .report-card {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      transition: all 0.3s;
+    }
+
+    .report-card:last-child {
+      border-bottom: none;
+    }
+
+    .report-card:hover {
+      background-color: var(--hover-color);
+    }
+
+    .report-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .report-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .report-meta {
+      display: flex;
+      gap: 1rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .report-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      background-color: var(--hover-color);
+    }
+
+    .report-priority {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .priority-high {
+      background-color: rgba(247, 37, 133, 0.1);
+      color: var(--danger-color);
+    }
+
+    .priority-medium {
+      background-color: rgba(248, 150, 30, 0.1);
+      color: var(--warning-color);
+    }
+
+    .priority-low {
+      background-color: rgba(76, 201, 240, 0.1);
+      color: var(--success-color);
+    }
+
+    .report-content {
+      margin-bottom: 1rem;
+      color: var(--text-color);
+    }
+
+    .report-images {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      overflow-x: auto;
+      padding-bottom: 1rem;
+    }
+
+    .report-image {
+      width: 120px;
+      height: 120px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .report-image:hover {
+      transform: scale(1.05);
+    }
+
+    .report-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .report-date {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .report-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .report-actions button {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-edit {
+      background-color: var(--info-color);
+      color: white;
+    }
+
+    .btn-delete {
+      background-color: var(--danger-color);
+      color: white;
+    }
+
+    .btn-solve {
+      background-color: var(--success-color);
+      color: white;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-secondary);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--border-color);
+    }
+
+    .empty-state h3 {
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+    }
+
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      color: var(--primary-color);
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 1.5rem;
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    .image-viewer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .main-image {
+      max-width: 100%;
+      max-height: 60vh;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .thumbnail-container {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 1rem;
+    }
+
+    .thumbnail {
+      width: 80px;
+      height: 80px;
+      border-radius: 4px;
+      object-fit: cover;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .thumbnail.active {
+      border-color: var(--primary-color);
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 1024px) {
+      .sidebar {
+        transform: translateX(-100%);
+        z-index: 1000;
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      main {
+        margin-left: 0;
+      }
+
+      .hamburger-btn {
+        display: block;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 999;
+        background: var(--card-bg);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    @media (max-width: 768px) {
+      main {
+        padding: 1rem;
+      }
+
+      .form-row {
+        flex-direction: column;
+      }
+
+      .report-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+
+      .report-meta {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .report-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .report-actions {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .priority-selector {
+        flex-direction: column;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+     .brand-logo {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  .brand-selector {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .brand-option input[type="radio"] {
+    display: none;
+  }
+
+  .brand-option label {
+    padding: 8px 12px;
+    border-radius: 20px;
+    background-color: #2b2b2b;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+  }
+
+  .brand-option input[type="radio"]:checked + label {
+    background-color: #33caff;
+    color: black;
+  }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-tasks"></i> Dashboard CSS</h2>
+      </div>
+      <nav>
+        <a href="index.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+        <a href="report-pending.html" class="active"><i class="fas fa-clock"></i> <span>Report Pending</span></a>
+        <a href="report-solved.html"><i class="fas fa-check-circle"></i> <span>Report Solved</span></a>
+        <a href="information.html"><i class="fas fa-info-circle"></i> <span>Information</span></a>
+        <a href="release-feature.html"><i class="fas fa-rocket"></i> <span>Release New Feature</span></a>
+        <a href="ide-saran.html"><i class="fas fa-lightbulb"></i> <span>Ide & Saran</span></a>
+        <a href="weekly-meeting.html"><i class="fas fa-users"></i> <span>Weekly Meeting</span></a>
+        <a href="phishing.html"><i class="fas fa-shield-alt"></i> <span>Phishing</span></a>
+        <a href="pembahasan-pending.html"><i class="fas fa-comments"></i> <span>Pembahasan Pending</span></a>
+        <a href="research.html"><i class="fas fa-search"></i> <span>Research</span></a>
+        <a href="respon-chat.html"><i class="fas fa-comment-dots"></i> <span>Respon Chat</span></a>
+        <a href="idea.html"><i class="fas fa-brain"></i> <span>Idea</span></a>
+        <a href="list-domain.html"><i class="fas fa-globe"></i> <span>List Domain</span></a>
+        
+        <button id="logout-btn" class="btn-logout"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
+      </nav>
+      <div class="sidebar-footer">
+        <button onclick="toggleThemeQuick()" class="theme-button" title="Toggle theme">
+          <span id="theme-toggle-icon"><i class="fas fa-moon"></i></span>
+        </button>
+        <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
+      </div>
+    </aside>
+
+    <main>
+      <header>
+        <h1><i class="fas fa-clock"></i> Report Pending</h1>
+        <div class="header-info">
+          <span id="current-date"></span>
+          <span id="current-time"></span>
+        </div>
+      </header>
+
+      <div class="report-form-container">
+        <h2><i class="fas fa-plus-circle"></i> Create New Report</h2>
+        <form id="reportForm">
+          <div class="form-row">
+            <div class="form-col">
+              <div class="form-group">
+                <label for="reportTitle">Report Title</label>
+                <input type="text" id="reportTitle" class="form-control" placeholder="Enter report title" required>
+              </div>
+            </div>
+            <div class="form-col">
+              <div class="form-group">
+                <label for="reportCategory">Category</label>
+                <select id="reportCategory" class="form-control" required>
+                  <option value="">Select category</option>
+                  <option value="bug">Bug/Error</option>
+                  <option value="feature">Feature Request</option>
+                  <option value="improvement">Improvement</option>
+                  <option value="security">Security Issue</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+  <label>Engine</label>
+  <div class="brand-selector">
+    <div class="brand-option">
+      <input type="radio" id="brand-gacha" name="brand" value="gacha" checked>
+      <label for="brand-gacha">
+        <img src="GACHA1.png" alt="GACHA" class="brand-logo"> GACHA
+      </label>
+    </div>
+    <div class="brand-option">
+      <input type="radio" id="brand-dgaming" name="brand" value="dgaming">
+      <label for="brand-dgaming">
+        <img src="DGAMING.png" alt="D-GAMING" class="brand-logo"> D-GAMING
+      </label>
+    </div>
+    <div class="brand-option">
+      <input type="radio" id="brand-brem" name="brand" value="brem">
+      <label for="brand-brem">
+        <img src="GACHA1.png" alt="BREM" class="brand-logo"> BREM
+      </label>
+    </div>
+    <div class="brand-option">
+      <input type="radio" id="brand-89gaming" name="brand" value="89gaming">
+      <label for="brand-89gaming">
+        <img src="89.png" alt="89GAMING" class="brand-logo"> 89GAMING
+      </label>
+    </div>
+    <div class="brand-option">
+      <input type="radio" id="brand-luxion" name="brand" value="luxion">
+      <label for="brand-luxion">
+        <img src="GACHA1.png" alt="LUXION" class="brand-logo"> LUXION
+      </label>
+    </div>
+  </div>
+</div>
+
+          <div class="form-group">
+            <label>Priority</label>
+            <div class="priority-selector">
+              <div class="priority-option">
+                <input type="radio" id="priority-high" name="priority" value="high">
+                <label for="priority-high"><i class="fas fa-exclamation-triangle"></i> High</label>
+              </div>
+              <div class="priority-option">
+                <input type="radio" id="priority-medium" name="priority" value="medium" checked>
+                <label for="priority-medium"><i class="fas fa-exclamation-circle"></i> Medium</label>
+              </div>
+              <div class="priority-option">
+                <input type="radio" id="priority-low" name="priority" value="low">
+                <label for="priority-low"><i class="fas fa-info-circle"></i> Low</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="reportDescription">Detailed Description</label>
+            <textarea id="reportDescription" class="form-control" placeholder="Describe the issue in detail..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Attachments (Photos/Screenshots)</label>
+            <div class="file-upload">
+              <input type="file" id="fileInput" class="file-upload-input" accept="image/*" multiple>
+              <label for="fileInput" class="file-upload-label">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <div class="file-upload-text">
+                  <h4>Drag & Drop files here</h4>
+                  <p>or click to browse (max 5 files)</p>
+                </div>
+              </label>
+              <div class="preview-container" id="previewContainer"></div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="reset" class="btn btn-secondary">
+              <i class="fas fa-undo"></i> Reset
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-paper-plane"></i> Submit Report
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="reports-list">
+        <h2><i class="fas fa-list"></i> Pending Reports</h2>
+        
+        <div id="reportsContainer">
+          <!-- Reports will be dynamically inserted here -->
+          <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <h3>No pending reports</h3>
+            <p>Submit your first report using the form above</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Image Viewer Modal -->
+  <div class="modal" id="imageModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Image Preview</h3>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="image-viewer">
+          <img id="mainImage" class="main-image" src="" alt="Report Image">
+          <div class="thumbnail-container" id="thumbnailContainer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+
+<!-- Firebase Configuration -->
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBZiEOPEv_nN2kK9pGGGZJvKu5KbWjK1gM",
+    authDomain: "kasirapp-62ee2.firebaseapp.com",
+    databaseURL: "https://kasirapp-62ee2-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "kasirapp-62ee2",
+    storageBucket: "kasirapp-62ee2.appspot.com",
+    messagingSenderId: "614149754496",
+    appId: "1:614149754496:web:2b24d77c489a383366e065",
+    measurementId: "G-Q9XL52HWFY"
+  };
+
+  // Inisialisasi Firebase
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+  const auth = firebase.auth();
+
+    // Check authentication state
+    auth.onAuthStateChanged((user) => {
+      if (!user) {
+        window.location.href = 'login.html';
+      } else {
+        // User is signed in, load dashboard data
+        loadDashboardData();
+      }
+    });
+
+    // DOM elements
+    const currentDateElem = document.getElementById('current-date');
+    const currentTimeElem = document.getElementById('current-time');
+    const reportForm = document.getElementById('reportForm');
+    const fileInput = document.getElementById('fileInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const reportsContainer = document.getElementById('reportsContainer');
+    const imageModal = document.getElementById('imageModal');
+    const mainImage = document.getElementById('mainImage');
+    const thumbnailContainer = document.getElementById('thumbnailContainer');
+
+    // Sample data for demonstration
+    let reports = JSON.parse(localStorage.getItem('pendingReports')) || [];
+    let uploadedFiles = [];
+
+    // Update clock
+    function updateClock() {
+      const now = new Date();
+      currentDateElem.textContent = now.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        day: 'numeric', 
+        month: 'long', 
+        year: 'numeric' 
+      });
+      currentTimeElem.textContent = now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+    }
+
+    // Handle file upload
+    fileInput.addEventListener('change', function(e) {
+      const files = Array.from(e.target.files);
+      
+      // Clear previous previews
+      previewContainer.innerHTML = '';
+      uploadedFiles = [];
+      
+      // Limit to 5 files
+      if (files.length > 5) {
+        alert('You can upload a maximum of 5 files');
+        return;
+      }
+      
+      files.forEach(file => {
+        if (!file.type.match('image.*')) {
+          return;
+        }
+        
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          const previewItem = document.createElement('div');
+          previewItem.className = 'preview-item';
+          
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.alt = file.name;
+          
+          const removeBtn = document.createElement('button');
+          removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+          removeBtn.onclick = function() {
+            previewItem.remove();
+            uploadedFiles = uploadedFiles.filter(f => f.name !== file.name);
+          };
+          
+          previewItem.appendChild(img);
+          previewItem.appendChild(removeBtn);
+          previewContainer.appendChild(previewItem);
+          
+          uploadedFiles.push({
+            name: file.name,
+            data: e.target.result
+          });
+        };
+        
+        reader.readAsDataURL(file);
+      });
+    });
+
+    // Handle form submission
+    reportForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const reportTitle = document.getElementById('reportTitle').value;
+      const reportCategory = document.getElementById('reportCategory').value;
+      const reportDescription = document.getElementById('reportDescription').value;
+      const brand = document.querySelector('input[name="brand"]:checked').value;
+      const priority = document.querySelector('input[name="priority"]:checked').value;
+      
+      const newReport = {
+        id: Date.now().toString(),
+        title: reportTitle,
+        category: reportCategory,
+        description: reportDescription,
+        brand: brand,
+        priority: priority,
+        images: uploadedFiles,
+        status: 'pending',
+        date: new Date().toISOString(),
+        createdBy: localStorage.getItem('username') || 'Anonymous'
+      };
+      
+      reports.unshift(newReport);
+      saveReports();
+      renderReports();
+      
+      // Reset form
+      reportForm.reset();
+      previewContainer.innerHTML = '';
+      uploadedFiles = [];
+      
+      alert('Report submitted successfully!');
+    });
+
+    // Save reports to localStorage
+    function saveReports() {
+      localStorage.setItem('pendingReports', JSON.stringify(reports));
+    }
+
+    // Render reports list
+    function renderReports() {
+      if (reports.length === 0) {
+        reportsContainer.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <h3>No pending reports</h3>
+            <p>Submit your first report using the form above</p>
+          </div>
+        `;
+        return;
+      }
+      
+      reportsContainer.innerHTML = '';
+      
+      reports.forEach(report => {
+        const reportCard = document.createElement('div');
+        reportCard.className = 'report-card';
+        
+        // Format date
+        const reportDate = new Date(report.date);
+        const formattedDate = reportDate.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        
+        // Get brand icon
+        let brandIcon = 'fa-question';
+        let brandName = 'Other';
+        
+        switch(report.brand) {
+          case 'nike':
+            brandIcon = 'fa-shoe-prints';
+            brandName = 'Nike';
+            break;
+          case 'adidas':
+            brandIcon = 'fa-tshirt';
+            brandName = 'Adidas';
+            break;
+          case 'puma':
+            brandIcon = 'fa-paw';
+            brandName = 'Puma';
+            break;
+        }
+        
+        // Priority class
+        let priorityClass = '';
+        let priorityIcon = '';
+        
+        switch(report.priority) {
+          case 'high':
+            priorityClass = 'priority-high';
+            priorityIcon = 'fa-exclamation-triangle';
+            break;
+          case 'medium':
+            priorityClass = 'priority-medium';
+            priorityIcon = 'fa-exclamation-circle';
+            break;
+          case 'low':
+            priorityClass = 'priority-low';
+            priorityIcon = 'fa-info-circle';
+            break;
+        }
+        
+        // Images preview
+        let imagesHTML = '';
+        if (report.images && report.images.length > 0) {
+          imagesHTML = `
+            <div class="report-images">
+              ${report.images.map((img, index) => `
+                <img src="${img.data}" alt="Report image ${index + 1}" class="report-image" 
+                  onclick="openImageModal('${report.id}', ${index})">
+              `).join('')}
+            </div>
+          `;
+        }
+        
+        reportCard.innerHTML = `
+          <div class="report-header">
+            <h3 class="report-title">${report.title}</h3>
+            <div class="report-meta">
+              <span class="report-brand">
+                <i class="fas ${brandIcon}"></i> ${brandName}
+              </span>
+              <span class="report-priority ${priorityClass}">
+                <i class="fas ${priorityIcon}"></i> ${report.priority.charAt(0).toUpperCase() + report.priority.slice(1)}
+              </span>
+            </div>
+          </div>
+          <div class="report-content">
+            <p>${report.description}</p>
+            ${imagesHTML}
+          </div>
+          <div class="report-footer">
+            <div class="report-date">
+              <i class="far fa-clock"></i> ${formattedDate} by ${report.createdBy}
+            </div>
+            <div class="report-actions">
+              <button class="btn-edit" onclick="editReport('${report.id}')">
+                <i class="fas fa-edit"></i> Edit
+              </button>
+              <button class="btn-delete" onclick="deleteReport('${report.id}')">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+              <button class="btn-solve" onclick="solveReport('${report.id}')">
+                <i class="fas fa-check"></i> Mark as Solved
+              </button>
+            </div>
+          </div>
+        `;
+        
+        reportsContainer.appendChild(reportCard);
+      });
+    }
+
+    // Open image modal
+    function openImageModal(reportId, imageIndex) {
+      const report = reports.find(r => r.id === reportId);
+      
+      if (!report || !report.images || report.images.length === 0) return;
+      
+      // Set main image
+      mainImage.src = report.images[imageIndex].data;
+      
+      // Create thumbnails
+      thumbnailContainer.innerHTML = '';
+      report.images.forEach((img, index) => {
+        const thumbnail = document.createElement('img');
+        thumbnail.src = img.data;
+        thumbnail.className = `thumbnail ${index === imageIndex ? 'active' : ''}`;
+        thumbnail.onclick = () => {
+          mainImage.src = img.data;
+          document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+          thumbnail.classList.add('active');
+        };
+        thumbnailContainer.appendChild(thumbnail);
+      });
+      
+      imageModal.classList.add('active');
+    }
+
+    // Close modal
+    function closeModal() {
+      imageModal.classList.remove('active');
+    }
+
+    // Edit report
+    function editReport(reportId) {
+      const report = reports.find(r => r.id === reportId);
+      if (!report) return;
+      
+      // Fill form with report data
+      document.getElementById('reportTitle').value = report.title;
+      document.getElementById('reportCategory').value = report.category;
+      document.getElementById('reportDescription').value = report.description;
+      document.getElementById(`brand-${report.brand}`).checked = true;
+      document.getElementById(`priority-${report.priority}`).checked = true;
+      
+      // Handle images (would need more complex implementation for actual edit)
+      previewContainer.innerHTML = '';
+      if (report.images && report.images.length > 0) {
+        report.images.forEach(img => {
+          const previewItem = document.createElement('div');
+          previewItem.className = 'preview-item';
+          
+          const previewImg = document.createElement('img');
+          previewImg.src = img.data;
+          previewImg.alt = img.name;
+          
+          const removeBtn = document.createElement('button');
+          removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+          removeBtn.onclick = function() {
+            previewItem.remove();
+          };
+          
+          previewItem.appendChild(previewImg);
+          previewItem.appendChild(removeBtn);
+          previewContainer.appendChild(previewItem);
+        });
+      }
+      
+      // Remove the report being edited
+      reports = reports.filter(r => r.id !== reportId);
+      saveReports();
+      
+      // Scroll to form
+      document.getElementById('reportTitle').focus();
+    }
+
+    // Delete report
+    function deleteReport(reportId) {
+      if (confirm('Are you sure you want to delete this report?')) {
+        reports = reports.filter(r => r.id !== reportId);
+        saveReports();
+        renderReports();
+      }
+    }
+
+    // Mark report as solved
+    function solveReport(reportId) {
+      if (confirm('Mark this report as solved?')) {
+        // In a real app, you would move this to a "solved reports" list
+        reports = reports.filter(r => r.id !== reportId);
+        saveReports();
+        renderReports();
+      }
+    }
+
+    // Theme toggle
+    function toggleThemeQuick() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'default' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      
+      // Update icon
+      const icon = document.getElementById('theme-toggle-icon');
+      icon.innerHTML = newTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    }
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'default';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    const themeIcon = document.getElementById('theme-toggle-icon');
+    themeIcon.innerHTML = savedTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+
+    // Sidebar toggle
+    function toggleSidebar() {
+      document.querySelector('.sidebar').classList.toggle('collapsed');
+    }
+
+    // Close sidebar on mobile when menu item clicked
+    document.querySelectorAll('.sidebar nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 1024) {
+          document.querySelector('.sidebar').classList.remove('open');
+        }
+      });
+    });
+
+    // Logout
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('username');
+        window.location.href = 'login.html';
+      }
+    });
+
+    // Initialize
+    updateClock();
+    setInterval(updateClock, 1000);
+    renderReports();
+
+    // Responsive sidebar handling
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 1024) {
+        document.querySelector('.sidebar').classList.remove('open');
+      }
+    });
+
+    // Close modal when clicking outside
+    imageModal.addEventListener('click', function(e) {
+      if (e.target === imageModal) {
+        closeModal();
+      }
+    });
+
+    // Add drag and drop functionality
+    const fileUploadLabel = document.querySelector('.file-upload-label');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      fileUploadLabel.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+      fileUploadLabel.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+      fileUploadLabel.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight() {
+  const root = document.documentElement;
+  const primaryColor = getComputedStyle(root).getPropertyValue('--primary-color').trim();
+  const hoverColor = getComputedStyle(root).getPropertyValue('--hover-color').trim();
+  
+  fileUploadLabel.style.borderColor = primaryColor;
+  fileUploadLabel.style.backgroundColor = hoverColor;
+}
+
+function unhighlight() {
+  const root = document.documentElement;
+  const borderColor = getComputedStyle(root).getPropertyValue('--border-color').trim();
+  const inputBg = getComputedStyle(root).getPropertyValue('--input-bg').trim();
+  
+  fileUploadLabel.style.borderColor = borderColor;
+  fileUploadLabel.style.backgroundColor = inputBg;
+}
+  </script>
+</body>
+</html>
