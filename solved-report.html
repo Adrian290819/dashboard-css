@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solved Reports - My Dashboard</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
     <link rel="stylesheet" href="global.css">
@@ -1223,12 +1223,33 @@
 .notification-footer a:hover {
     text-decoration: underline;
 }
-    </style>
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-completed {
+    background-color: #10b981;
+    color: white;
+}
+
+.status-verified {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.status-pending {
+    background-color: #f59e0b;
+    color: white;
+}
+</style>
 </head>
 <body>
-   
-
     <div id="sidebar-container"></div>
+    
     <!-- Main Content -->
     <div class="main-content">
         <div class="header">
@@ -1244,7 +1265,7 @@
                     <input type="text" placeholder="Search solved reports..." id="dashboardSearch">
                 </div>
                 
-             <div class="user-profile">
+                <div class="user-profile">
                     <img class="profile-img" src="https://iili.io/Fpiva7S.png" alt="Profile">
                     <div class="user-info">
                         <h4>Bang Pengshui</h4>
@@ -1279,911 +1300,865 @@
                         <option value="ATHENA168 (GACHA)">ATHENA168 (GACHA)</option>
                         <option value="ARES GACOR (GACHA)">ARES GACOR (GACHA)</option>
                         <option value="RAJA MAHJONG (GACHA)">RAJA MAHJONG (GACHA)</option>
-                        <option value="OLYMPUS1000 (GACHA)">OLYMPUS1000 (GACHA)</option>
-                        <option value="CLICKBET (GACHA)">CLICKBET (GACHA)</option>
-                        <option value="GACHA99 (GACHA)">GACHA99 (GACHA)</option>
-                        <option value="UJANGBET (BREM)">UJANGBET (BREM)</option>
-                        <option value="EPISODEBET (BREM)">EPISODEBET (BREM)</option>
-                        <option value="FOKUSBET88 (89ENGINE)">FOKUSBET88 (89ENGINE)</option>
-                        <option value="RAJAKING88 (89ENGINE)">RAJAKING88 (89ENGINE)</option>
-                        <option value="RAJANAGA99 (89ENGINE)">RAJANAGA99 (89ENGINE)</option>
-                        <option value="JOIN999 (LUXION)">JOIN999 (LUXION)</option>
+                        <option value="ZEUS GACOR (GACHA)">ZEUS GACOR (GACHA)</option>
+                        <option value="HADES GACOR (GACHA)">HADES GACOR (GACHA)</option>
+                        <option value="POSEIDON GACOR (GACHA)">POSEIDON GACOR (GACHA)</option>
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label class="filter-label">Category</label>
-                    <select class="filter-select" id="categoryFilter">
-                        <option value="">Select Category</option>
-
-                                    <option value="Kemenangan Pending">Kemenangan Pending</option>
-
-                                    <option value="Replay Pending">Replay Kemenangan</option>
-
-                                    <option value="Report Kendala Panel">Report Kendala Panel</option>
-
-                                    <option value="Report Kendala Provider">Report Kendala Provider</option>
-
-                                    <option value="Report Kendala Game">Report Kendala Game</option>
-
-                                    <option value="Report Maintenance">Report Maintenance</option>
-
-                                    <option value="Other">Other</option>
+                    <label class="filter-label">Status</label>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="">All Statuses</option>
+                        <option value="completed">Completed</option>
+                        <option value="verified">Verified</option>
+                        <option value="reopened">Reopened</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Priority</label>
+                    <select class="filter-select" id="priorityFilter">
+                        <option value="">All Priorities</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
                     </select>
                 </div>
                 <div class="filter-group">
                     <label class="filter-label">Date Range</label>
-                    <input type="date" class="filter-input" id="dateFilterFrom">
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">To</label>
-                    <input type="date" class="filter-input" id="dateFilterTo">
+                    <div class="date-range-inputs">
+                        <input type="date" class="filter-select" id="startDate">
+                        <span>to</span>
+                        <input type="date" class="filter-select" id="endDate">
+                    </div>
                 </div>
             </div>
         </div>
         
-        <!-- Reports Section -->
-        <div class="reports-section fade-in">
-            <div class="section-header">
-                <h2 class="section-title"><i class="fas fa-check-double"></i> History Completed Reports</h2>
-                <div class="section-actions">
-                    <button class="btn btn-danger" id="deleteAllReports">
-                        <i class="fas fa-trash"></i> Delete All
-                    </button>
-                    <button class="btn btn-outline" id="refreshReports">
-                        <i class="fas fa-sync-alt"></i> Refresh
-                    </button>
-                    <button class="btn btn-primary" id="exportReports">
-                        <i class="fas fa-download"></i> Export
-                    </button>
+        <!-- Statistics Cards -->
+        <div class="maintenance-stats fade-in">
+            <div class="maintenance-stat-card completed">
+                <div class="stat-header">
+                    <h3 class="stat-title">Completed Reports</h3>
+                    <div class="stat-icon completed">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="completedCount">0</div>
+                <p class="stat-description">Total reports marked as completed</p>
+            </div>
+            
+            <div class="maintenance-stat-card this-week">
+                <div class="stat-header">
+                    <h3 class="stat-title">Solved This Week</h3>
+                    <div class="stat-icon this-week">
+                        <i class="fas fa-calendar-week"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="thisWeekCount">0</div>
+                <p class="stat-description">Reports resolved in the last 7 days</p>
+            </div>
+            
+            <div class="maintenance-stat-card this-month">
+                <div class="stat-header">
+                    <h3 class="stat-title">Solved This Month</h3>
+                    <div class="stat-icon this-month">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="thisMonthCount">0</div>
+                <p class="stat-description">Reports resolved in the current month</p>
+            </div>
+            
+            <div class="maintenance-stat-card">
+                <div class="stat-header">
+                    <h3 class="stat-title">Average Resolution Time</h3>
+                    <div class="stat-icon average-time">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="avgResolutionTime">0h</div>
+                <p class="stat-description">Average time to resolve reports</p>
+            </div>
+        </div>
+        
+        <!-- Charts Section -->
+        <div class="chart-section fade-in">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">Solved Reports by Brand</h3>
+                    <select class="filter-select" id="chartTimeRange">
+                        <option value="week">This Week</option>
+                        <option value="month" selected>This Month</option>
+                        <option value="quarter">This Quarter</option>
+                    </select>
+                </div>
+                <div class="chart-container" id="brandChartContainer">
+                    <div class="custom-bar-chart" id="brandChart">
+                        <!-- Chart will be generated by JavaScript -->
+                    </div>
                 </div>
             </div>
             
-            <div class="reports-grid" id="reportsGrid">
-                <!-- Solved reports will be loaded dynamically -->
-            </div>
-            <div id="noReports" class="empty-state" style="display: none;">
-                <i class="fas fa-check-circle"></i>
-                <h3>No Solved Reports</h3>
-                <p>You haven't completed any reports yet.</p>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">Resolution Time Distribution</h3>
+                    <select class="filter-select" id="resolutionTimeRange">
+                        <option value="week">This Week</option>
+                        <option value="month" selected>This Month</option>
+                        <option value="quarter">This Quarter</option>
+                    </select>
+                </div>
+                <div class="chart-container" id="resolutionTimeChartContainer">
+                    <div class="custom-pie-chart" id="resolutionTimeChart">
+                        <!-- Pie chart will be generated by JavaScript -->
+                    </div>
+                    <div class="chart-legend" id="resolutionTimeLegend">
+                        <!-- Legend will be generated by JavaScript -->
+                    </div>
+                </div>
             </div>
         </div>
         
-        <!-- Report Details Modal -->
-        <div class="modal-overlay" id="reportModal">
-            <div class="modal">
-                <div class="modal-header">
-                    <h3 class="modal-title"><i class="fas fa-file-alt"></i> Report Details</h3>
-                    <button class="modal-close" id="closeModal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="report-details">
-                        <div class="report-detail-item">
-                            <div class="report-detail-label">Report ID</div>
-                            <div class="report-detail-value" id="detailReportId"></div>
-                        </div>
-                        <div class="report-detail-item">
-                            <div class="report-detail-label">Brand</div>
-                            <div class="report-detail-value" id="detailReportBrand"></div>
-                        </div>
-                        <div class="report-detail-item">
-                            <div class="report-detail-label">Date Created</div>
-                            <div class="report-detail-value" id="detailReportDateCreated"></div>
-                        </div>
-                        <div class="report-detail-item">
-                            <div class="report-detail-label">Date Solved</div>
-                            <div class="report-detail-value" id="detailReportDateSolved"></div>
-                        </div>
-                        <div class="report-detail-item">
-                            <div class="report-detail-label">Time to Resolution</div>
-                            <div class="report-detail-value" id="detailReportResolutionTime"></div>
-                        </div>
-                    </div>
-                    
-                    <!-- Status Information Grid -->
-                    <div class="status-info-grid">
-                        <div class="status-info-item">
-                            <div class="status-info-label">STATUS</div>
-                            <div class="status-info-value" id="detailReportStatus"></div>
-                        </div>
-                        <div class="status-info-item">
-                            <div class="status-info-label">CATEGORY</div>
-                            <div class="status-info-value" id="detailReportCategory"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="report-description">
-                        <h4>Case Report</h4>
-                        <div id="detailReportDescription"></div>
-                    </div>
-                    
-                    <div class="report-resolution">
-                        <h4>Solved Report</h4>
-                        <div id="detailReportResolution"></div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-outline" id="closeModalBtn">
-                        <i class="fas fa-times"></i> Close
-                    </button>
-                    <button class="btn btn-danger" id="deleteReportBtn">
-                        <i class="fas fa-trash"></i> Delete Report
-                    </button>
-                    <button class="btn btn-warning" id="reopenReportBtn">
-                        <i class="fas fa-undo"></i> Reopen Report
-                    </button>
+        <!-- Solved Reports Table -->
+        <div class="activities-section fade-in">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-list-check"></i> Solved Reports
+                    <span class="badge badge-primary" id="reportsCount">0</span>
+                </h2>
+                <div class="section-actions">
                 </div>
             </div>
-        </div>
-
-        <!-- Confirmation Modal -->
-        <div class="modal-overlay" id="confirmModal">
-            <div class="modal confirm-modal">
-                <div class="modal-header">
-                    <h3 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Confirmation</h3>
-                    <button class="modal-close" id="closeConfirmModal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="confirm-icon">
-                        <i class="fas fa-exclamation-circle"></i>
-                    </div>
-                    <div class="confirm-message" id="confirmMessage"></div>
-                    <div class="confirm-actions">
-                        <button class="btn btn-outline" id="cancelConfirm">
-                            <i class="fas fa-times"></i> Cancel
-                        </button>
-                        <button class="btn btn-danger" id="confirmAction">
-                            <i class="fas fa-check"></i> Confirm
-                        </button>
-                    </div>
-                </div>
+            
+            <div class="maintenance-table-container">
+                <table class="maintenance-table">
+                    <thead>
+                        <tr>
+                            <th>Report ID</th>
+                            <th>Brand</th>
+                            <th>Reported By</th>
+                            <th>Category</th>
+                            <th>Priority</th>
+                            <th>Reported At</th>
+                            <th>Resolved At</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="solvedReportsTableBody">
+                        <!-- Data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="pagination">
+                <button class="btn btn-secondary" id="prevPage">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                <span class="page-numbers" id="pageInfo">Page 1 of 1</span>
+                <button class="btn btn-secondary" id="nextPage">
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
         </div>
     </div>
-<script src="sidebar-loader.js"></script>
-<script src="user-profile.js"></script>
-<script src="notifications.js"></script>
-   
-   <script>
-    // ========== UTILITY FUNCTIONS ==========
     
-   function showToast(message, type = 'success', duration = 3000) {
-    const toast = document.createElement('div');
-    toast.className = `toast-notification ${type}`;
-
-    toast.innerHTML = `
-        <div class="toast-content">
-            <span>${message}</span>
+    <!-- Report Details Modal -->
+    <div class="modal-overlay" id="reportDetailsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-file-alt"></i> Report Details</h2>
+                <button class="modal-close" id="closeDetailsModal">&times;</button>
+            </div>
+            <div class="modal-body" id="reportDetailsContent">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeDetailsBtn">Close</button>
+                <button class="btn btn-warning" id="reopenReportBtn">
+                    <i class="fas fa-undo"></i> Reopen Report
+                </button>
+            </div>
         </div>
-    `;
-
-    document.body.appendChild(toast);
-
-    // Auto-hide after duration
-    setTimeout(() => {
-        toast.classList.add('hide');
-        toast.addEventListener('animationend', () => {
-            toast.remove();
-        });
-    }, duration);
-
-
-        
-        // Tambahkan ke body
-        document.body.appendChild(toast);
-        
-        // Tampilkan toast
-        setTimeout(() => {
-            toast.classList.add('show');
-        }, 10);
-        
-        // Sembunyikan setelah 3 detik
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.parentNode.removeChild(toast);
-                }
-            }, 300);
-        }, 3000);
-    }
-
-    // ========== DATA MANAGEMENT FUNCTIONS ==========
+    </div>
     
-    // Fungsi untuk mendapatkan laporan yang sudah solved
-    function getSolvedReports() {
-        const reports = localStorage.getItem('solvedReports');
-        return reports ? JSON.parse(reports) : [];
-    }
-
-    // Fungsi untuk mendapatkan laporan pending
-    function getPendingReports() {
-        const reports = localStorage.getItem('pendingReports');
-        return reports ? JSON.parse(reports) : [];
-    }
-
-    // Fungsi untuk menyimpan laporan pending
-    function savePendingReports(reports) {
-        localStorage.setItem('pendingReports', JSON.stringify(reports));
-    }
-
-    // Fungsi untuk menyimpan laporan solved
-    function saveSolvedReports(reports) {
-        localStorage.setItem('solvedReports', JSON.stringify(reports));
-    }
-
-    // Fungsi untuk memperbarui jumlah notifikasi
-function updateBadgeCounts() {
-    const pendingReports = getPendingReports();
-    const notificationBadge = document.getElementById('notificationCount');
-    
-    if (notificationBadge) {
-        // Hitung notifikasi yang belum dibaca
-        const notifications = getNotifications();
-        const unreadCount = notifications.filter(n => !n.read).length;
-        notificationBadge.textContent = unreadCount;
-    }
-}
-    // ========== REPORT OPERATIONS ==========
-    
-    // ========== REPORT OPERATIONS ==========
-
-// Fungsi untuk memindahkan laporan kembali ke pending
-function reopenReport(reportId) {
-    const solvedReports = getSolvedReports();
-    const pendingReports = getPendingReports();
-    
-    // Cari report yang akan dipindahkan
-    const reportIndex = solvedReports.findIndex(report => report.id === reportId);
-    
-    if (reportIndex === -1) {
-        showToast('Report not found!', 'error');
-        return false;
-    }
-    
-    // Ambil report dan ubah statusnya
-    const reopenedReport = {...solvedReports[reportIndex]};
-    reopenedReport.status = 'Pending';
-    delete reopenedReport.dateSolved;
-    delete reopenedReport.resolutionDescription;
-    
-    // Hapus dari solved dan tambahkan ke pending
-    solvedReports.splice(reportIndex, 1);
-    pendingReports.push(reopenedReport);
-    
-    // Simpan perubahan
-    saveSolvedReports(solvedReports);
-    savePendingReports(pendingReports);
-    updateBadgeCounts();
-    
-    // Tambahkan notifikasi
-    addNotification({
-        type: 'report_reopened',
-        message: `Report ${reportId} has been reopened and moved back to Pending Reports`,
-        timestamp: new Date().toISOString(),
-        reportId: reportId,
-        read: false
-    });
-    
-    showToast('Report reopened successfully!');
-    return true;
-}
-
-// Fungsi untuk menghapus laporan solved
-function deleteReport(reportId) {
-    const solvedReports = getSolvedReports();
-    
-    // Cari report yang akan dihapus
-    const reportIndex = solvedReports.findIndex(report => report.id === reportId);
-    
-    if (reportIndex === -1) {
-        showToast('Report not found!', 'error');
-        return false;
-    }
-    
-    // Hapus report
-    solvedReports.splice(reportIndex, 1);
-    
-    // Simpan perubahan
-    saveSolvedReports(solvedReports);
-    updateBadgeCounts();
-    
-    // Tambahkan notifikasi
-    addNotification({
-        type: 'report_deleted',
-        message: `Report ${reportId} has been deleted from Solved Reports`,
-        timestamp: new Date().toISOString(),
-        reportId: reportId,
-        read: false
-    });
-    
-    showToast('Report deleted successfully!');
-    return true;
-}
-
-// Fungsi untuk menghapus semua laporan solved
-function deleteAllReports() {
-    if (getSolvedReports().length === 0) {
-        showToast('No reports to delete!', 'error');
-        return false;
-    }
-    
-    // Kosongkan semua laporan solved
-    saveSolvedReports([]);
-    updateBadgeCounts();
-    
-    // Tambahkan notifikasi
-    addNotification({
-        type: 'report_deleted',
-        message: `All solved reports have been deleted`,
-        timestamp: new Date().toISOString(),
-        read: false
-    });
-    
-    showToast('All reports deleted successfully!');
-    return true;
-}
-
-    // Fungsi untuk menghapus laporan solved
-    function deleteReport(reportId) {
-        const solvedReports = getSolvedReports();
-        
-        // Cari report yang akan dihapus
-        const reportIndex = solvedReports.findIndex(report => report.id === reportId);
-        
-        if (reportIndex === -1) {
-            showToast('Report not found!', 'error');
-            return false;
-        }
-        
-        // Hapus report
-        solvedReports.splice(reportIndex, 1);
-        
-        // Simpan perubahan
-        saveSolvedReports(solvedReports);
-        updateBadgeCounts();
-        
-        showToast('Report deleted successfully!');
-        return true;
-    }
-
-    // Fungsi untuk menghapus semua laporan solved
-    function deleteAllReports() {
-        if (getSolvedReports().length === 0) {
-            showToast('No reports to delete!', 'error');
-            return false;
-        }
-        
-        // Kosongkan semua laporan solved
-        saveSolvedReports([]);
-        updateBadgeCounts();
-        
-        showToast('All reports deleted successfully!');
-        return true;
-    }
-// ========== NOTIFICATION FUNCTIONS ==========
-
-// Fungsi untuk mendapatkan notifikasi
-function getNotifications() {
-    const notifications = localStorage.getItem('notifications');
-    return notifications ? JSON.parse(notifications) : [];
-}
-
-// Fungsi untuk menyimpan notifikasi
-function saveNotifications(notifications) {
-    localStorage.setItem('notifications', JSON.stringify(notifications));
-}
-
-// Fungsi untuk menambahkan notifikasi baru
-function addNotification(notification) {
-    const notifications = getNotifications();
-    notifications.unshift(notification); // Tambahkan di awal array
-    saveNotifications(notifications);
-    updateNotificationUI();
-}
-
-// Fungsi untuk memperbarui UI notifikasi
-function updateNotificationUI() {
-    const notifications = getNotifications();
-    const unreadCount = notifications.filter(n => !n.read).length;
-    
-    // Perbarui badge count
-    const notificationBadge = document.getElementById('notificationCount');
-    if (notificationBadge) {
-        notificationBadge.textContent = unreadCount;
-    }
-    
-    // Perbarui dropdown notifikasi (jika ada)
-    updateNotificationDropdown();
-}
-
-// Fungsi untuk memperbarui dropdown notifikasi
-function updateNotificationDropdown() {
-    const notificationList = document.getElementById('notificationList');
-    if (!notificationList) return;
-    
-    const notifications = getNotifications();
-    
-    if (notifications.length === 0) {
-        notificationList.innerHTML = `
-            <div class="empty-state" style="padding: var(--space-md);">
-                <i class="fas fa-bell-slash"></i>
-                <p>No notifications</p>
+    <!-- Reopen Confirmation Modal -->
+    <div class="modal-overlay" id="reopenConfirmModal">
+        <div class="modal confirm-modal">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Confirm Reopen</h2>
+                <button class="modal-close" id="closeReopenModal">&times;</button>
             </div>
-        `;
-        return;
-    }
-    
-    notificationList.innerHTML = '';
-    
-    // Batasi hanya 5 notifikasi terbaru
-    const recentNotifications = notifications.slice(0, 5);
-    
-    recentNotifications.forEach(notification => {
-        const notificationItem = document.createElement('div');
-        notificationItem.className = `notification-item ${notification.read ? '' : 'unread'}`;
-        
-        // Tentukan ikon berdasarkan jenis notifikasi
-        let icon = 'fas fa-bell';
-        if (notification.type === 'new_report') {
-            icon = 'fas fa-file-alt';
-        } else if (notification.type === 'report_solved') {
-            icon = 'fas fa-check-circle';
-        } else if (notification.type === 'report_reopened') {
-            icon = 'fas fa-undo';
-        } else if (notification.type === 'report_deleted') {
-            icon = 'fas fa-trash';
-        }
-        
-        // Format waktu
-        const time = formatNotificationTime(notification.timestamp);
-        
-        notificationItem.innerHTML = `
-            <div class="notification-icon">
-                <i class="${icon}"></i>
+            <div class="modal-body">
+                <div class="confirm-icon">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <p class="confirm-message" id="reopenConfirmMessage">
+                    Are you sure you want to reopen this report? This will move it back to pending reports.
+                </p>
             </div>
-            <div class="notification-content">
-                <p class="notification-message">${notification.message}</p>
-                <span class="notification-time">${time}</span>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelReopenBtn">Cancel</button>
+                <button class="btn btn-warning" id="confirmReopenBtn">Yes, Reopen Report</button>
             </div>
-            ${!notification.read ? '<div class="notification-dot"></div>' : ''}
-        `;
-        
-        // Tambahkan event listener untuk menandai sebagai telah dibaca
-        notificationItem.addEventListener('click', () => {
-            markNotificationAsRead(notification.timestamp);
-        });
-        
-        notificationList.appendChild(notificationItem);
-    });
-}
+        </div>
+    </div>
+    <script src="sidebar-loader.js"></script>
+    <script src="user-profile.js"></script>
+    
+    <!-- Firebase App (core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <!-- Firebase Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <!-- Firebase Auth -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
-// Fungsi untuk memformat waktu notifikasi
-function formatNotificationTime(timestamp) {
-    const now = new Date();
-    const time = new Date(timestamp);
-    const diffInMinutes = Math.floor((now - time) / (1000 * 60));
-    
-    if (diffInMinutes < 1) return 'Just now';
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `${diffInDays}d ago`;
-    
-    return time.toLocaleDateString();
-}
+    <script>
+    // Konfigurasi Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyDUZka4FZyLi_cv6X_5D4zeRsfkpqOlBpY",
+        authDomain: "dashboard-css.firebaseapp.com",
+        databaseURL: "https://dashboard-css-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "dashboard-css",
+        storageBucket: "dashboard-css.appspot.com",
+        messagingSenderId: "771131792881",
+        appId: "1:771131792881:web:ad634424225bd7de847850",
+        measurementId: "G-3CYBC5B101"
+    };
 
-// Fungsi untuk menandai notifikasi sebagai telah dibaca
-function markNotificationAsRead(timestamp) {
-    const notifications = getNotifications();
-    const notificationIndex = notifications.findIndex(n => n.timestamp === timestamp);
-    
-    if (notificationIndex !== -1) {
-        notifications[notificationIndex].read = true;
-        saveNotifications(notifications);
-        updateNotificationUI();
-    }
-}
+    // Inisialisasi Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
 
-// Fungsi untuk menandai semua notifikasi sebagai telah dibaca
-function markAllNotificationsAsRead() {
-    const notifications = getNotifications();
-    notifications.forEach(notification => {
-        notification.read = true;
-    });
-    saveNotifications(notifications);
-    updateNotificationUI();
-}
-    // ========== UI FUNCTIONS ==========
-    
-    // Fungsi untuk menampilkan modal konfirmasi
-    function showConfirmModal(message, callback) {
-        const confirmModal = document.getElementById('confirmModal');
-        const confirmMessage = document.getElementById('confirmMessage');
-        const confirmActionBtn = document.getElementById('confirmAction');
-        const cancelConfirmBtn = document.getElementById('cancelConfirm');
-        const closeConfirmModalBtn = document.getElementById('closeConfirmModal');
+    // Deklarasi variabel global untuk solved reports
+    let solvedReports = [];
+    let unsubscribeSolved = null;
+    let currentReportId = null;
+    let currentPage = 1;
+    const reportsPerPage = 10;
+
+    function setupSolvedReportsListener() {
+        if (unsubscribeSolved) {
+            unsubscribeSolved();
+        }
         
-        confirmMessage.textContent = message;
-        
-        // Hapus event listener sebelumnya
-        const newConfirmActionBtn = confirmActionBtn.cloneNode(true);
-        confirmActionBtn.parentNode.replaceChild(newConfirmActionBtn, confirmActionBtn);
-        
-        const newCancelConfirmBtn = cancelConfirmBtn.cloneNode(true);
-        cancelConfirmBtn.parentNode.replaceChild(newCancelConfirmBtn, cancelConfirmBtn);
-        
-        const newCloseConfirmModalBtn = closeConfirmModalBtn.cloneNode(true);
-        closeConfirmModalBtn.parentNode.replaceChild(newCloseConfirmModalBtn, closeConfirmModalBtn);
-        
-        // Tambahkan event listener baru
-        newConfirmActionBtn.addEventListener('click', function() {
-            callback();
-            confirmModal.classList.remove('active');
-        });
-        
-        newCancelConfirmBtn.addEventListener('click', function() {
-            confirmModal.classList.remove('active');
-        });
-        
-        newCloseConfirmModalBtn.addEventListener('click', function() {
-            confirmModal.classList.remove('active');
-        });
-        
-        // Tampilkan modal
-        confirmModal.classList.add('active');
+        const reportsRef = db.collection('solvedReports');
+
+        unsubscribeSolved = reportsRef
+            .orderBy('dateSolved', 'desc')
+            .onSnapshot(snapshot => {
+                solvedReports = [];
+                snapshot.forEach(doc => {
+                    const report = doc.data();
+                    report.id = doc.id;
+                    
+                    // Pastikan data yang diperlukan ada
+                    if (report.dateCreated && report.dateSolved && report.status) {
+                        solvedReports.push(report);
+                    } else {
+                        console.warn("Invalid report data:", report);
+                    }
+                });
+
+                updateSolvedReportsUI();
+                updateStatistics();
+                updateCharts();
+
+            }, error => {
+                console.error("Error fetching solved reports:", error);
+                showToast("Error loading solved reports", "error");
+            });
     }
 
-    // Fungsi untuk memformat tanggal
-    function formatDate(date) {
-        const d = new Date(date);
-        return d.toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric' 
+    function updateStatistics() {
+        const now = new Date();
+        const completedReports = solvedReports.filter(report => report.status === "completed");
+        const completed = completedReports.length;
+
+        let thisWeek = 0;
+        let thisMonth = 0;
+        let totalResolutionTime = 0;
+
+        completedReports.forEach(report => {
+            // Konversi Firestore timestamp ke JS Date
+            const created = report.dateCreated.toDate ? report.dateCreated.toDate() : new Date(report.dateCreated);
+            const solved = report.dateSolved.toDate ? report.dateSolved.toDate() : new Date(report.dateSolved);
+
+            const resolutionTime = solved - created;
+            totalResolutionTime += resolutionTime;
+
+            const daysAgo = (now - solved) / (1000 * 60 * 60 * 24);
+            if (daysAgo <= 7) thisWeek++;
+            if (now.getMonth() === solved.getMonth() &&
+                now.getFullYear() === solved.getFullYear()) {
+                thisMonth++;
+            }
         });
+
+        const avgResolutionTime = completed > 0 ? (totalResolutionTime / completed) : 0;
+
+        document.getElementById("completedCount").innerText = completed;
+        document.getElementById("thisWeekCount").innerText = thisWeek;
+        document.getElementById("thisMonthCount").innerText = thisMonth;
+        document.getElementById("avgResolutionTime").innerText = (avgResolutionTime / (1000 * 60 * 60)).toFixed(1) + "h";
     }
 
-    // Fungsi untuk menghitung selisih waktu antara dua tanggal
-    function getTimeDifference(startDate, endDate) {
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        const diffTime = Math.abs(end - start);
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        const diffHours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const diffMinutes = Math.floor((diffTime % (1000 * 60 * 60)) / (1000 * 60));
+    function updateSolvedReportsUI() {
+        const tableBody = document.getElementById('solvedReportsTableBody');
+        const reportsCount = document.getElementById('reportsCount');
         
-        if (diffDays > 0) {
-            return `${diffDays}d ${diffHours}h ${diffMinutes}m`;
-        } else if (diffHours > 0) {
-            return `${diffHours}h ${diffMinutes}m`;
-        } else {
-            return `${diffMinutes}m`;
-        }
-    }
-
-    // Fungsi untuk merender kartu laporan solved
-    function renderReportCards() {
-        const reportsGrid = document.getElementById('reportsGrid');
-        const noReports = document.getElementById('noReports');
-        const reports = getSolvedReports();
-        
-        // Apply filters
-        const brandFilter = document.getElementById('brandFilter').value;
-        const categoryFilter = document.getElementById('categoryFilter').value;
-        const dateFrom = document.getElementById('dateFilterFrom').value;
-        const dateTo = document.getElementById('dateFilterTo').value;
-        
-        let filteredReports = reports;
-        
-        if (brandFilter) {
-            filteredReports = filteredReports.filter(report => report.brand === brandFilter);
-        }
-        
-        if (categoryFilter) {
-            filteredReports = filteredReports.filter(report => report.category === categoryFilter);
-        }
-        
-        if (dateFrom) {
-            const fromDate = new Date(dateFrom);
-            filteredReports = filteredReports.filter(report => new Date(report.dateSolved) >= fromDate);
-        }
-        
-        if (dateTo) {
-            const toDate = new Date(dateTo);
-            toDate.setHours(23, 59, 59, 999); // End of the day
-            filteredReports = filteredReports.filter(report => new Date(report.dateSolved) <= toDate);
-        }
-        
-        if (filteredReports.length === 0) {
-            reportsGrid.innerHTML = '';
-            noReports.style.display = 'block';
+        if (solvedReports.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="empty-state">
+                        <i class="fas fa-database"></i>
+                        <h3>No Solved Reports Found</h3>
+                        <p>There are no completed reports in the database yet.</p>
+                    </td>
+                </tr>
+            `;
             return;
         }
         
-        noReports.style.display = 'none';
-        reportsGrid.innerHTML = '';
+        const filteredReports = filterReports(solvedReports);
         
-        // Urutkan laporan berdasarkan tanggal solved (terbaru di atas)
-        const sortedReports = [...filteredReports].sort((a, b) => 
-            new Date(b.dateSolved) - new Date(a.dateSolved)
-        );
+        reportsCount.textContent = filteredReports.length;
         
-        sortedReports.forEach(report => {
-            const resolutionTime = getTimeDifference(report.dateCreated, report.dateSolved);
+        // Pagination
+        const totalPages = Math.ceil(filteredReports.length / reportsPerPage);
+        document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+        
+        // Enable/disable pagination buttons
+        document.getElementById('prevPage').disabled = currentPage === 1;
+        document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
+        
+        // Calculate start and end index for current page
+        const startIndex = (currentPage - 1) * reportsPerPage;
+        const endIndex = Math.min(startIndex + reportsPerPage, filteredReports.length);
+        const currentPageReports = filteredReports.slice(startIndex, endIndex);
+        
+        // Clear table
+        tableBody.innerHTML = '';
+        
+        if (currentPageReports.length === 0) {
+            const emptyRow = document.createElement('tr');
+            emptyRow.innerHTML = `
+                <td colspan="9" style="text-align: center; padding: 40px 20px;">
+                    <i class="fas fa-inbox" style="font-size: 3rem; color: var(--text-tertiary); margin-bottom: 15px; display: block;"></i>
+                    <h3 style="color: var(--text-secondary; margin-bottom: 10px;">No solved reports found</h3>
+                    <p style="color: var(--text-tertiary);">Try adjusting your filters or check back later.</p>
+                </td>
+            `;
+            tableBody.appendChild(emptyRow);
+            return;
+        }
+        
+        currentPageReports.forEach(report => {
+            const row = document.createElement('tr');
             
-            const reportCard = document.createElement('div');
-            reportCard.className = 'report-card fade-in';
-            reportCard.innerHTML = `
-                <div class="report-card-header">
-                    <span class="report-id">${report.id}</span>
-                    <span class="status status-completed">Solved</span>
-                </div>
-                <div class="report-card-body">
-                    <h3 class="report-title">${report.title}</h3>
-                    <p class="report-desc">${report.description}</p>
-                    <div class="report-meta">
-                        <span class="brand brand-${report.brand.toLowerCase().replace(/[^a-z0-9]/g, '-')}">${report.brand}</span>
-                        <span class="report-date">Solved: ${formatDate(report.dateSolved)}</span>
+            // Format dates - gunakan field yang sesuai dengan Firestore
+            const reportedDate = report.dateCreated ? formatDate(report.dateCreated.toDate()) : 'N/A';
+            const resolvedDate = report.dateSolved ? formatDate(report.dateSolved.toDate()) : 'N/A';
+            
+            row.innerHTML = `
+                <td>${report.id}</td>
+                <td>${report.brand || 'N/A'}</td>
+                <td>${report.userId || report.reportedBy || 'N/A'}</td>
+                <td>${report.category || 'N/A'}</td>
+                <td><span class="priority-medium">${report.priority || 'Medium'}</span></td>
+                <td>${reportedDate}</td>
+                <td>${resolvedDate}</td>
+                <td><span class="status-badge status-${report.status}">${report.status}</span></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn-icon view" data-id="${report.id}" title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
                     </div>
-                </div>
-                <div class="report-card-footer">
-                    <button class="btn btn-outline btn-sm view-report-btn" data-id="${report.id}">
-                        <i class="fas fa-eye"></i> View
-                    </button>
-                    <button class="btn btn-danger btn-sm delete-report-btn" data-id="${report.id}">
-                        <i class="fas fa-trash"></i> Delete
-                    </button>
-                    <button class="btn btn-warning btn-sm reopen-report-btn" data-id="${report.id}">
-                        <i class="fas fa-undo"></i> Reopen
-                    </button>
-                </div>
+                </td>
             `;
             
-            reportsGrid.appendChild(reportCard);
+            tableBody.appendChild(row);
         });
         
-        // Tambahkan event listener untuk tombol view
-        document.querySelectorAll('.view-report-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
+        // Add event listeners to view buttons
+        document.querySelectorAll('.btn-icon.view').forEach(button => {
+            button.addEventListener('click', function() {
                 const reportId = this.getAttribute('data-id');
-                viewReportDetails(reportId);
-            });
-        });
-        
-        // Tambahkan event listener untuk tombol delete
-        document.querySelectorAll('.delete-report-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const reportId = this.getAttribute('data-id');
-                showConfirmModal(`Are you sure you want to delete report ${reportId}? This action cannot be undone.`, function() {
-                    const success = deleteReport(reportId);
-                    if (success) {
-                        renderReportCards();
-                    }
-                });
-            });
-        });
-        
-        // Tambahkan event listener untuk tombol reopen
-        document.querySelectorAll('.reopen-report-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const reportId = this.getAttribute('data-id');
-                showConfirmModal(`Are you sure you want to reopen report ${reportId}? It will be moved back to Pending Reports.`, function() {
-                    const success = reopenReport(reportId);
-                    if (success) {
-                        renderReportCards();
-                    }
-                });
+                showReportDetails(reportId);
             });
         });
     }
-
-    // Fungsi untuk menampilkan detail laporan
-    function viewReportDetails(reportId) {
-        const reports = getSolvedReports();
-        const report = reports.find(r => r.id === reportId);
+    
+    function filterReports(reports) {
+        const brandFilter = document.getElementById('brandFilter').value;
+        const statusFilter = document.getElementById('statusFilter').value;
+        const priorityFilter = document.getElementById('priorityFilter').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        
+        return reports.filter(report => {
+            // Filter by brand
+            if (brandFilter && report.brand !== brandFilter) {
+                return false;
+            }
+            
+            // Filter by status
+            if (statusFilter && report.status !== statusFilter) {
+                return false;
+            }
+            
+            // Filter by priority
+            if (priorityFilter && report.priority !== priorityFilter) {
+                return false;
+            }
+            
+            // Filter by date range - gunakan dateSolved yang sesuai dengan Firestore
+            if (startDate && report.dateSolved) {
+                const solvedDate = report.dateSolved.toDate().toISOString().split('T')[0];
+                if (solvedDate < startDate) {
+                    return false;
+                }
+            }
+            
+            if (endDate && report.dateSolved) {
+                const solvedDate = report.dateSolved.toDate().toISOString().split('T')[0];
+                if (solvedDate > endDate) {
+                    return false;
+                }
+            }
+            
+            return true;
+        });
+    }
+    
+    function updateCharts() {
+        updateBrandChart();
+        updateResolutionTimeChart();
+    }
+    
+    function updateBrandChart() {
+        const chartContainer = document.getElementById('brandChart');
+        chartContainer.innerHTML = '';
+        
+        // Group reports by brand
+        const brandCounts = {};
+        solvedReports.forEach(report => {
+            const brand = report.brand || 'Unknown';
+            brandCounts[brand] = (brandCounts[brand] || 0) + 1;
+        });
+        
+        // Sort brands by count (descending)
+        const sortedBrands = Object.entries(brandCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 8); // Top 8 brands
+        
+        if (sortedBrands.length === 0) {
+            chartContainer.innerHTML = '<div class="empty-chart">No data available</div>';
+            return;
+        }
+        
+        // Find max count for scaling
+        const maxCount = Math.max(...sortedBrands.map(b => b[1]));
+        
+        // Create bars for each brand
+        sortedBrands.forEach(([brand, count]) => {
+            const barHeight = Math.max(20, (count / maxCount) * 150); // Minimum height 20px
+            
+            const barContainer = document.createElement('div');
+            barContainer.className = 'bar-container';
+            
+            barContainer.innerHTML = `
+                <div class="bar-value">${count}</div>
+                <div class="bar" style="height: ${barHeight}px;"></div>
+                <div class="bar-label">${brand.length > 10 ? brand.substring(0, 10) + '...' : brand}</div>
+            `;
+            
+            chartContainer.appendChild(barContainer);
+        });
+    }
+    
+    function updateResolutionTimeChart() {
+        const chartContainer = document.getElementById('resolutionTimeChart');
+        const legendContainer = document.getElementById('resolutionTimeLegend');
+        chartContainer.innerHTML = '';
+        legendContainer.innerHTML = '';
+        
+        // Kategorikan berdasarkan waktu resolusi
+        const categories = {
+            'Under 1h': 0,
+            '1-4h': 0,
+            '4-12h': 0,
+            '12-24h': 0,
+            'Over 24h': 0
+        };
+        
+        solvedReports.forEach(report => {
+            if (report.dateCreated && report.dateSolved) {
+                const reportedTime = report.dateCreated.toDate();
+                const solvedTime = report.dateSolved.toDate();
+                const diffHours = Math.abs(solvedTime - reportedTime) / 36e5;
+                
+                if (diffHours < 1) {
+                    categories['Under 1h']++;
+                } else if (diffHours < 4) {
+                    categories['1-4h']++;
+                } else if (diffHours < 12) {
+                    categories['4-12h']++;
+                } else if (diffHours < 24) {
+                    categories['12-24h']++;
+                } else {
+                    categories['Over 24h']++;
+                }
+            }
+        });
+            
+        // Filter out categories with zero counts
+        const nonZeroCategories = Object.entries(categories).filter(([_, count]) => count > 0);
+        
+        if (nonZeroCategories.length === 0) {
+            chartContainer.innerHTML = '<div class="empty-chart">No data available</div>';
+            return;
+        }
+        
+        // Colors for pie chart segments
+        const colors = ['#4361ee', '#4cc9f0', '#3a0ca3', '#7209b7', '#f72585'];
+        
+        // Calculate total for percentages
+        const total = nonZeroCategories.reduce((sum, [_, count]) => sum + count, 0);
+        
+        // Create pie chart
+        let cumulativePercentage = 0;
+        
+        nonZeroCategories.forEach(([label, count], index) => {
+            const percentage = (count / total) * 100;
+            const segment = document.createElement('div');
+            segment.className = 'pie-segment';
+            segment.style.background = colors[index % colors.length];
+            segment.style.transform = `rotate(${cumulativePercentage * 3.6}deg)`;
+            segment.style.clipPath = `polygon(50% 50%, 50% 0%, ${cumulativePercentage + percentage > 50 ? '100% 0%, 100% 100%, 50% 100%' : '100% 0%'})`;
+            
+            chartContainer.appendChild(segment);
+            cumulativePercentage += percentage;
+            
+            // Add legend item
+            const legendItem = document.createElement('div');
+            legendItem.className = 'legend-item';
+            legendItem.innerHTML = `
+                <span class="legend-color" style="background: ${colors[index % colors.length]}"></span>
+                <span>${label}: ${count} (${Math.round(percentage)}%)</span>
+            `;
+            
+            legendContainer.appendChild(legendItem);
+        });
+        
+        // Add center text
+        const center = document.createElement('div');
+        center.className = 'pie-center';
+        center.textContent = `${total}`;
+        chartContainer.appendChild(center);
+    }
+    
+    function showReportDetails(reportId) {
+        const report = solvedReports.find(r => r.id === reportId);
         
         if (!report) {
-            showToast('Report not found!', 'error');
+            showToast("Report not found", "error");
             return;
         }
         
-        const resolutionTime = getTimeDifference(report.dateCreated, report.dateSolved);
-        const resolutionDescription = report.resolutionDescription || 'No resolution description provided.';
+        currentReportId = reportId;
         
-        // Isi modal dengan data laporan
-        document.querySelector('.modal-title').innerHTML = `<i class="fas fa-file-alt"></i> ${report.title}`;
-        document.getElementById('detailReportId').textContent = report.id;
-        document.getElementById('detailReportStatus').innerHTML = `<span class="status-completed">Solved</span>`;
-        document.getElementById('detailReportBrand').innerHTML = `<span class="brand brand-${report.brand.toLowerCase().replace(/[^a-z0-9]/g, '-')}">${report.brand}</span>`;
-        document.getElementById('detailReportCategory').textContent = report.category;
-        document.getElementById('detailReportDateCreated').textContent = formatDate(report.dateCreated);
-        document.getElementById('detailReportDateSolved').textContent = formatDate(report.dateSolved);
-        document.getElementById('detailReportResolutionTime').textContent = resolutionTime;
+        const modalContent = document.getElementById('reportDetailsContent');
         
-        // Tampilkan deskripsi asli dan deskripsi penyelesaian
-        document.getElementById('detailReportDescription').innerHTML = `<p>${report.description}</p>`;
-        document.getElementById('detailReportResolution').innerHTML = `<p>${resolutionDescription}</p>`;
+        // Format dates - sesuaikan dengan field Firestore
+        const reportedDate = report.dateCreated ? formatDateTime(report.dateCreated.toDate()) : 'N/A';
+        const resolvedDate = report.dateSolved ? formatDateTime(report.dateSolved.toDate()) : 'N/A';
         
-        // Set data attribute untuk tombol
-        document.getElementById('deleteReportBtn').setAttribute('data-id', reportId);
-        document.getElementById('reopenReportBtn').setAttribute('data-id', reportId);
+        // Calculate resolution time
+        let resolutionTime = 'N/A';
+        if (report.dateCreated && report.dateSolved) {
+            const reportedTime = report.dateCreated.toDate();
+            const solvedTime = report.dateSolved.toDate();
+            const diffHours = Math.abs(solvedTime - reportedTime) / 36e5;
+            resolutionTime = `${Math.round(diffHours)} hours`;
+        }
+        
+        modalContent.innerHTML = `
+            <div class="report-details">
+                <div class="report-detail-item">
+                    <span class="report-detail-label">Report ID</span>
+                    <span class="report-detail-value">${report.id}</span>
+                </div>
+                <div class="report-detail-item">
+                    <span class="report-detail-label">Brand</span>
+                    <span class="report-detail-value">${report.brand || 'N/A'}</span>
+                </div>
+                <div class="report-detail-item">
+                    <span class="report-detail-label">Reported By</span>
+                    <span class="report-detail-value">${report.userId || report.reportedBy || 'N/A'}</span>
+                </div>
+                <div class="report-detail-item">
+                    <span class="report-detail-label">Category</span>
+                    <span class="report-detail-value">${report.category || 'N/A'}</span>
+                </div>
+                <div class="report-detail-item">
+                    <span class="report-detail-label">Priority</span>
+                    <span class="report-detail-value priority-medium">${report.priority || 'Medium'}</span>
+                </div>
+                <div class="report-detail-item">
+                    <span class="report-detail-label">Status</span>
+                    <span class="report-detail-value status-badge status-${report.status}">${report.status}</span>
+                </div>
+                <div class="report-detail-item">
+                    <span class="report-detail-label">Reported At</span>
+                    <span class="report-detail-value">${reportedDate}</span>
+                </div>
+                <div class="report-detail-item">
+                    <span class="report-detail-label">Solved At</span>
+                    <span class="report-detail-value">${resolvedDate}</span>
+                </div>
+            </div>
+            
+            <div class="status-info-grid">
+                <div class="status-info-item">
+                    <div class="status-info-label">Resolution Time</div>
+                    <div class="status-info-value">${resolutionTime}</div>
+                </div>
+                <div class="status-info-item">
+                    <div class="status-info-label">Completed By</div>
+                    <div class="status-info-value">${report.completedBy || 'Unknown'}</div>
+                </div>
+            </div>
+            
+            <div class="report-description">
+                <h4>Issue Description</h4>
+                <div>${report.description || 'No description provided'}</div>
+            </div>
+            
+            <div class="report-resolution">
+                <h4>Resolution Notes</h4>
+                <div>${report.resolution || 'No resolution notes provided'}</div>
+            </div>
+        `;
         
         // Tampilkan modal
-        const reportModal = document.getElementById('reportModal');
-        reportModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        document.getElementById('reportDetailsModal').classList.add('active');
     }
+    
+function reopenReport(reportId) {
+    const solvedReportRef = db.collection('solvedReports').doc(reportId);
+    const pendingReportRef = db.collection('pendingReports').doc(reportId); // Ubah ke pendingReports
 
-    // Fungsi untuk mengekspor laporan
-    function exportReports() {
-        const reports = getSolvedReports();
-        
-        if (reports.length === 0) {
-            showToast('No reports to export!', 'error');
-            return;
-        }
-        
-        // Format data untuk CSV
-        let csvContent = "ID,Title,Category,Brand,Date Created,Date Solved,Resolution Time\n";
-        
-        reports.forEach(report => {
-            const resolutionTime = getTimeDifference(report.dateCreated, report.dateSolved);
-            csvContent += `"${report.id}","${report.title}","${report.category}","${report.brand}","${formatDate(report.dateCreated)}","${formatDate(report.dateSolved)}","${resolutionTime}"\n`;
-        });
-        
-        // Buat blob dan download
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        const date = new Date().toISOString().slice(0, 10);
-        
-        link.setAttribute("href", url);
-        link.setAttribute("download", `solved_reports_${date}.csv`);
-        link.style.visibility = 'hidden';
-        
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        showToast('Reports exported successfully!');
-    }
-
-    // Fungsi untuk mencari laporan
-    function searchReports() {
-        const searchTerm = document.getElementById('dashboardSearch').value.toLowerCase();
-        const reportCards = document.querySelectorAll('.report-card');
-        
-        reportCards.forEach(card => {
-            const title = card.querySelector('.report-title').textContent.toLowerCase();
-            const description = card.querySelector('.report-desc').textContent.toLowerCase();
-            const brand = card.querySelector('.brand').textContent.toLowerCase();
+    // Pertama, ambil data dari solvedReports
+    solvedReportRef.get().then((doc) => {
+        if (doc.exists) {
+            const reportData = doc.data();
             
-            if (title.includes(searchTerm) || description.includes(searchTerm) || brand.includes(searchTerm)) {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    }
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize UI components
-    renderReportCards();
-    updateBadgeCounts();
-    updateNotificationUI(); // Inisialisasi notifikasi
-    
-    
-    
-    // Event listener untuk tombol refresh
-    const refreshButton = document.getElementById('refreshReports');
-    if (refreshButton) {
-        refreshButton.addEventListener('click', () => {
-            renderReportCards();
-            showToast('Solved reports refreshed successfully!', 'success');
-        });
-    }
-
-// Event listener untuk tombol reset filter
-const resetFiltersButton = document.getElementById('resetFilters');
-if (resetFiltersButton) {
-    resetFiltersButton.addEventListener('click', () => {
-        const statusFilter = document.getElementById('statusFilter');
-        const brandFilter = document.getElementById('brandFilter');
-        const categoryFilter = document.getElementById('categoryFilter');
-        const dateFilter = document.getElementById('dateFilter');
-
-        if (statusFilter) statusFilter.value = '';
-        if (brandFilter) brandFilter.value = '';
-        if (categoryFilter) categoryFilter.value = '';
-        if (dateFilter) dateFilter.value = '';
-
-        renderReportCards();
-        showToast('Filters have been refreshed!', 'success');
+            // Pindahkan ke pendingReports dengan status pending
+            pendingReportRef.set({
+                ...reportData,
+                status: 'pending',
+                dateSolved: null,
+                resolution: null,
+                completedBy: null,
+                dateUpdated: new Date() // Tambahkan timestamp update
+            })
+            .then(() => {
+                // Hapus dari solvedReports
+                return solvedReportRef.delete();
+            })
+            .then(() => {
+                showToast("Report reopened successfully", "success");
+                document.getElementById('reopenConfirmModal').classList.remove('active');
+            })
+            .catch(error => {
+                console.error("Error reopening report:", error);
+                showToast("Error reopening report", "error");
+            });
+        }
     });
 }
-
+    
+    function showToast(message, type = "info") {
+        // Create toast element if it doesn't exist
+        let toast = document.getElementById('toastNotification');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'toastNotification';
+            toast.className = 'toast-notification';
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <span id="toastMessage"></span>
+                </div>
+            `;
+            document.body.appendChild(toast);
+        }
         
-        // Event listener untuk tombol export
-        document.getElementById('exportReports').addEventListener('click', exportReports);
+        const toastMessage = document.getElementById('toastMessage');
         
-        // Event listener untuk tombol delete all
-        document.getElementById('deleteAllReports').addEventListener('click', function() {
-            if (getSolvedReports().length === 0) {
-                showToast('No reports to delete!', 'error');
-                return;
+        toastMessage.textContent = message;
+        toast.className = `toast-notification ${type}`;
+        toast.style.display = 'block';
+        toast.style.animation = 'toast-in 0.5s ease forwards';
+        
+        // Show toast
+        setTimeout(() => {
+            toast.style.animation = 'toast-out 0.4s ease forwards';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 400);
+        }, 3000);
+    }
+    
+    function formatDate(date) {
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    }
+    
+    function formatDateTime(date) {
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+    
+    function convertToCSV(reports) {
+        const headers = ['ID', 'Brand', 'User', 'Category', 'Priority', 'Reported Date', 'Solved Date', 'Status'];
+        
+        const rows = reports.map(report => [
+            report.id,
+            report.brand || '',
+            report.userId || report.reportedBy || '',
+            report.category || '',
+            report.priority || '',
+            report.dateCreated ? formatDate(report.dateCreated.toDate()) : '',
+            report.dateCreated ? formatDate(report.dateSolved.toDate()) : '',
+            report.status || ''
+        ]);
+        
+        return [headers, ...rows].map(row => row.join(',')).join('\n');
+    }
+    
+    function downloadCSV(content, filename) {
+        const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+    }
+    
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        // Cek status autentikasi pengguna
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                console.log("User logged in:", user.uid);
+                setupSolvedReportsListener();
+                
+                // Test koneksi Firebase
+                db.collection('solvedReports').limit(1).get()
+                    .then(snapshot => {
+                        console.log("Firebase connection test successful:", snapshot.size, "documents found");
+                    })
+                    .catch(error => {
+                        console.error("Firebase connection error:", error);
+                        showToast("Cannot connect to database", "error");
+                    });
+                
+                // Filter event listeners
+                document.getElementById('brandFilter').addEventListener('change', updateSolvedReportsUI);
+                document.getElementById('statusFilter').addEventListener('change', updateSolvedReportsUI);
+                document.getElementById('priorityFilter').addEventListener('change', updateSolvedReportsUI);
+                document.getElementById('startDate').addEventListener('change', updateSolvedReportsUI);
+                document.getElementById('endDate').addEventListener('change', updateSolvedReportsUI);
+                document.getElementById('resetFilters').addEventListener('click', function() {
+                    document.getElementById('brandFilter').value = '';
+                    document.getElementById('statusFilter').value = '';
+                    document.getElementById('priorityFilter').value = '';
+                    document.getElementById('startDate').value = '';
+                    document.getElementById('endDate').value = '';
+                    updateSolvedReportsUI();
+                });
+                
+                // Pagination event listeners
+                document.getElementById('prevPage').addEventListener('click', function() {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        updateSolvedReportsUI();
+                    }
+                });
+                
+                document.getElementById('nextPage').addEventListener('click', function() {
+                    const filteredReports = filterReports(solvedReports);
+                    const totalPages = Math.ceil(filteredReports.length / reportsPerPage);
+                    
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        updateSolvedReportsUI();
+                    }
+                });
+                
+                // Modal event listeners
+                document.getElementById('closeDetailsModal').addEventListener('click', function() {
+                    document.getElementById('reportDetailsModal').classList.remove('active');
+                });
+                
+                document.getElementById('closeDetailsBtn').addEventListener('click', function() {
+                    document.getElementById('reportDetailsModal').classList.remove('active');
+                });
+                
+                document.getElementById('reopenReportBtn').addEventListener('click', function() {
+                    document.getElementById('reopenConfirmModal').classList.add('active');
+                    document.getElementById('reopenConfirmMessage').textContent = 
+                        `Are you sure you want to reopen report ${currentReportId}? This will move it back to pending reports.`;
+                });
+                
+                document.getElementById('closeReopenModal').addEventListener('click', function() {
+                    document.getElementById('reopenConfirmModal').classList.remove('active');
+                });
+                
+                document.getElementById('cancelReopenBtn').addEventListener('click', function() {
+                    document.getElementById('reopenConfirmModal').classList.remove('active');
+                });
+                
+                document.getElementById('confirmReopenBtn').addEventListener('click', function() {
+                    reopenReport(currentReportId);
+                });
+                
+                // Export button event listener
+                const exportButton = document.getElementById('exportButton');
+                if (exportButton) {
+                    exportButton.addEventListener('click', function() {
+                        const filteredReports = filterReports(solvedReports);
+                        const csvContent = convertToCSV(filteredReports);
+                        downloadCSV(csvContent, 'solved-reports.csv');
+                    });
+                }
+                
+                // Chart filter event listeners
+                const chartTimeRange = document.getElementById('chartTimeRange');
+                const resolutionTimeRange = document.getElementById('resolutionTimeRange');
+                
+                if (chartTimeRange) {
+                    chartTimeRange.addEventListener('change', updateBrandChart);
+                }
+                
+                if (resolutionTimeRange) {
+                    resolutionTimeRange.addEventListener('change', updateResolutionTimeChart);
+                }
+            } else {
+                // Pengguna belum login, redirect ke halaman login
+                console.log("User not logged in, redirecting...");
+                window.location.href = "login.html";
             }
-            
-            showConfirmModal('Are you sure you want to delete ALL solved reports? This action cannot be undone.', function() {
-                const success = deleteAllReports();
-                if (success) {
-                    renderReportCards();
-                }
-            });
-        });
-        
-        // Event listener untuk reset filters
-        document.getElementById('resetFilters').addEventListener('click', function() {
-            document.getElementById('brandFilter').value = '';
-            document.getElementById('categoryFilter').value = '';
-            document.getElementById('dateFilterFrom').value = '';
-            document.getElementById('dateFilterTo').value = '';
-            renderReportCards();
-        });
-        
-        // Event listener untuk filter changes
-        document.getElementById('brandFilter').addEventListener('change', renderReportCards);
-        document.getElementById('categoryFilter').addEventListener('change', renderReportCards);
-        document.getElementById('dateFilterFrom').addEventListener('change', renderReportCards);
-        document.getElementById('dateFilterTo').addEventListener('change', renderReportCards);
-        
-        // Event listener untuk pencarian
-        document.getElementById('dashboardSearch').addEventListener('input', searchReports);
-        
-        // Event listener untuk close modal detail laporan
-        document.getElementById('closeModal').addEventListener('click', function() {
-            const reportModal = document.getElementById('reportModal');
-            reportModal.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-        
-        // Event listener untuk close modal detail laporan melalui button
-        document.getElementById('closeModalBtn').addEventListener('click', function() {
-            const reportModal = document.getElementById('reportModal');
-            reportModal.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-        
-        // Event listener untuk delete report button di modal
-        document.getElementById('deleteReportBtn').addEventListener('click', function() {
-            const reportId = this.getAttribute('data-id');
-            const reportModal = document.getElementById('reportModal');
-            
-            showConfirmModal(`Are you sure you want to delete report ${reportId}? This action cannot be undone.`, function() {
-                const success = deleteReport(reportId);
-                if (success) {
-                    reportModal.classList.remove('active');
-                    document.body.style.overflow = '';
-                    renderReportCards();
-                }
-            });
-        });
-        
-        // Event listener untuk reopen report button di modal
-        document.getElementById('reopenReportBtn').addEventListener('click', function() {
-            const reportId = this.getAttribute('data-id');
-            const reportModal = document.getElementById('reportModal');
-            
-            showConfirmModal(`Are you sure you want to reopen report ${reportId}? It will be moved back to Pending Reports.`, function() {
-                const success = reopenReport(reportId);
-                if (success) {
-                    reportModal.classList.remove('active');
-                    document.body.style.overflow = '';
-                    renderReportCards();
-                }
-            });
         });
     });
 </script>
