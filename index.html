@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSS Admin Dashboard</title>
+    <title>Dashboard Admin CSS</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="global.css">
     <style>
-            /* ========== VARIABEL CSS YANG DIPERLUKAN ========== */
+           /* ========== VARIABEL CSS YANG DIPERLUKAN ========== */
         :root {
             --primary-gradient: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
             --success-gradient: linear-gradient(135deg, #4cc9f0 0%, #4361ee 100%);
@@ -668,8 +668,11 @@
             font-weight: var(--font-semibold);
             color: var(--text-primary);
         }
-
-       
+        /* ========== ANIMATIONS ========== */
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -822,7 +825,201 @@
             outline: 2px solid var(--primary);
             outline-offset: 2px;
         }
-        
+        .toast-notification {
+            /* Notification Dropdown Styles */
+.notification-bell {
+    position: relative;
+    cursor: pointer;
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 350px;
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+    z-index: var(--z-dropdown);
+    margin-top: 10px;
+    display: none;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-bell:hover .notification-dropdown {
+    display: block;
+}
+
+.notification-header {
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-title {
+    font-size: var(--text-md);
+    font-weight: var(--font-semibold);
+    margin: 0;
+}
+
+.notification-clear {
+    background: none;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+    font-size: var(--text-xs);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.notification-list {
+    padding: var(--space-xs);
+}
+
+.notification-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    position: relative;
+    transition: background-color var(--transition-fast);
+}
+
+.notification-item:hover {
+    background-color: var(--hover-color);
+}
+
+.notification-item.unread {
+    background-color: rgba(59, 130, 246, 0.05);
+}
+
+.notification-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.notification-icon i {
+    color: var(--primary);
+    font-size: var(--text-sm);
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-message {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: 1.4;
+    color: var(--text-primary);
+}
+
+.notification-time {
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
+    margin-top: 2px;
+    display: block;
+}
+
+.notification-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.notification-footer {
+    padding: var(--space-sm);
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.notification-footer a {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: var(--text-sm);
+}
+
+.notification-footer a:hover {
+    text-decoration: underline;
+}
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: var(--radius-md);
+    color: white;
+    z-index: var(--z-modal);
+    max-width: 300px;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    transform: translateY(-30px);
+    pointer-events: none;
+    animation: toast-in 0.5s ease forwards;
+}
+
+/* Animation for showing toast */
+@keyframes toast-in {
+    0% {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animation for hiding toast */
+@keyframes toast-out {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+.toast-notification.hide {
+    animation: toast-out 0.4s ease forwards;
+}
+
+/* Status colors */
+.toast-notification.success {
+    background-color: var(--success);
+}
+
+.toast-notification.error {
+    background-color: var(--danger);
+}
+
+.toast-notification.info {
+    background-color: var(--info);
+}
+
+/* Toast content layout */
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
     </style>
 </head>
 <body>
@@ -832,49 +1029,64 @@
     <!-- Main Content -->
     <div class="main-content">
         <div class="header">
-            <div id="notificationContainer"></div>
-            <button class="menu-toggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <h1><i class="fas fa-chart-line"></i> Dashboard Overview</h1>
+            <h1><i class="fas fa-tachometer-alt"></i> Dashboard Overview</h1>
             <div class="header-actions">
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search..." id="dashboardSearch">
+                    <input type="text" placeholder="Cari..." id="dashboardSearch">
                 </div>
                 
-              
-                <button class="menu-toggle">
-                <i class="fas fa-bars"></i>
-            </button>
-                <div class="user-profile">
+                <div class="user-profile" id="userProfile">
                     <img class="profile-img" src="https://iili.io/Fpiva7S.png" alt="Profile">
                     <div class="user-info">
-                        <h4>Nama Masing Masing</h4>
+                        <h4>Nama Pengguna</h4>
                         <p>Customer Service Support</p>
                     </div>
                 </div>
             </div>
         </div>
-        
+
+        <div class="kpi-container">
+            <!-- Tab Menu -->
+            <div class="kpi-tab-menu">
+                <!-- Dashboard Overview -->
+                <a class="menu-item active" href="index.html">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard Overview</span>
+                </a>
+
+                <!-- Daily Dashboard -->
+                <a class="menu-item" href="daily-dashboard.html">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Daily Dashboard</span>
+                </a>
+
+                <!-- Summary Dashboard -->
+                <a class="menu-item" href="summary-dashboard.html">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Summary Dashboard</span>
+                </a>
+            </div>
+        </div>
+
         <div class="dashboard-stats">
-            <!-- ✅ Total Report Card -->
+            <!-- Total Report Card -->
             <div class="stat-card fade-in" style="animation-delay: 0.1s;">
                 <div class="stat-card-header">
-                    <h3 class="stat-title">Total Report</h3>
+                    <h3 class="stat-title">Total Laporan</h3>
                     <div class="stat-icon">
                         <i class="fas fa-file-alt"></i>
                     </div>
                 </div>
                 <div class="stat-card-content">
                     <div class="stat-numbers">
-                        <div class="stat-value" id="maintenanceValue">0</div>
-                        <div class="stat-change" id="maintenanceChange">
-                            <i class="fas fa-minus"></i> 0% from last week
+                        <div class="stat-value" id="totalReports">0</div>
+                        <div class="stat-change" id="totalChange">
+                            <i class="fas fa-minus"></i> 0% dari minggu lalu
                         </div>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill animated" id="maintenanceProgress" style="width: 0%;"></div>
+                        <div class="progress-fill animated" id="totalProgress" style="width: 0%;"></div>
                     </div>
                 </div>
             </div>
@@ -882,7 +1094,7 @@
             <!-- Pending Reports Card -->
             <div class="stat-card fade-in" style="animation-delay: 0.2s;">
                 <div class="stat-card-header">
-                    <h3 class="stat-title">Pending Reports</h3>
+                    <h3 class="stat-title">Laporan Tertunda</h3>
                     <div class="stat-icon">
                         <i class="fas fa-clock"></i>
                     </div>
@@ -891,7 +1103,7 @@
                     <div class="stat-numbers">
                         <div class="stat-value" id="pendingCount">0</div>
                         <div class="stat-change" id="pendingChange">
-                            <i class="fas fa-minus"></i> 0% from last week
+                            <i class="fas fa-minus"></i> 0% dari minggu lalu
                         </div>
                     </div>
                     <div class="progress-bar">
@@ -903,7 +1115,7 @@
             <!-- Solved Reports Card -->
             <div class="stat-card fade-in" style="animation-delay: 0.3s;">
                 <div class="stat-card-header">
-                    <h3 class="stat-title">Solved Reports</h3>
+                    <h3 class="stat-title">Laporan Terselesaikan</h3>
                     <div class="stat-icon">
                         <i class="fas fa-check-circle"></i>
                     </div>
@@ -912,7 +1124,7 @@
                     <div class="stat-numbers">
                         <div class="stat-value" id="solvedCount">0</div>
                         <div class="stat-change" id="solvedChange">
-                            <i class="fas fa-minus"></i> 0% from last week
+                            <i class="fas fa-minus"></i> 0% dari minggu lalu
                         </div>
                     </div>
                     <div class="progress-bar">
@@ -924,7 +1136,7 @@
             <!-- Urgent Tasks Card -->
             <div class="stat-card fade-in" style="animation-delay: 0.4s;">
                 <div class="stat-card-header">
-                    <h3 class="stat-title">Urgent Tasks</h3>
+                    <h3 class="stat-title">Tugas Mendesak</h3>
                     <div class="stat-icon">
                         <i class="fas fa-exclamation-triangle"></i>
                     </div>
@@ -933,7 +1145,7 @@
                     <div class="stat-numbers">
                         <div class="stat-value" id="urgentCount">0</div>
                         <div class="stat-change" id="urgentChange">
-                            <i class="fas fa-minus"></i> 0% from last week
+                            <i class="fas fa-minus"></i> 0% dari minggu lalu
                         </div>
                     </div>
                     <div class="progress-bar">
@@ -945,7 +1157,7 @@
             <!-- Team Performance Card -->
             <div class="stat-card fade-in" style="animation-delay: 0.5s;">
                 <div class="stat-card-header">
-                    <h3 class="stat-title">Team Performance</h3>
+                    <h3 class="stat-title">Kinerja Tim</h3>
                     <div class="stat-icon">
                         <i class="fas fa-users"></i>
                     </div>
@@ -954,7 +1166,7 @@
                     <div class="stat-numbers">
                         <div class="stat-value" id="performanceValue">0%</div>
                         <div class="stat-change" id="performanceChange">
-                            <i class="fas fa-minus"></i> 0% from last week
+                            <i class="fas fa-minus"></i> 0% dari minggu lalu
                         </div>
                     </div>
                     <div class="progress-bar">
@@ -962,17 +1174,17 @@
                     </div>
                 </div>
             </div>
-        </div> 
+        </div>
         
         <div class="activities-section fade-in" style="animation-delay: 0.6s;">
             <div class="section-header">
-                <h2 class="section-title"><i class="fas fa-list-alt"></i> Recent Activities</h2>
+                <h2 class="section-title"><i class="fas fa-list-alt"></i> Aktivitas Terbaru</h2>
                 <div class="section-actions">
                     <button class="btn btn-outline" id="refreshActivities">
-                        <i class="fas fa-sync-alt"></i> Refresh
+                        <i class="fas fa-sync-alt"></i> Muat Ulang
                     </button>
-                    <button onclick="resetLastWeekStats()" class="btn btn-warning">
-                        <i class="fas fa-redo"></i> Reset Last Week Stats
+                    <button class="btn btn-warning" id="resetStatsBtn">
+                        <i class="fas fa-redo"></i> Reset Statistik Minggu Lalu
                     </button>
                 </div>
             </div>
@@ -980,12 +1192,12 @@
             <table id="activitiesTable">
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>AGENT ID</th>
-                        <th>Category</th>
+                        <th>Tanggal</th>
+                        <th>ID AGEN</th>
+                        <th>Kategori</th>
                         <th>Status</th>
-                        <th>Brand</th>
-                        <th>Action</th>
+                        <th>Merek</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="activitiesTableBody">
@@ -994,396 +1206,531 @@
             </table>
             <div id="noActivities" class="empty-state" style="display: none;">
                 <i class="fas fa-inbox"></i>
-                <h3>No Pending Reports</h3>
-                <p>You don't have any pending reports at the moment.</p>
+                <h3>Tidak Ada Aktivitas</h3>
+                <p>Tidak ada aktivitas untuk ditampilkan saat ini.</p>
             </div>
         </div>
     </div>
-<script src="auth-check.js"></script>
-<script src="sidebar-loader.js"></script>
-<script src="user-profile.js"></script>
-<script src="notifications.js"></script>
-<script>
-// Fungsi untuk memuat data dari localStorage
-function initializeSampleData() {
-    // Data untuk laporan pending
-    if (!localStorage.getItem('pendingReports')) {
-        const sampleReports = [
-            {
-                id: 'RP-123456789',
-                title: 'Login Issue on Mobile App',
-                category: 'Technical',
-                status: 'Pending',
-                priority: 'High',
-                dateCreated: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-                dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
-                brand: 'Brand A'
-            },
-            {
-                id: 'RP-987654321',
-                title: 'Payment Gateway Error',
-                category: 'Billing',
-                status: 'Pending',
-                priority: 'Medium',
-                dateCreated: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-                dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-                brand: 'Brand B'
-            },
-            {
-                id: 'RP-456789123',
-                title: 'Feature Request - Dark Mode',
-                category: 'Enhancement',
-                status: 'Pending',
-                priority: 'Low',
-                dateCreated: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-                dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-                brand: 'Brand C'
-            }
-        ];
-        localStorage.setItem('pendingReports', JSON.stringify(sampleReports));
-    }
 
-    // Data untuk laporan solved
-    if (!localStorage.getItem('solvedReports')) {
-        const sampleSolvedReports = [
-            {
-                id: 'RP-111111111',
-                title: 'Password Reset Issue',
-                category: 'Technical',
-                status: 'Completed',
-                priority: 'Medium',
-                dateCreated: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-                dateSolved: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-                brand: 'Brand A',
-                resolutionDescription: 'Reset password melalui admin panel dan mengirim email konfirmasi ke user.'
-            },
-            {
-                id: 'RP-222222222',
-                title: 'Account Verification Problem',
-                category: 'Account',
-                status: 'Completed',
-                priority: 'High',
-                dateCreated: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-                dateSolved: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-                brand: 'Brand B',
-                resolutionDescription: 'Memverifikasi dokumen manual dan mengaktifkan akun melalui backend.'
-            }
-        ];
-        localStorage.setItem('solvedReports', JSON.stringify(sampleSolvedReports));
-    }
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <div class="login-card">
+                <div class="login-header">
+                    <h1><i class="fas fa-tachometer-alt"></i> Dashboard Login</h1>
+                    <p>Masukkan kredensial Anda untuk mengakses dashboard</p>
+                </div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" placeholder="Masukkan email Anda" required>
+                        <div class="error-message" id="emailError"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Kata Sandi</label>
+                        <input type="password" id="loginPassword" placeholder="Masukkan kata sandi Anda" required>
+                        <div class="error-message" id="passwordError"></div>
+                    </div>
+                    <button type="submit" class="btn-primary">Masuk</button>
+                </form>
+                <div class="login-footer">
+                    <p>Tidak punya akun? <a href="#" id="registerLink">Daftar di sini</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="sidebar-loader.js"></script>
+    <script src="user-profile.js"></script>
+    <script src="notifications.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
 
-    // Statistik minggu lalu jika belum ada
-    if (!localStorage.getItem('lastWeekStats')) {
-        const lastWeekStats = {
-            total: 3,
-            pending: 2,
-            solved: 1,
-            urgent: 1,
-            performance: 75
+    <script>
+        // Konfigurasi Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDUZka4FZyLi_cv6X_5D4zeRsfkpqOlBpY",
+            authDomain: "dashboard-css.firebaseapp.com",
+            databaseURL: "https://dashboard-css-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "dashboard-css",
+            storageBucket: "dashboard-css.appspot.com",
+            messagingSenderId: "771131792881",
+            appId: "1:771131792881:web:ad634424225bd7de847850",
+            measurementId: "G-3CYBC5B101"
         };
-        localStorage.setItem('lastWeekStats', JSON.stringify(lastWeekStats));
-    }
-}
 
-// Fungsi untuk mendapatkan semua laporan pending
-function getReports() {
-    const reports = localStorage.getItem('pendingReports');
-    return reports ? JSON.parse(reports) : [];
-}
+        // Inisialisasi Firebase
+        try {
+            firebase.initializeApp(firebaseConfig);
+            console.log("Firebase initialized successfully");
+        } catch (error) {
+            console.error("Firebase initialization error:", error);
+        }
 
-// Fungsi untuk mendapatkan laporan yang sudah diselesaikan
-function getCompletedReports() {
-    const reports = localStorage.getItem('solvedReports');
-    return reports ? JSON.parse(reports) : [];
-}
+        const db = firebase.firestore();
+        const auth = firebase.auth();
 
-// Fungsi untuk menghitung statistik dashboard
-function calculateDashboardStats() {
-    const reports = getReports();
-    const completedReports = getCompletedReports();
-    const allReports = [...reports, ...completedReports];
-
-    const pendingCount = reports.length;
-    const solvedCount = completedReports.length;
-    const urgentCount = reports.filter(report => report.priority === 'High').length;
-    const totalReports = pendingCount + solvedCount;
-
-    // Hitung performa tim (rasio laporan terselesaikan)
-    const performanceValue = totalReports > 0 ? Math.round((solvedCount / totalReports) * 100) : 0;
-
-    // Ambil statistik minggu lalu
-    const lastWeekStats = JSON.parse(localStorage.getItem('lastWeekStats')) || {
-        total: 0,
-        pending: 0,
-        solved: 0,
-        urgent: 0,
-        performance: 0
-    };
-
-    // Hitung perubahan dari minggu lalu
-    const totalChange = calculateChange(totalReports, lastWeekStats.total || 0);
-    const pendingChange = calculateChange(pendingCount, lastWeekStats.pending || 0);
-    const solvedChange = calculateChange(solvedCount, lastWeekStats.solved || 0);
-    const urgentChange = calculateChange(urgentCount, lastWeekStats.urgent || 0);
-    const performanceChange = calculateChange(performanceValue, lastWeekStats.performance || 0);
-
-    // Perbarui UI
-    updateStatCard('maintenanceValue', totalReports, 'maintenanceProgress', totalReports, totalChange, 'maintenanceChange');
-    updateStatCard('pendingCount', pendingCount, 'pendingProgress', pendingCount, pendingChange, 'pendingChange');
-    updateStatCard('solvedCount', solvedCount, 'solvedProgress', solvedCount, solvedChange, 'solvedChange');
-    updateStatCard('urgentCount', urgentCount, 'urgentProgress', urgentCount, urgentChange, 'urgentChange');
-    updateStatCard('performanceValue', `${performanceValue}%`, 'performanceProgress', performanceValue, performanceChange, 'performanceChange');
-
-    // Perbarui badge notifikasi
-    const notificationCount = document.getElementById('notificationCount');
-    if (notificationCount) {
-        notificationCount.textContent = urgentCount > 0 ? urgentCount : '0';
-    }
-}
-
-// Fungsi untuk menghitung perubahan persentase
-function calculateChange(current, previous) {
-    if (previous === 0 && current === 0) return 0;
-    if (previous === 0) return 100;
-    return Math.round(((current - previous) / previous) * 100);
-}
-
-// Fungsi untuk memperbarui kartu statistik
-function updateStatCard(valueElementId, value, progressElementId, progressValue, change, changeElementId) {
-    const valueElement = document.getElementById(valueElementId);
-    const progressElement = document.getElementById(progressElementId);
-    const changeElement = document.getElementById(changeElementId);
-    
-    if (valueElement) valueElement.textContent = value;
-    if (progressElement) {
-        const progressPercent = progressElementId === 'performanceProgress' 
-            ? progressValue 
-            : Math.min(100, progressValue * (progressElementId === 'urgentProgress' ? 20 : 10));
-        progressElement.style.width = `${progressPercent}%`;
-    }
-    if (changeElement) {
-        const isPositive = change >= 0;
-        changeElement.innerHTML = isPositive 
-            ? `<i class="fas fa-arrow-up"></i> ${Math.abs(change)}% from last week`
-            : `<i class="fas fa-arrow-down"></i> ${Math.abs(change)}% from last week`;
-        changeElement.className = `stat-change ${isPositive ? 'positive' : 'negative'}`;
-    }
-}
-
-// Fungsi untuk merender tabel aktivitas (MENAMPILKAN HISTORY)
-function renderActivitiesTable() {
-    const tableBody = document.getElementById('activitiesTableBody');
-    const noActivities = document.getElementById('noActivities');
-    
-    // Ambil data dari kedua sumber: pending dan solved reports
-    const pendingReports = getReports();
-    const solvedReports = getCompletedReports();
-    
-    // Gabungkan semua laporan
-    const allReports = [...pendingReports, ...solvedReports];
-    
-    if (allReports.length === 0) {
-        if (tableBody) tableBody.innerHTML = '';
-        if (noActivities) noActivities.style.display = 'block';
-        return;
-    }
-
-    if (noActivities) noActivities.style.display = 'none';
-    if (tableBody) tableBody.innerHTML = '';
-
-    // Urutkan berdasarkan tanggal dibuat (terbaru pertama)
-    const sortedReports = [...allReports].sort((a, b) => 
-        new Date(b.dateCreated) - new Date(a.dateCreated)
-    );
-
-    // Ambil 5 laporan terbaru
-    const recentReports = sortedReports.slice(0, 5);
-
-    recentReports.forEach(report => {
-        const isSolved = report.status === 'Completed' || report.status === 'Solved';
-        const statusClass = isSolved ? 'status-completed' : 
-                           (getDaysLeft(report.dueDate) < 0 ? 'status-overdue' : 'status-pending');
-        const statusText = isSolved ? 'Solved' : 
-                          (getDaysLeft(report.dueDate) < 0 ? 'Overdue' : report.status);
-
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${formatDate(report.dateCreated)}</td>
-            <td>${report.id}</td>
-            <td>${report.category}</td>
-            <td><span class="status ${statusClass}">${statusText}</span></td>
-            <td>${report.brand || '-'}</td>
-            <td>
-                <button class="btn btn-outline btn-sm view-activity-btn" data-id="${report.id}" data-solved="${isSolved}">
-                    <i class="fas fa-eye"></i> View
-                </button>
-            </td>
-        `;
-        if (tableBody) tableBody.appendChild(row);
-    });
-
-    // Tambahkan event listener untuk tombol view
-    document.querySelectorAll('.view-activity-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const reportId = this.getAttribute('data-id');
-            const isSolved = this.getAttribute('data-solved') === 'true';
-            
-            // Redirect ke halaman yang sesuai berdasarkan status laporan
-            if (isSolved) {
-                window.location.href = `solved-report.html?view=${reportId}`;
-            } else {
-                window.location.href = `pending-reports.html?view=${reportId}`;
+        // Variabel global untuk data
+        let dashboardData = {
+            pendingReports: [],
+            solvedReports: [],
+            notifications: [],
+            dailyActivities: [],
+            lastWeekData: {
+                totalReports: 0,
+                pendingCount: 0,
+                solvedCount: 0,
+                urgentCount: 0,
+                performanceValue: 0
             }
-        });
-    });
-}
-
-// Fungsi utilitas: menghitung hari tersisa
-function getDaysLeft(dueDate) {
-    const today = new Date();
-    const due = new Date(dueDate);
-    const diffTime = due - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-}
-
-// Fungsi utilitas: memformat tanggal
-function formatDate(date) {
-    const d = new Date(date);
-    return d.toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric' 
-    });
-}
-
-// Fungsi untuk mereset statistik minggu lalu
-function resetLastWeekStats() {
-    const confirmReset = confirm("Are you sure you want to reset last week's statistics?\nThis week's change percentages will be reset to 0%.");
-    
-    if (confirmReset) {
-        // Simpan statistik minggu ini sebagai referensi minggu depan
-        const reports = getReports();
-        const completedReports = getCompletedReports();
-        const urgentCount = reports.filter(report => report.priority === 'High').length;
-        const total = reports.length + completedReports.length;
-        const performance = total > 0 ? Math.round((completedReports.length / total) * 100) : 0;
-        
-        const currentStats = {
-            total: total,
-            pending: reports.length,
-            solved: completedReports.length,
-            urgent: urgentCount,
-            performance: performance
         };
-        
-        localStorage.setItem('lastWeekStats', JSON.stringify(currentStats));
-        alert("Last week's statistics have been reset. Current statistics have been saved as a reference for next week.");
-        
-        // Perbarui dashboard
-        calculateDashboardStats();
-    }
-}
 
-// Fungsi untuk mencari laporan
-function searchReports() {
-    const searchTerm = document.getElementById('dashboardSearch').value.toLowerCase();
-    const tableBody = document.getElementById('activitiesTableBody');
-    const rows = tableBody.getElementsByTagName('tr');
+        // Fungsi utama untuk memuat data dashboard
+        async function loadDashboardData() {
+            try {
+                console.log("Starting to load dashboard data...");
+                showLoading();
+                
+                // Ambil data dari semua koleksi secara paralel
+                const promises = [
+                    db.collection('pendingReports').get(),
+                    db.collection('solvedReports').orderBy('dateSolved', 'desc').get(),
+                    db.collection('notifications').orderBy('timestamp', 'desc').limit(5).get(),
+                    db.collection('dailyActivities').orderBy('date', 'desc').limit(10).get()
+                ];
 
-    for (let i = 0; i < rows.length; i++) {
-        const cells = rows[i].getElementsByTagName('td');
-        let found = false;
+                const [
+                    pendingSnapshot, 
+                    solvedSnapshot, 
+                    notificationsSnapshot,
+                    activitiesSnapshot
+                ] = await Promise.all(promises);
 
-        for (let j = 0; j < cells.length; j++) {
-            if (cells[j].textContent.toLowerCase().includes(searchTerm)) {
-                found = true;
-                break;
+                console.log("Data retrieved:", {
+                    pending: pendingSnapshot.size,
+                    solved: solvedSnapshot.size,
+                    notifications: notificationsSnapshot.size,
+                    activities: activitiesSnapshot.size
+                });
+
+                // Simpan data ke variabel global
+                dashboardData.pendingReports = pendingSnapshot.docs.map(doc => ({ 
+                    id: doc.id, 
+                    ...doc.data(),
+                    status: 'pending' // Tambahkan status untuk aktivitas
+                }));
+                
+                dashboardData.solvedReports = solvedSnapshot.docs.map(doc => ({ 
+                    id: doc.id, 
+                    ...doc.data(),
+                    status: 'completed' // Tambahkan status untuk aktivitas
+                }));
+                
+                dashboardData.notifications = notificationsSnapshot.docs.map(doc => ({ 
+                    id: doc.id, 
+                    ...doc.data() 
+                }));
+                
+                dashboardData.dailyActivities = activitiesSnapshot.docs.map(doc => ({ 
+                    id: doc.id, 
+                    ...doc.data() 
+                }));
+
+                // Update UI dengan data yang diambil
+                updateStatistics();
+                updateRecentActivities();
+                
+                hideLoading();
+                hideError();
+                
+            } catch (error) {
+                console.error("Error loading dashboard data:", error);
+                showError("Failed to load dashboard data: " + error.message);
+                hideLoading();
             }
         }
 
-        rows[i].style.display = found ? '' : 'none';
-    }
-}
+        // Fungsi untuk menampilkan statistik
+        function updateStatistics() {
+            try {
+                const pendingCount = dashboardData.pendingReports.length;
+                const solvedCount = dashboardData.solvedReports.length;
+                const totalReports = pendingCount + solvedCount;
+                
+                // Hitung laporan urgent (prioritas tinggi)
+                const urgentCount = dashboardData.pendingReports.filter(report => 
+                    report.priority === 'high' || report.priority === 'urgent'
+                ).length;
+                
+                // Hitung kinerja tim (% penyelesaian)
+                const performanceValue = totalReports > 0 ? Math.round((solvedCount / totalReports) * 100) : 0;
 
-// Inisialisasi saat halaman dimuat
-document.addEventListener('DOMContentLoaded', function() {
-    initializeSampleData();
-    calculateDashboardStats();
-    renderActivitiesTable();
-    updateBadgeCounts();
+                // Hitung perubahan dari minggu lalu
+                const totalChange = calculateChange(totalReports, dashboardData.lastWeekData.totalReports);
+                const pendingChange = calculateChange(pendingCount, dashboardData.lastWeekData.pendingCount);
+                const solvedChange = calculateChange(solvedCount, dashboardData.lastWeekData.solvedCount);
+                const urgentChange = calculateChange(urgentCount, dashboardData.lastWeekData.urgentCount);
+                const performanceChange = calculateChange(performanceValue, dashboardData.lastWeekData.performanceValue);
 
-    // Event listener untuk tombol refresh
-    const refreshButton = document.getElementById('refreshActivities');
-    if (refreshButton) {
-        refreshButton.addEventListener('click', function() {
-            calculateDashboardStats();
-            renderActivitiesTable();
-            showNotification('Data refreshed successfully!', 'success');
-        });
-    }
+                // Update elemen HTML
+                document.getElementById('totalReports').textContent = totalReports;
+                document.getElementById('pendingCount').textContent = pendingCount;
+                document.getElementById('solvedCount').textContent = solvedCount;
+                document.getElementById('urgentCount').textContent = urgentCount;
+                document.getElementById('performanceValue').textContent = `${performanceValue}%`;
 
-    // Event listener untuk pencarian
-    const searchInput = document.getElementById('dashboardSearch');
-    if (searchInput) {
-        searchInput.addEventListener('input', searchReports);
-    }
+                // Update perubahan
+                updateChangeElement('totalChange', totalChange);
+                updateChangeElement('pendingChange', pendingChange);
+                updateChangeElement('solvedChange', solvedChange);
+                updateChangeElement('urgentChange', urgentChange);
+                updateChangeElement('performanceChange', performanceChange);
 
-    // Event listener untuk reset statistik
-    const resetStatsBtn = document.querySelector('button[onclick="resetLastWeekStats()"]');
-    if (resetStatsBtn) {
-        resetStatsBtn.addEventListener('click', resetLastWeekStats);
-    }
-
-    // Animasi untuk kartu
-    const cards = document.querySelectorAll('.stat-card, .activities-section');
-    cards.forEach((card, index) => {
-        card.style.animationDelay = `${index * 0.1}s`;
-    });
-});
-
-// Fungsi untuk menampilkan notifikasi
-function showNotification(message, type = 'info') {
-    // Buat elemen notifikasi
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
-            <span>${message}</span>
-        </div>
-    `;
-    
-    // Tambahkan ke body
-    document.body.appendChild(notification);
-    
-    // Tampilkan notifikasi
-    setTimeout(() => notification.classList.add('show'), 100);
-    
-    // Hapus notifikasi setelah 3 detik
-    setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
+                // Update progress bars
+                updateProgressBars(totalReports, pendingCount, solvedCount, urgentCount, performanceValue);
+                
+            } catch (error) {
+                console.error("Error in updateStatistics:", error);
             }
-        }, 300);
-    }, 3000);
-}
+        }
 
-// Fungsi untuk memperbarui badge count
-function updateBadgeCounts() {
-    const pendingReports = getReports();
-    const solvedReports = getCompletedReports();
+        // Hitung perubahan persentase
+        function calculateChange(current, previous) {
+            if (previous === 0) return current > 0 ? 100 : 0;
+            return Math.round(((current - previous) / previous) * 100);
+        }
 
-    // Di halaman lain, Anda mungkin perlu memperbarui elemen tertentu
-    // Di sini kita hanya fokus pada notifikasi
-    const notificationCount = document.getElementById('notificationCount');
-    if (notificationCount) {
-        const urgentCount = pendingReports.filter(r => r.priority === 'High').length;
-        notificationCount.textContent = urgentCount > 0 ? urgentCount : '0';
-    }
-}
-</script>
+        // Update elemen perubahan
+        function updateChangeElement(elementId, change) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            const icon = change > 0 ? 'fa-arrow-up' : (change < 0 ? 'fa-arrow-down' : 'fa-minus');
+            const color = change > 0 ? 'var(--success)' : (change < 0 ? 'var(--danger)' : 'var(--text-secondary)');
+            
+            element.innerHTML = `<i class="fas ${icon}"></i> ${Math.abs(change)}% dari minggu lalu`;
+            element.style.color = color;
+        }
+
+        // Update progress bars
+        function updateProgressBars(total, pending, solved, urgent, performance) {
+            try {
+                // Progress bar untuk total laporan (berdasarkan target)
+                const totalProgress = Math.min(100, Math.round((total / 100) * 100));
+                document.getElementById('totalProgress').style.width = `${totalProgress}%`;
+                
+                // Progress bar untuk laporan tertunda
+                const pendingProgress = total > 0 ? Math.round((pending / total) * 100) : 0;
+                document.getElementById('pendingProgress').style.width = `${pendingProgress}%`;
+                
+                // Progress bar untuk laporan terselesaikan
+                document.getElementById('solvedProgress').style.width = `${solved > 0 ? 100 : 0}%`;
+                
+                // Progress bar untuk tugas mendesak
+                const urgentProgress = total > 0 ? Math.round((urgent / total) * 100) : 0;
+                document.getElementById('urgentProgress').style.width = `${urgentProgress}%`;
+                
+                // Progress bar untuk kinerja tim
+                document.getElementById('performanceProgress').style.width = `${performance}%`;
+                
+            } catch (error) {
+                console.error("Error in updateProgressBars:", error);
+            }
+        }
+
+        // Fungsi untuk update recent activities - MENGGABUNGKAN DATA DARI PENDING DAN SOLVED
+        function updateRecentActivities() {
+            try {
+                const container = document.getElementById('activitiesTableBody');
+                const emptyState = document.getElementById('noActivities');
+                
+                if (!container) {
+                    console.log("activitiesTableBody container not found");
+                    return;
+                }
+                
+                // Gabungkan data dari pendingReports dan solvedReports
+                const combinedActivities = [
+                    ...dashboardData.pendingReports.map(report => ({
+                        ...report,
+                        date: report.dateCreated || new Date(),
+                        type: 'pending'
+                    })),
+                    ...dashboardData.solvedReports.map(report => ({
+                        ...report,
+                        date: report.dateSolved || new Date(),
+                        type: 'solved'
+                    }))
+                ];
+                
+                // Urutkan berdasarkan tanggal (yang terbaru di atas)
+                combinedActivities.sort((a, b) => {
+                    const dateA = a.date.toDate ? a.date.toDate() : new Date(a.date);
+                    const dateB = b.date.toDate ? b.date.toDate() : new Date(b.date);
+                    return dateB - dateA;
+                });
+                
+                // Ambil 10 aktivitas terbaru
+                const recentActivities = combinedActivities.slice(0, 10);
+                
+                if (recentActivities.length === 0) {
+                    if (emptyState) emptyState.style.display = 'block';
+                    container.innerHTML = '';
+                    return;
+                }
+                
+                if (emptyState) emptyState.style.display = 'none';
+                
+                // Render activities table
+                container.innerHTML = recentActivities.map(activity => `
+                    <tr>
+                        <td>${formatDate(activity.date)}</td>
+                        <td>${activity.agentId || 'N/A'}</td>
+                        <td>${activity.category || 'N/A'}</td>
+                        <td><span class="status-badge ${getStatusClass(activity.status)}">${getStatusText(activity.status)}</span></td>
+                        <td>${activity.brand || 'N/A'}</td>
+                        <td>
+                            <button class="btn-icon view" onclick="viewActivity('${activity.id}', '${activity.type}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+            } catch (error) {
+                console.error("Error in updateRecentActivities:", error);
+            }
+        }
+
+        // Helper function untuk format tanggal
+        function formatDate(dateValue) {
+            try {
+                if (!dateValue) return 'N/A';
+                
+                const date = dateValue.toDate ? dateValue.toDate() : new Date(dateValue);
+                return date.toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+            } catch (error) {
+                return 'N/A';
+            }
+        }
+
+        // Helper function untuk class status
+        function getStatusClass(status) {
+            const statusClasses = {
+                'completed': 'status-completed',
+                'in-progress': 'status-progress',
+                'pending': 'status-pending',
+                'overdue': 'status-overdue'
+            };
+            return statusClasses[status] || 'status-pending';
+        }
+
+        // Helper function untuk teks status
+        function getStatusText(status) {
+            const statusTexts = {
+                'completed': 'Selesai',
+                'in-progress': 'Dalam Proses',
+                'pending': 'Tertunda',
+                'overdue': 'Terlambat'
+            };
+            return statusTexts[status] || status;
+        }
+
+        // Fungsi untuk menampilkan loading
+        function showLoading() {
+            const cards = document.querySelectorAll('.stat-card');
+            cards.forEach(card => {
+                card.style.opacity = '0.7';
+            });
+        }
+
+        // Fungsi untuk menyembunyikan loading
+        function hideLoading() {
+            const cards = document.querySelectorAll('.stat-card');
+            cards.forEach(card => {
+                card.style.opacity = '1';
+            });
+        }
+
+        // Fungsi untuk menampilkan error
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            if (errorMessage) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        // Fungsi untuk menyembunyikan error
+        function hideError() {
+            const errorMessage = document.getElementById('errorMessage');
+            if (errorMessage) {
+                errorMessage.style.display = 'none';
+            }
+        }
+
+        // Reset data minggu lalu
+        function resetLastWeekData() {
+            const pendingCount = dashboardData.pendingReports.length;
+            const solvedCount = dashboardData.solvedReports.length;
+            const totalReports = pendingCount + solvedCount;
+            const urgentCount = dashboardData.pendingReports.filter(report => 
+                report.priority === 'high' || report.priority === 'urgent'
+            ).length;
+            const performanceValue = totalReports > 0 ? Math.round((solvedCount / totalReports) * 100) : 0;
+            
+            dashboardData.lastWeekData = {
+                totalReports: totalReports,
+                pendingCount: pendingCount,
+                solvedCount: solvedCount,
+                urgentCount: urgentCount,
+                performanceValue: performanceValue
+            };
+            
+            // Simpan ke localStorage
+            localStorage.setItem('lastWeekData', JSON.stringify(dashboardData.lastWeekData));
+            
+            // Update UI
+            updateStatistics();
+            
+            // Tampilkan notifikasi
+            showToast('Data minggu lalu telah direset', 'success');
+        }
+
+        // Fungsi untuk menampilkan toast notifikasi
+        function showToast(message, type = 'info') {
+            // Buat elemen toast jika belum ada
+            let toast = document.getElementById('toastNotification');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toastNotification';
+                toast.className = 'toast-notification';
+                document.body.appendChild(toast);
+            }
+            
+            // Set pesan dan jenis toast
+            toast.textContent = message;
+            toast.className = `toast-notification ${type}`;
+            
+            // Tampilkan toast
+            toast.style.display = 'block';
+            toast.style.opacity = '1';
+            
+            // Sembunyikan setelah 3 detik
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 300);
+            }, 3000);
+        }
+
+        // Fungsi untuk melihat detail aktivitas
+        function viewActivity(activityId, activityType) {
+            // Implementasi view activity detail
+            console.log("View activity:", activityId, activityType);
+            showToast('Melihat detail aktivitas: ' + activityId, 'info');
+        }
+
+        // Event listener untuk form login
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+            
+            // Reset error messages
+            emailError.style.display = 'none';
+            passwordError.style.display = 'none';
+            
+            // Simple validation
+            if (!email) {
+                emailError.textContent = 'Email harus diisi';
+                emailError.style.display = 'block';
+                return;
+            }
+            
+            if (!password) {
+                passwordError.textContent = 'Kata sandi harus diisi';
+                passwordError.style.display = 'block';
+                return;
+            }
+            
+            // Login with Firebase
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Hide login modal
+                    document.getElementById('loginModal').classList.remove('active');
+                    showToast('Login berhasil!', 'success');
+                    
+                    // Load dashboard data
+                    loadDashboardData();
+                })
+                .catch((error) => {
+                    console.error("Login error:", error);
+                    showToast('Login gagal: ' + error.message, 'error');
+                });
+        });
+
+        // Event listener untuk refresh data
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM loaded, checking auth state...");
+            
+            // Cek status autentikasi
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    console.log("User authenticated:", user.uid);
+                    // Update user profile
+                    document.querySelector('.user-info h4').textContent = user.displayName || user.email || 'Nama Pengguna';
+                    
+                    // Hide login modal
+                    document.getElementById('loginModal').classList.remove('active');
+                    
+                    // Load dashboard data
+                    loadDashboardData();
+                    
+                    // Refresh data setiap 30 detik
+                    setInterval(loadDashboardData, 30000);
+                    
+                } else {
+                    console.log("User not authenticated, showing login modal...");
+                    // Show login modal
+                    document.getElementById('loginModal').classList.add('active');
+                }
+            });
+            
+            // Set up event listeners
+            const refreshBtn = document.getElementById('refreshActivities');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', loadDashboardData);
+            }
+            
+            const resetBtn = document.getElementById('resetStatsBtn');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', resetLastWeekData);
+            }
+            
+            // Register link
+            document.getElementById('registerLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                showToast('Fitur pendaftaran akan segera hadir', 'info');
+            });
+        });
+
+        // Load data minggu lalu dari localStorage jika ada
+        const savedLastWeekData = localStorage.getItem('lastWeekData');
+        if (savedLastWeekData) {
+            dashboardData.lastWeekData = JSON.parse(savedLastWeekData);
+        }
+
+        console.log("Dashboard script loaded successfully");
+    </script>
 </body>
 </html>
