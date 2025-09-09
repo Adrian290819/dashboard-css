@@ -1,20 +1,19 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Pending Reports - My Dashboard</title>
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
-
     <link rel="stylesheet" href="global.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.20.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.20.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.20.0/firebase-analytics-compat.js"></script>
 
     <style>
             /* ========== VARIABEL CSS YANG DIPERLUKAN ========== */
@@ -1047,10 +1046,9 @@
         <div class="header">
 <div id="notificationContainer"></div>
             <button class="menu-toggle">
-<button class="menu-toggle">
                 <i class="fas fa-bars"></i>
             </button>
-                <i class="fas fa-bars"></i>
+                
 
             </button>
 
@@ -1736,305 +1734,376 @@
 </div>
 
 <script src="sidebar-loader.js"></script>
-
-<script src="user-profile.js"></script>
-<script src="notifications.js"></script>
-
+    <script src="user-profile.js"></script>
     
+   <script>
+    // ========== FIREBASE INITIALIZATION ==========
+    const firebaseConfig = {
+        apiKey: "AIzaSyDUZka4FZyLi_cv6X_5D4zeRsfkpqOlBpY",
+        authDomain: "dashboard-css.firebaseapp.com",
+        databaseURL: "https://dashboard-css-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "dashboard-css",
+        storageBucket: "dashboard-css.appspot.com",
+        messagingSenderId: "771131792881",
+        appId: "1:771131792881:web:ad634424225bd7de847850",
+        measurementId: "G-3CYBC5B101"
+    };
 
-<script>
-    // Fungsi untuk menampilkan toast notification
-    function showToast(message, type = 'success', duration = 3000) {
-    const toast = document.createElement('div');
-    toast.className = `toast-notification ${type}`;
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const analytics = firebase.analytics();
 
-    toast.innerHTML = `
-        <div class="toast-content">
-            <span>${message}</span>
-        </div>
-    `;
+    // Variabel global
+    let currentUser = null;
+    let currentReportId = null;
 
-    document.body.appendChild(toast);
+    // ========== FUNGSI NOTIFIKASI ==========
+    
+    // Fungsi untuk mendapatkan notifikasi
+    function getNotifications() {
+        const notifications = localStorage.getItem('notifications');
+        return notifications ? JSON.parse(notifications) : [];
+    }
 
-    // Auto-hide after duration
-    setTimeout(() => {
-        toast.classList.add('hide');
-        toast.addEventListener('animationend', () => {
-            toast.remove();
+    // Fungsi untuk menyimpan notifikasi
+    function saveNotifications(notifications) {
+        localStorage.setItem('notifications', JSON.stringify(notifications));
+    }
+
+    // Fungsi untuk menambahkan notifikasi baru
+    function addNotification(notification) {
+        const notifications = getNotifications();
+        notifications.unshift({
+            ...notification,
+            timestamp: new Date().toISOString(),
+            read: false
         });
-    }, duration);
-
-
-        // Tampilkan toast
-        toast.classList.add('show', type);
         
-        // Sembunyikan otomatis setelah 3 detik
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3000);
-    }
-
-    // Hamburger toggle (untuk mobile)
-    const hamburgerBtn = document.getElementById('hamburgerBtn');
-    const sidebar = document.getElementById('mainSidebar');
-    if (hamburgerBtn && sidebar) {
-        hamburgerBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-        });
-    }
-
-    // Fungsi untuk menghasilkan ID unik
-    function generateId() {
-        return 'RP-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-    }
-
-    // Fungsi untuk memformat tanggal
-    function formatDate(date) {
-        const d = new Date(date);
-        return d.toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric' 
-        });
-    }
-
-    // Fungsi untuk menghitung hari tersisa
-    function getDaysLeft(dueDate) {
-        const today = new Date();
-        const due = new Date(dueDate);
-        const diffTime = due - today;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return diffDays;
-    }
-
-    // Fungsi untuk mendapatkan semua laporan dari localStorage
-    function getReports() {
-        const reports = localStorage.getItem('pendingReports');
-        return reports ? JSON.parse(reports) : [];
-    }
-
-    // Fungsi untuk mendapatkan laporan yang sudah solved
-    function getSolvedReports() {
-        const reports = localStorage.getItem('solvedReports');
-        return reports ? JSON.parse(reports) : [];
-    }
-
-    // Fungsi untuk menyimpan laporan ke localStorage
-    function saveReports(reports) {
-        localStorage.setItem('pendingReports', JSON.stringify(reports));
-    }
-
-    // Fungsi untuk menyimpan laporan solved
-    function saveSolvedReports(reports) {
-        localStorage.setItem('solvedReports', JSON.stringify(reports));
-    }
-
-    // Fungsi untuk memperbarui badge count
-    function updateBadgeCounts() {
-        const pendingReports = getReports();
-        const solvedReports = getSolvedReports();
+        // Simpan maksimal 50 notifikasi
+        if (notifications.length > 50) {
+            notifications.splice(50);
+        }
         
-        // Update notification badge
-        const notificationCount = document.getElementById('notificationCount');
-        if (notificationCount) {
-            notificationCount.textContent = pendingReports.length;
+        saveNotifications(notifications);
+        updateNotificationUI();
+    }
+
+    // Fungsi untuk memperbarui UI notifikasi
+    function updateNotificationUI() {
+        const notifications = getNotifications();
+        const unreadCount = notifications.filter(n => !n.read).length;
+        
+        // Perbarui badge count
+        const notificationBadge = document.getElementById('notificationCount');
+        if (notificationBadge) {
+            notificationBadge.textContent = unreadCount;
+            notificationBadge.style.display = unreadCount > 0 ? 'flex' : 'none';
+        }
+    }
+
+    // ========== FUNGSI UTAMA ==========
+    
+    // Fungsi untuk memeriksa status autentikasi
+    function checkAuthState() {
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                console.log("User is signed in:", user.uid);
+                loadUserData();
+                setupEventListeners();
+            } else {
+                console.log("User is signed out");
+                window.location.href = "login.html";
+            }
+        });
+    }
+
+    // Fungsi untuk memuat data pengguna
+    function loadUserData() {
+        renderReportCards();
+        updateNotificationUI();
+    }
+
+    // Fungsi untuk mengatur event listener
+    function setupEventListeners() {
+        // Event listener untuk tombol confirm completion
+        const confirmMarkComplete = document.getElementById('confirmMarkComplete');
+        if (confirmMarkComplete) {
+            confirmMarkComplete.addEventListener('click', markReportAsComplete);
+        }
+
+        // Event listener untuk tombol cancel di modal mark complete
+        const cancelMarkComplete = document.getElementById('cancelMarkComplete');
+        if (cancelMarkComplete) {
+            cancelMarkComplete.addEventListener('click', function() {
+                const markCompleteModal = document.getElementById('markCompleteModal');
+                markCompleteModal.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        }
+        
+        // Event listener untuk tombol close di modal mark complete
+        const closeMarkCompleteModal = document.getElementById('closeMarkCompleteModal');
+        if (closeMarkCompleteModal) {
+            closeMarkCompleteModal.addEventListener('click', function() {
+                const markCompleteModal = document.getElementById('markCompleteModal');
+                markCompleteModal.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        }
+
+        // Event listener untuk tombol refresh
+        const refreshButton = document.getElementById('refreshReports');
+        if (refreshButton) {
+            refreshButton.addEventListener('click', () => {
+                renderReportCards();
+                showToast('Reports refreshed successfully!', 'success');
+            });
+        }
+
+        // Event listener untuk tombol edit di modal detail
+        const editReportBtn = document.getElementById('editReportBtn');
+        if (editReportBtn) {
+            editReportBtn.addEventListener('click', function() {
+                const reportId = this.getAttribute('data-id');
+                const reportModal = document.getElementById('reportModal');
+                if (reportModal) {
+                    reportModal.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+                
+                // Buka modal edit
+                openEditModal(reportId);
+            });
+        }
+        
+        // Event listener untuk tombol update di modal edit
+        const updateReportBtn = document.getElementById('updateReport');
+        if (updateReportBtn) {
+            updateReportBtn.addEventListener('click', updateReport);
+        }
+        
+        // Event listener untuk tombol tutup modal
+        document.querySelectorAll('.modal-close, .btn-outline').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.modal-overlay').forEach(modal => {
+                    modal.classList.remove('active');
+                });
+                document.body.style.overflow = '';
+            });
+        });
+
+        // Event listener untuk tombol add report
+        const addReportBtn = document.getElementById('addReportBtn');
+        if (addReportBtn) {
+            addReportBtn.addEventListener('click', function() {
+                document.getElementById('addReportModal').classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+        }
+
+        // Event listener untuk tombol submit report
+        const submitReportBtn = document.getElementById('submitReport');
+        if (submitReportBtn) {
+            submitReportBtn.addEventListener('click', addNewReport);
+        }
+
+        // Event listener untuk pencarian
+        const searchInput = document.getElementById('dashboardSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', filterReports);
+        }
+
+        const markCompleteBtn = document.getElementById('markCompleteBtn');
+        if (markCompleteBtn) {
+            markCompleteBtn.addEventListener('click', function() {
+                const reportId = this.getAttribute('data-id');
+                openMarkCompleteModal(reportId);
+            });
+        }
+        
+        // Event listener untuk tombol delete
+        const deleteReportBtn = document.getElementById('deleteReportBtn');
+        if (deleteReportBtn) {
+            deleteReportBtn.addEventListener('click', function() {
+                const reportId = this.getAttribute('data-id');
+                if (confirm('Are you sure you want to delete this report?')) {
+                    deleteExistingReport(reportId);
+                    
+                    // Tutup modal setelah menghapus
+                    const reportModal = document.getElementById('reportModal');
+                    if (reportModal) {
+                        reportModal.classList.remove('active');
+                    }
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+
+        // Event listener untuk tombol close di modal detail
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', function() {
+                const reportModal = document.getElementById('reportModal');
+                if (reportModal) {
+                    reportModal.classList.remove('active');
+                }
+                document.body.style.overflow = '';
+            });
+        }
+
+        // Event listener untuk tombol close di modal detail (ikon X)
+        const closeModal = document.getElementById('closeModal');
+        if (closeModal) {
+            closeModal.addEventListener('click', function() {
+                const reportModal = document.getElementById('reportModal');
+                if (reportModal) {
+                    reportModal.classList.remove('active');
+                }
+                document.body.style.overflow = '';
+            });
+        }
+
+        // Event listener untuk tombol add first report
+        const addFirstReportBtn = document.getElementById('addFirstReport');
+        if (addFirstReportBtn) {
+            addFirstReportBtn.addEventListener('click', function() {
+                document.getElementById('addReportModal').classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+        }
+
+        // Event listener untuk filter
+        const statusFilter = document.getElementById('statusFilter');
+        if (statusFilter) {
+            statusFilter.addEventListener('change', filterReports);
+        }
+
+        const brandFilter = document.getElementById('brandFilter');
+        if (brandFilter) {
+            brandFilter.addEventListener('change', filterReports);
+        }
+
+        const categoryFilter = document.getElementById('categoryFilter');
+        if (categoryFilter) {
+            categoryFilter.addEventListener('change', filterReports);
+        }
+
+        const dateFilter = document.getElementById('dateFilter');
+        if (dateFilter) {
+            dateFilter.addEventListener('change', filterReports);
+        }
+
+        const resetFilters = document.getElementById('resetFilters');
+        if (resetFilters) {
+            resetFilters.addEventListener('click', resetAllFilters);
+        }
+    }
+
+    // Fungsi untuk mendapatkan laporan yang tertunda
+    async function getReports() {
+        if (!currentUser) return [];
+        
+        try {
+            const snapshot = await db.collection('pendingReports')
+                .where('userId', '==', currentUser.uid)
+                .orderBy('dateCreated', 'desc')
+                .get();
+                
+            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        } catch (error) {
+            console.error("Error getting reports:", error);
+            showToast('Error loading reports', 'error');
+            return [];
         }
     }
 
     // Fungsi untuk menambahkan laporan baru
-function addNewReport(reportData) {
-    const reports = getReports();
-    const newReport = {
-        id: generateId(),
-        title: reportData.title,
-        category: reportData.category,
-        brand: reportData.brand,
-        dueDate: reportData.dueDate,
-        description: reportData.description,
-        status: 'Pending',
-        dateCreated: new Date().toISOString()
-    };
-    
-    reports.push(newReport);
-    saveReports(reports);
-    updateBadgeCounts();
-    
-    // TAMBAHKAN NOTIFIKASI DI SINI
-    addNotification({
-        type: 'new_report',
-        message: `Anda baru saja menambahkan report: "${reportData.title}"`,
-        timestamp: new Date().toISOString(),
-        reportId: newReport.id,
-        read: false
-    });
-    
-    return newReport;
-}
-
-    // Fungsi untuk menghapus laporan
-    function deleteReport(reportId) {
-        const reports = getReports();
-        const updatedReports = reports.filter(report => report.id !== reportId);
-        saveReports(updatedReports);
-        updateBadgeCounts();
-        return true;
-    }
-
-    // Fungsi untuk membuka modal edit
-    function openEditModal(reportId) {
-        const reports = getReports();
-        const report = reports.find(r => r.id === reportId);
+    async function addNewReport() {
+        const title = document.getElementById('reportTitle').value;
+        const category = document.getElementById('reportCategory').value;
+        const brand = document.getElementById('reportBrand').value;
+        const dueDate = document.getElementById('reportDueDate').value;
+        const description = document.getElementById('reportDescription').value;
         
-        if (!report) {
-            showToast('Report not found!', 'error');
+        if (!title || !category || !brand || !dueDate || !description) {
+            showToast('Please fill all fields!', 'error');
             return;
         }
         
-        // Isi form dengan data laporan
-        document.getElementById('editReportId').value = report.id;
-        document.getElementById('editReportTitle').value = report.title;
-        document.getElementById('editReportCategory').value = report.category;
-        document.getElementById('editReportBrand').value = report.brand;
-        document.getElementById('editReportDueDate').value = report.dueDate;
-        document.getElementById('editReportDescription').value = report.description;
-        
-        // Tampilkan modal
-        const editReportModal = document.getElementById('editReportModal');
-        editReportModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-// Fungsi untuk mendapatkan notifikasi
-function getNotifications() {
-    const notifications = localStorage.getItem('notifications');
-    return notifications ? JSON.parse(notifications) : [];
-}
-
-// Fungsi untuk menyimpan notifikasi
-function saveNotifications(notifications) {
-    localStorage.setItem('notifications', JSON.stringify(notifications));
-}
-
-// Fungsi untuk menambahkan notifikasi baru
-function addNotification(notification) {
-    const notifications = getNotifications();
-    notifications.unshift(notification); // Tambahkan di awal array
-    saveNotifications(notifications);
-    updateNotificationUI();
-}
-
-// Fungsi untuk memperbarui UI notifikasi
-function updateNotificationUI() {
-    const notifications = getNotifications();
-    const unreadCount = notifications.filter(n => !n.read).length;
-    
-    // Perbarui badge count
-    const notificationBadge = document.getElementById('notificationCount');
-    if (notificationBadge) {
-        notificationBadge.textContent = unreadCount;
-    }
-    
-    // Perbarui dropdown notifikasi (jika ada)
-    updateNotificationDropdown();
-}
-
-// Fungsi untuk memperbarui dropdown notifikasi
-function updateNotificationDropdown() {
-    const notificationList = document.getElementById('notificationList');
-    if (!notificationList) return;
-    
-    const notifications = getNotifications();
-    
-    if (notifications.length === 0) {
-        notificationList.innerHTML = `
-            <div class="empty-state" style="padding: var(--space-md);">
-                <i class="fas fa-bell-slash"></i>
-                <p>No notifications</p>
-            </div>
-        `;
-        return;
-    }
-    
-    notificationList.innerHTML = '';
-    
-    // Batasi hanya 5 notifikasi terbaru
-    const recentNotifications = notifications.slice(0, 5);
-    
-    recentNotifications.forEach(notification => {
-        const notificationItem = document.createElement('div');
-        notificationItem.className = `notification-item ${notification.read ? '' : 'unread'}`;
-        
-        // Tentukan ikon berdasarkan jenis notifikasi
-        let icon = 'fas fa-bell';
-        if (notification.type === 'new_report') {
-            icon = 'fas fa-file-alt';
-        } else if (notification.type === 'report_solved') {
-            icon = 'fas fa-check-circle';
+        try {
+            const docRef = await db.collection('pendingReports').add({
+                title,
+                category,
+                brand,
+                dueDate,
+                description,
+                userId: currentUser.uid,
+                status: 'pending',
+                dateCreated: new Date(),
+                dateUpdated: new Date(),
+                // Tambahkan field untuk konsistensi
+                priority: 'medium',
+                reportedBy: currentUser.displayName || 'Unknown'
+            });
+            
+            showToast('Report added successfully!');
+            
+            // Tambahkan notifikasi
+            addNotification({
+                type: 'new_report',
+                message: `New report "${title}" has been created`,
+                reportId: docRef.id
+            });
+            
+            // Tutup modal dan reset form
+            document.getElementById('addReportModal').classList.remove('active');
+            document.getElementById('reportForm').reset();
+            document.body.style.overflow = '';
+            
+            // Perbarui daftar laporan
+            renderReportCards();
+            
+        } catch (error) {
+            console.error("Error adding report:", error);
+            showToast('Error adding report', 'error');
         }
-        
-        // Format waktu
-        const time = formatNotificationTime(notification.timestamp);
-        
-        notificationItem.innerHTML = `
-            <div class="notification-icon">
-                <i class="${icon}"></i>
-            </div>
-            <div class="notification-content">
-                <p class="notification-message">${notification.message}</p>
-                <span class="notification-time">${time}</span>
-            </div>
-            ${!notification.read ? '<div class="notification-dot"></div>' : ''}
-        `;
-        
-        // Tambahkan event listener untuk menandai sebagai telah dibaca
-        notificationItem.addEventListener('click', () => {
-            markNotificationAsRead(notification.timestamp);
-        });
-        
-        notificationList.appendChild(notificationItem);
-    });
-}
-
-// Fungsi untuk memformat waktu notifikasi
-function formatNotificationTime(timestamp) {
-    const now = new Date();
-    const time = new Date(timestamp);
-    const diffInMinutes = Math.floor((now - time) / (1000 * 60));
-    
-    if (diffInMinutes < 1) return 'Just now';
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `${diffInDays}d ago`;
-    
-    return time.toLocaleDateString();
-}
-
-// Fungsi untuk menandai notifikasi sebagai telah dibaca
-function markNotificationAsRead(timestamp) {
-    const notifications = getNotifications();
-    const notificationIndex = notifications.findIndex(n => n.timestamp === timestamp);
-    
-    if (notificationIndex !== -1) {
-        notifications[notificationIndex].read = true;
-        saveNotifications(notifications);
-        updateNotificationUI();
     }
-}
 
-// Fungsi untuk menandai semua notifikasi sebagai telah dibaca
-function markAllNotificationsAsRead() {
-    const notifications = getNotifications();
-    notifications.forEach(notification => {
-        notification.read = true;
-    });
-    saveNotifications(notifications);
-    updateNotificationUI();
-}
+    // Fungsi untuk membuka modal edit
+    async function openEditModal(reportId) {
+        try {
+            const doc = await db.collection('pendingReports').doc(reportId).get();
+            
+            if (!doc.exists) {
+                showToast('Report not found!', 'error');
+                return;
+            }
+            
+            const report = doc.data();
+            
+            // Isi form edit dengan data laporan
+            document.getElementById('editReportId').value = reportId;
+            document.getElementById('editReportTitle').value = report.title;
+            document.getElementById('editReportCategory').value = report.category;
+            document.getElementById('editReportBrand').value = report.brand;
+            document.getElementById('editReportDueDate').value = report.dueDate;
+            document.getElementById('editReportDescription').value = report.description;
+            
+            // Tampilkan modal edit
+            document.getElementById('editReportModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+        } catch (error) {
+            console.error("Error opening edit modal:", error);
+            showToast('Error loading report details', 'error');
+        }
+    }
+
     // Fungsi untuk memperbarui laporan
-    function updateReport() {
+    async function updateReport() {
         const reportId = document.getElementById('editReportId').value;
         const title = document.getElementById('editReportTitle').value;
         const category = document.getElementById('editReportCategory').value;
@@ -2042,48 +2111,225 @@ function markAllNotificationsAsRead() {
         const dueDate = document.getElementById('editReportDueDate').value;
         const description = document.getElementById('editReportDescription').value;
         
-        if (!title || !category || !brand || !dueDate || !description) {
-            showToast('Please fill in all fields!', 'error');
+        if (!reportId || !title || !category || !brand || !dueDate || !description) {
+            showToast('Please fill all fields!', 'error');
             return;
         }
         
-        const reports = getReports();
-        const reportIndex = reports.findIndex(r => r.id === reportId);
-        
-        if (reportIndex === -1) {
-            showToast('Report not found!', 'error');
-            return;
+        try {
+            await db.collection('pendingReports').doc(reportId).update({
+                title,
+                category,
+                brand,
+                dueDate,
+                description,
+                dateUpdated: new Date()
+            });
+            
+            showToast('Report updated successfully!');
+            
+            // Tambahkan notifikasi
+            addNotification({
+                type: 'report_updated',
+                message: `Report "${title}" has been updated`,
+                reportId: reportId
+            });
+            
+            // Tutup modal edit
+            document.getElementById('editReportModal').classList.remove('active');
+            document.body.style.overflow = '';
+            
+            // Perbarui daftar laporan
+            renderReportCards();
+            
+        } catch (error) {
+            console.error("Error updating report:", error);
+            showToast('Error updating report', 'error');
         }
-        
-        // Perbarui data laporan
-        reports[reportIndex] = {
-            ...reports[reportIndex],
-            title,
-            category,
-            brand,
-            dueDate,
-            description
-        };
-        
-        // Simpan perubahan
-        saveReports(reports);
-        
-        showToast('Report updated successfully!');
-        
-        // Tutup modal
-        const editReportModal = document.getElementById('editReportModal');
-        editReportModal.classList.remove('active');
-        document.body.style.overflow = '';
-        
-        // Perbarui tampilan
-        renderReportCards();
     }
 
-    // Fungsi untuk merender kartu laporan
-    function renderReportCards(reportsToRender = null) {
+    // Fungsi untuk menghapus laporan
+    async function deleteExistingReport(reportId) {
+        try {
+            // Dapatkan data laporan untuk notifikasi
+            const doc = await db.collection('pendingReports').doc(reportId).get();
+            const report = doc.data();
+            
+            await db.collection('pendingReports').doc(reportId).delete();
+            
+            showToast('Report deleted successfully!');
+            
+            // Tambahkan notifikasi
+            addNotification({
+                type: 'report_deleted',
+                message: `Report "${report.title}" has been deleted`,
+                reportId: reportId
+            });
+            
+            // Perbarui daftar laporan
+            renderReportCards();
+            
+        } catch (error) {
+            console.error("Error deleting report:", error);
+            showToast('Error deleting report', 'error');
+        }
+    }
+
+    // Fungsi untuk menampilkan detail laporan
+    async function viewReportDetails(reportId) {
+        try {
+            const doc = await db.collection('pendingReports').doc(reportId).get();
+            
+            if (!doc.exists) {
+                showToast('Report not found!', 'error');
+                return;
+            }
+            
+            const report = doc.data();
+            const daysLeft = getDaysLeft(report.dueDate);
+            const isOverdue = daysLeft < 0;
+            
+            // Isi modal dengan data laporan
+            const modalTitle = document.querySelector('#reportModal .modal-title');
+            if (modalTitle) {
+                modalTitle.innerHTML = `<i class="fas fa-file-alt"></i> ${report.title}`;
+            }
+            
+            document.getElementById('detailReportId').textContent = reportId;
+            document.getElementById('detailReportStatus').innerHTML = `<span class="status ${isOverdue ? 'status-overdue' : 'status-pending'}">${isOverdue ? 'Overdue' : report.status}</span>`;
+            document.getElementById('detailReportBrand').innerHTML = `<span class="brand brand-${report.brand.toLowerCase().replace(/\s+/g, '-')}">${report.brand}</span>`;
+            document.getElementById('detailReportCategory').textContent = report.category;
+            document.getElementById('detailReportDateCreated').textContent = formatDate(report.dateCreated);
+            document.getElementById('detailReportDueDate').innerHTML = `${formatDate(report.dueDate)} <span class="text-muted">(${Math.abs(daysLeft)} ${daysLeft < 0 ? 'days overdue' : 'days left'})</span>`;
+            document.getElementById('detailReportDescription').innerHTML = `<p>${report.description}</p>`;
+            
+            // PERBAIKAN PENTING: Set atribut data-id untuk tombol markCompleteBtn
+            document.getElementById('markCompleteBtn').setAttribute('data-id', reportId);
+            document.getElementById('deleteReportBtn').setAttribute('data-id', reportId);
+            document.getElementById('editReportBtn').setAttribute('data-id', reportId);
+            
+            // Tampilkan modal
+            const reportModal = document.getElementById('reportModal');
+            if (reportModal) {
+                reportModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        } catch (error) {
+            console.error("Error viewing report details:", error);
+            showToast('Error loading report details', 'error');
+        }
+    }
+
+    // Fungsi untuk membuka modal mark complete
+    function openMarkCompleteModal(reportId) {
+        currentReportId = reportId;
+        
+        // Reset form
+        document.getElementById('resolutionDescription').value = '';
+        
+        // Tutup modal detail jika terbuka
+        const reportModal = document.getElementById('reportModal');
+        if (reportModal) {
+            reportModal.classList.remove('active');
+        }
+        
+        // Buka modal mark complete
+        const markCompleteModal = document.getElementById('markCompleteModal');
+        if (markCompleteModal) {
+            markCompleteModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    // ========== FUNGSI UTAMA: Transfer Data ke Solved Reports ==========
+    async function markReportAsComplete() {
+        const resolutionDescription = document.getElementById('resolutionDescription').value;
+        
+        if (!resolutionDescription) {
+            showToast('Please provide resolution details!', 'error');
+            return;
+        }
+        
+        if (!currentReportId) {
+            showToast('No report selected!', 'error');
+            return;
+        }
+        
+        try {
+            // Dapatkan data laporan dari pendingReports
+            const doc = await db.collection('pendingReports').doc(currentReportId).get();
+            
+            if (!doc.exists) {
+                showToast('Report not found!', 'error');
+                return;
+            }
+            
+            const reportData = doc.data();
+            
+            // Buat data untuk solvedReports dengan semua field yang diperlukan
+            const solvedReportData = {
+                title: reportData.title,
+                category: reportData.category,
+                brand: reportData.brand,
+                description: reportData.description,
+                userId: reportData.userId,
+                reportedBy: reportData.reportedBy || currentUser.displayName || 'Unknown',
+                priority: reportData.priority || 'medium',
+                status: 'completed',
+                dateCreated: reportData.dateCreated,
+                dateSolved: new Date(),
+                dateUpdated: new Date(),
+                resolution: resolutionDescription,
+                completedBy: currentUser.displayName || 'Unknown',
+                dueDate: reportData.dueDate,
+                originalReportId: currentReportId
+            };
+            
+            // Gunakan batch write untuk operasi atomik
+            const batch = db.batch();
+            
+            // Tambahkan ke solvedReports
+            const solvedReportRef = db.collection('solvedReports').doc(currentReportId);
+            batch.set(solvedReportRef, solvedReportData);
+            
+            // Hapus dari pendingReports
+            const pendingReportRef = db.collection('pendingReports').doc(currentReportId);
+            batch.delete(pendingReportRef);
+            
+            // Commit batch operation
+            await batch.commit();
+            
+            // Tambahkan notifikasi
+            addNotification({
+                type: 'report_solved',
+                message: `Report "${reportData.title}" has been marked as completed`,
+                reportId: currentReportId
+            });
+            
+            showToast('Report marked as completed successfully!');
+            
+            // Tutup modal
+            const markCompleteModal = document.getElementById('markCompleteModal');
+            if (markCompleteModal) {
+                markCompleteModal.classList.remove('active');
+            }
+            document.body.style.overflow = '';
+            
+            // Perbarui daftar laporan
+            renderReportCards();
+            
+        } catch (error) {
+            console.error("Error marking report as complete:", error);
+            showToast('Error marking report as complete', 'error');
+        }
+    }
+
+    // Fungsi untuk menampilkan kartu laporan
+    async function renderReportCards() {
         const reportsGrid = document.getElementById('reportsGrid');
         const noReports = document.getElementById('noReports');
-        const reports = reportsToRender || getReports();
+        
+        const reports = await getReports();
         
         if (reports.length === 0) {
             if (reportsGrid) reportsGrid.innerHTML = '';
@@ -2102,14 +2348,14 @@ function markAllNotificationsAsRead() {
             reportCard.className = 'report-card fade-in';
             reportCard.innerHTML = `
                 <div class="report-card-header">
-                    <span class="report-id">${report.id}</span>
+                    <span class="report-id">${report.id.substring(0, 8)}...</span>
                     <span class="status ${isOverdue ? 'status-overdue' : 'status-pending'}">
                         ${isOverdue ? 'Overdue' : report.status}
                     </span>
                 </div>
                 <div class="report-card-body">
                     <h3 class="report-title">${report.title}</h3>
-                    <p class="report-desc">${report.description}</p>
+                    <p class="report-desc">${report.description.substring(0, 100)}${report.description.length > 100 ? '...' : ''}</p>
                     <div class="report-meta">
                         <span class="brand brand-${report.brand.toLowerCase().replace(/\s+/g, '-')}">${report.brand}</span>
                         <span class="report-date">Due: ${formatDate(report.dueDate)}</span>
@@ -2152,488 +2398,206 @@ function markAllNotificationsAsRead() {
             btn.addEventListener('click', function() {
                 const reportId = this.getAttribute('data-id');
                 if (confirm('Are you sure you want to delete this report?')) {
-                    deleteReport(reportId);
-                    showToast('Report deleted successfully!');
-                    renderReportCards();
+                    deleteExistingReport(reportId);
                 }
             });
         });
     }
 
-    // Fungsi untuk menampilkan detail laporan
-    function viewReportDetails(reportId) {
-        const reports = getReports();
-        const report = reports.find(r => r.id === reportId);
+    // Fungsi untuk memfilter laporan berdasarkan pencarian
+    async function filterReports() {
+        const searchTerm = document.getElementById('dashboardSearch').value.toLowerCase();
+        const statusFilterValue = document.getElementById('statusFilter').value;
+        const brandFilterValue = document.getElementById('brandFilter').value;
+        const categoryFilterValue = document.getElementById('categoryFilter').value;
+        const dateFilterValue = document.getElementById('dateFilter').value;
         
-        if (!report) {
-            showToast('Report not found!', 'error');
+        const reports = await getReports();
+        
+        let filteredReports = reports;
+        
+        // Filter berdasarkan pencarian
+        if (searchTerm) {
+            filteredReports = filteredReports.filter(report => 
+                report.title.toLowerCase().includes(searchTerm) ||
+                report.description.toLowerCase().includes(searchTerm) ||
+                report.brand.toLowerCase().includes(searchTerm) ||
+                report.category.toLowerCase().includes(searchTerm)
+            );
+        }
+        
+        // Filter berdasarkan status
+        if (statusFilterValue) {
+            filteredReports = filteredReports.filter(report => {
+                if (statusFilterValue === 'overdue') {
+                    const daysLeft = getDaysLeft(report.dueDate);
+                    return daysLeft < 0;
+                }
+                return report.status === statusFilterValue;
+            });
+        }
+        
+        // Filter berdasarkan brand
+        if (brandFilterValue) {
+            filteredReports = filteredReports.filter(report => report.brand === brandFilterValue);
+        }
+        
+        // Filter berdasarkan kategori
+        if (categoryFilterValue) {
+            filteredReports = filteredReports.filter(report => report.category === categoryFilterValue);
+        }
+        
+        // Filter berdasarkan tanggal
+        if (dateFilterValue) {
+            filteredReports = filteredReports.filter(report => {
+                const reportDate = new Date(report.dateCreated).toISOString().split('T')[0];
+                return reportDate === dateFilterValue;
+            });
+        }
+        
+        const reportsGrid = document.getElementById('reportsGrid');
+        const noReports = document.getElementById('noReports');
+        
+        if (filteredReports.length === 0) {
+            if (reportsGrid) reportsGrid.innerHTML = '';
+            if (noReports) noReports.style.display = 'block';
             return;
         }
         
-        const daysLeft = getDaysLeft(report.dueDate);
-        const isOverdue = daysLeft < 0;
+        if (noReports) noReports.style.display = 'none';
+        if (reportsGrid) reportsGrid.innerHTML = '';
         
-        // Isi modal dengan data laporan
-        document.querySelector('.modal-title').innerHTML = `<i class="fas fa-file-alt"></i> ${report.title}`;
-        document.getElementById('detailReportId').textContent = report.id;
-        document.getElementById('detailReportStatus').innerHTML = `<span class="status ${isOverdue ? 'status-overdue' : 'status-pending'}">${isOverdue ? 'Overdue' : report.status}</span>`;
-        document.getElementById('detailReportBrand').innerHTML = `<span class="brand brand-${report.brand.toLowerCase().replace(/\s+/g, '-')}">${report.brand}</span>`;
-        document.getElementById('detailReportCategory').textContent = report.category;
-        document.getElementById('detailReportDateCreated').textContent = formatDate(report.dateCreated);
-        document.getElementById('detailReportDueDate').innerHTML = `${formatDate(report.dueDate)} <span class="text-muted">(${Math.abs(daysLeft)} ${daysLeft < 0 ? 'days overdue' : 'days left'})</span>`;
-        document.getElementById('detailReportDescription').innerHTML = `<p>${report.description}</p>`;
-        
-        // Set data attribute untuk tombol
-        document.getElementById('markCompleteBtn').setAttribute('data-id', reportId);
-        document.getElementById('deleteReportBtn').setAttribute('data-id', reportId);
-        document.getElementById('editReportBtn').setAttribute('data-id', reportId);
-        
-        // Tampilkan modal
-        const reportModal = document.getElementById('reportModal');
-        reportModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    // Fungsi untuk menangani pembuatan laporan baru
-    function handleNewReportSubmission(e) {
-        e.preventDefault();
-        
-        const title = document.getElementById('reportTitle').value;
-        const category = document.getElementById('reportCategory').value;
-        const brand = document.getElementById('reportBrand').value;
-        const dueDate = document.getElementById('reportDueDate').value;
-        const description = document.getElementById('reportDescription').value;
-        
-        if (!title || !category || !brand || !dueDate || !description) {
-            showToast('Please fill in all fields!', 'error');
-            return false;
-        }
-        
-        const newReport = addNewReport({
-            title,
-            category,
-            brand,
-            dueDate,
-            description
+        filteredReports.forEach(report => {
+            const daysLeft = getDaysLeft(report.dueDate);
+            const isOverdue = daysLeft < 0;
+            
+            const reportCard = document.createElement('div');
+            reportCard.className = 'report-card fade-in';
+            reportCard.innerHTML = `
+                <div class="report-card-header">
+                    <span class="report-id">${report.id.substring(0, 8)}...</span>
+                    <span class="status ${isOverdue ? 'status-overdue' : 'status-pending'}">
+                        ${isOverdue ? 'Overdue' : report.status}
+                    </span>
+                </div>
+                <div class="report-card-body">
+                    <h3 class="report-title">${report.title}</h3>
+                    <p class="report-desc">${report.description.substring(0, 100)}${report.description.length > 100 ? '...' : ''}</p>
+                    <div class="report-meta">
+                        <span class="brand brand-${report.brand.toLowerCase().replace(/\s+/g, '-')}">${report.brand}</span>
+                        <span class="report-date">Due: ${formatDate(report.dueDate)}</span>
+                    </div>
+                </div>
+                <div class="report-card-footer">
+                    <button class="btn btn-outline btn-sm view-report-btn" data-id="${report.id}">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                    <button class="btn btn-edit btn-sm edit-report-btn" data-id="${report.id}">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn btn-danger btn-sm delete-report-btn" data-id="${report.id}">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            `;
+            
+            if (reportsGrid) reportsGrid.appendChild(reportCard);
         });
         
-        showToast('Report submitted successfully!');
-        
-        // Tutup modal
-        const addReportModal = document.getElementById('addReportModal');
-        addReportModal.classList.remove('active');
-        document.body.style.overflow = '';
-        
-        // Reset form
-        document.getElementById('reportForm').reset();
-        
-        // Perbarui tampilan
-        renderReportCards();
-        
-        return false;
-    }
-
-    // Fungsi untuk memfilter laporan
-    function filterReports() {
-        const statusFilter = document.getElementById('statusFilter').value;
-        const brandFilter = document.getElementById('brandFilter').value;
-        const categoryFilter = document.getElementById('categoryFilter').value;
-        const dateFilter = document.getElementById('dateFilter').value;
-        
-        const reports = getReports();
-        
-        let filteredReports = reports.filter(report => {
-            // Filter status
-            let statusMatch = true;
-            if (statusFilter) {
-                const daysLeft = getDaysLeft(report.dueDate);
-                if (statusFilter === 'overdue') {
-                    statusMatch = daysLeft < 0;
-                } else if (statusFilter === 'pending') {
-                    statusMatch = daysLeft >= 0 && report.status === 'Pending';
-                } else if (statusFilter === 'in-progress') {
-                    statusMatch = report.status === 'In Progress';
-                }
-            }
-            
-            // Filter brand
-            const brandMatch = !brandFilter || report.brand === brandFilter;
-            
-            // Filter category
-            const categoryMatch = !categoryFilter || report.category === categoryFilter;
-            
-            // Filter date
-            let dateMatch = true;
-            if (dateFilter) {
-                const reportDate = new Date(report.dateCreated).toDateString();
-                const filterDate = new Date(dateFilter).toDateString();
-                dateMatch = reportDate === filterDate;
-            }
-            
-            return statusMatch && brandMatch && categoryMatch && dateMatch;
-        });
-        
-        renderReportCards(filteredReports);
-    }
-    
-    // Fungsi untuk memindahkan laporan ke solved dengan deskripsi penyelesaian
-    function markReportAsSolved(reportId, resolutionDescription) {
-        const pendingReports = getReports();
-        const solvedReports = getSolvedReports();
-            
-        // Cari report yang akan dipindahkan
-        const reportIndex = pendingReports.findIndex(report => report.id === reportId);
-        
-        if (reportIndex === -1) {
-            showToast('Report not found!', 'error');
-            return false;
-        }
-        
-        // Ambil report dan ubah statusnya
-        const solvedReport = {...pendingReports[reportIndex]};
-        solvedReport.status = 'Solved';
-        solvedReport.dateSolved = new Date().toISOString();
-        solvedReport.resolutionDescription = resolutionDescription; // Tambahkan deskripsi penyelesaian
-        
-        // Hapus dari pending dan tambahkan ke solved
-        pendingReports.splice(reportIndex, 1);
-        solvedReports.push(solvedReport);
-        
-        // Simpan perubahan
-        saveReports(pendingReports);
-        saveSolvedReports(solvedReports);
-        updateBadgeCounts();
-        
-        showToast('Report marked as solved!');
-        return true;
-    }
-
-    // Variabel untuk menyimpan ID report yang sedang diproses
-    let currentReportId = null;
-
-    // Inisialisasi saat halaman dimuat
-    document.addEventListener('DOMContentLoaded', function() {
-        // Render laporan dan perbarui badge count
-        renderReportCards();
-        updateBadgeCounts();
-
-// Event listener untuk tombol refresh
-const refreshButton = document.getElementById('refreshReports');
-if (refreshButton) {
-    refreshButton.addEventListener('click', () => {
-        renderReportCards();
-        showToast('Reports refreshed successfully!', 'success');
-    });
-}
-
-// Event listener untuk tombol reset filter
-const resetFiltersButton = document.getElementById('resetFilters');
-if (resetFiltersButton) {
-    resetFiltersButton.addEventListener('click', () => {
-        const statusFilter = document.getElementById('statusFilter');
-        const brandFilter = document.getElementById('brandFilter');
-        const categoryFilter = document.getElementById('categoryFilter');
-        const dateFilter = document.getElementById('dateFilter');
-
-        if (statusFilter) statusFilter.value = '';
-        if (brandFilter) brandFilter.value = '';
-        if (categoryFilter) categoryFilter.value = '';
-        if (dateFilter) dateFilter.value = '';
-
-        renderReportCards();
-        showToast('Filters have been refreshed!', 'success');
-    });
-}
-
-        
-        // Event listener untuk tombol add report
-        const addReportBtn = document.getElementById('addReportBtn');
-        if (addReportBtn) {
-            addReportBtn.addEventListener('click', function() {
-                const addReportModal = document.getElementById('addReportModal');
-                if (addReportModal) {
-                    addReportModal.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                }
-            });
-        }
-        
-        // Event listener untuk tombol add first report
-        const addFirstReport = document.getElementById('addFirstReport');
-        if (addFirstReport) {
-            addFirstReport.addEventListener('click', function() {
-                const addReportModal = document.getElementById('addReportModal');
-                if (addReportModal) {
-                    addReportModal.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                }
-            });
-        }
-        
-        // Event listener untuk tombol submit report
-        const submitReport = document.getElementById('submitReport');
-        if (submitReport) {
-            submitReport.addEventListener('click', handleNewReportSubmission);
-        }
-
-        // Event listener untuk form submission
-        const reportForm = document.getElementById('reportForm');
-        if (reportForm) {
-            reportForm.addEventListener('submit', handleNewReportSubmission);
-        }
-        
-        // Event listener untuk tombol cancel add report
-        const cancelAddReport = document.getElementById('cancelAddReport');
-        if (cancelAddReport) {
-            cancelAddReport.addEventListener('click', function() {
-                const addReportModal = document.getElementById('addReportModal');
-                if (addReportModal) {
-                    addReportModal.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            });
-        }
-        
-        // Event listener untuk tombol close add modal
-        const closeAddModal = document.getElementById('closeAddModal');
-        if (closeAddModal) {
-            closeAddModal.addEventListener('click', function() {
-                const addReportModal = document.getElementById('addReportModal');
-                if (addReportModal) {
-                    addReportModal.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            });
-        }
-        
-        // Event listener untuk tombol close modal
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        if (closeModalBtn) {
-            closeModalBtn.addEventListener('click', function() {
-                const reportModal = document.getElementById('reportModal');
-                if (reportModal) {
-                    reportModal.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            });
-        }
-        
-        // Event listener untuk tombol close modal (X)
-        const closeModal = document.getElementById('closeModal');
-        if (closeModal) {
-            closeModal.addEventListener('click', function() {
-                const reportModal = document.getElementById('reportModal');
-                if (reportModal) {
-                    reportModal.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            });
-        }
-        
-        // Event listener untuk tombol edit report
-        const editReportBtn = document.getElementById('editReportBtn');
-        if (editReportBtn) {
-            editReportBtn.addEventListener('click', function() {
+        // Tambahkan event listener untuk tombol view
+        document.querySelectorAll('.view-report-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
                 const reportId = this.getAttribute('data-id');
-                const reportModal = document.getElementById('reportModal');
-                if (reportModal) {
-                    reportModal.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-                
-                // Buka modal edit
+                viewReportDetails(reportId);
+            });
+        });
+        
+        // Tambahkan event listener untuk tombol edit
+        document.querySelectorAll('.edit-report-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const reportId = this.getAttribute('data-id');
                 openEditModal(reportId);
             });
-        }
+        });
         
-        // Event listener untuk tombol update report
-        const updateReportBtn = document.getElementById('updateReport');
-        if (updateReportBtn) {
-            updateReportBtn.addEventListener('click', updateReport);
-        }
-        
-        // Event listener untuk tombol cancel edit report
-        const cancelEditReport = document.getElementById('cancelEditReport');
-        if (cancelEditReport) {
-            cancelEditReport.addEventListener('click', function() {
-                const editReportModal = document.getElementById('editReportModal');
-                if (editReportModal) {
-                    editReportModal.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            });
-        }
-        
-        // Event listener untuk tombol close edit modal
-        const closeEditModal = document.getElementById('closeEditModal');
-        if (closeEditModal) {
-            closeEditModal.addEventListener('click', function() {
-                const editReportModal = document.getElementById('editReportModal');
-                if (editReportModal) {
-                    editReportModal.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            });
-        }
-        
-        // Event listener untuk tombol delete report
-        const deleteReportBtn = document.getElementById('deleteReportBtn');
-        if (deleteReportBtn) {
-            deleteReportBtn.addEventListener('click', function() {
+        // Tambahkan event listener untuk tombol delete
+        document.querySelectorAll('.delete-report-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
                 const reportId = this.getAttribute('data-id');
-                const reportModal = document.getElementById('reportModal');
-                
                 if (confirm('Are you sure you want to delete this report?')) {
-                    deleteReport(reportId);
-                    showToast('Report deleted successfully!');
-                    if (reportModal) {
-                        reportModal.classList.remove('active');
-                        document.body.style.overflow = '';
-                    }
-                    renderReportCards();
+                    deleteExistingReport(reportId);
                 }
             });
+        });
+    }
+
+    // Fungsi untuk mereset semua filter
+    function resetAllFilters() {
+        document.getElementById('dashboardSearch').value = '';
+        document.getElementById('statusFilter').value = '';
+        document.getElementById('brandFilter').value = '';
+        document.getElementById('categoryFilter').value = '';
+        document.getElementById('dateFilter').value = '';
+        
+        renderReportCards();
+    }
+
+    // Fungsi utilitas untuk memformat tanggal
+    function formatDate(date) {
+        if (!date) return 'N/A';
+        
+        const d = new Date(date);
+        return d.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric' 
+        });
+    }
+
+    // Fungsi utilitas untuk menghitung hari tersisa
+    function getDaysLeft(dueDate) {
+        if (!dueDate) return 0;
+        
+        const today = new Date();
+        const due = new Date(dueDate);
+        const diffTime = due - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays;
+    }
+
+    // Fungsi untuk menampilkan notifikasi toast
+    function showToast(message, type = 'success', duration = 3000) {
+        // Hapus toast sebelumnya jika ada
+        const existingToast = document.querySelector('.toast-notification');
+        if (existingToast) {
+            existingToast.remove();
         }
         
-        // Event listener untuk tombol mark as complete
-        const markCompleteBtn = document.getElementById('markCompleteBtn');
-        if (markCompleteBtn) {
-            markCompleteBtn.addEventListener('click', function() {
-                const reportId = this.getAttribute('data-id');
-                const reportModal = document.getElementById('reportModal');
-                
-                // Simpan ID report yang sedang diproses
-                currentReportId = reportId;
-                
-                // Sembunyikan modal detail dan tampilkan modal mark complete
-                if (reportModal) {
-                    reportModal.classList.remove('active');
-                }
-                
-                const markCompleteModal = document.getElementById('markCompleteModal');
-                if (markCompleteModal) {
-                    markCompleteModal.classList.add('active');
-                }
-            });
-        }
-        
-        // Event listener untuk tombol confirm mark as complete
-        const confirmMarkComplete = document.getElementById('confirmMarkComplete');
-        if (confirmMarkComplete) {
-            confirmMarkComplete.addEventListener('click', function() {
-                const resolutionDescription = document.getElementById('resolutionDescription').value;
-                
-                if (!resolutionDescription) {
-                    showToast('Please provide a resolution description!', 'error');
-                    return;
-                }
-                
-                // Pindahkan report ke solved dengan deskripsi penyelesaian
-                if (markReportAsSolved(currentReportId, resolutionDescription)) {
-                    // Tutup modal mark complete
-                    const markCompleteModal = document.getElementById('markCompleteModal');
-                    if (markCompleteModal) {
-                        markCompleteModal.classList.remove('active');
-                        document.body.style.overflow = '';
-                    }
-                    
-                    // Reset form
-                    document.getElementById('resolutionDescription').value = '';
-                    
-                    // Perbarui tampilan
-                    renderReportCards();
-                }
-            });
-        }
-        
-        // Event listener untuk tombol cancel mark as complete
-        const cancelMarkComplete = document.getElementById('cancelMarkComplete');
-        if (cancelMarkComplete) {
-            cancelMarkComplete.addEventListener('click', function() {
-                const markCompleteModal = document.getElementById('markCompleteModal');
-                if (markCompleteModal) {
-                    markCompleteModal.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-                
-                // Reset form
-                document.getElementById('resolutionDescription').value = '';
-            });
-        }
-        
-        // Event listener untuk tombol close mark complete modal
-        const closeMarkCompleteModal = document.getElementById('closeMarkCompleteModal');
-        if (closeMarkCompleteModal) {
-            closeMarkCompleteModal.addEventListener('click', function() {
-                const markCompleteModal = document.getElementById('markCompleteModal');
-                if (markCompleteModal) {
-                    markCompleteModal.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-                
-                // Reset form
-                document.getElementById('resolutionDescription').value = '';
-            });
-        }
-        
-        // Event listener untuk filter
-        const statusFilter = document.getElementById('statusFilter');
-        if (statusFilter) {
-            statusFilter.addEventListener('change', filterReports);
-        }
-        
-        const brandFilter = document.getElementById('brandFilter');
-        if (brandFilter) {
-            brandFilter.addEventListener('change', filterReports);
-        }
-        
-        const categoryFilter = document.getElementById('categoryFilter');
-        if (categoryFilter) {
-            categoryFilter.addEventListener('change', filterReports);
-        }
-        
-        const dateFilter = document.getElementById('dateFilter');
-        if (dateFilter) {
-            dateFilter.addEventListener('change', filterReports);
-        }
-        
-        // Event listener untuk reset filter
-        const resetFilters = document.getElementById('resetFilters');
-        if (resetFilters) {
-            resetFilters.addEventListener('click', function() {
-                document.getElementById('statusFilter').value = '';
-                document.getElementById('brandFilter').value = '';
-                document.getElementById('categoryFilter').value = '';
-                document.getElementById('dateFilter').value = '';
-                renderReportCards();
-            });
-        }
-        
-        // Event listener untuk search
-        const dashboardSearch = document.getElementById('dashboardSearch');
-        if (dashboardSearch) {
-            dashboardSearch.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                const reports = getReports();
-                
-                if (!searchTerm) {
-                    renderReportCards();
-                    return;
-                }
-                
-                const filteredReports = reports.filter(report => {
-                    return (
-                        report.title.toLowerCase().includes(searchTerm) ||
-                        report.description.toLowerCase().includes(searchTerm) ||
-                        report.brand.toLowerCase().includes(searchTerm) ||
-                        report.category.toLowerCase().includes(searchTerm) ||
-                        report.id.toLowerCase().includes(searchTerm)
-                    );
-                });
-                
-                renderReportCards(filteredReports);
-            });
-        }
+        const toast = document.createElement('div');
+        toast.className = `toast-notification ${type}`;
+        toast.innerHTML = `
+            <div class="toast-content">
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+                <span>${message}</span>
+            </div>
+        `;
+
+        document.body.appendChild(toast);
+
+        // Sembunyikan secara otomatis setelah durasi
+        setTimeout(() => {
+            toast.classList.add('hide');
+            setTimeout(() => {
+                toast.remove();
+            }, 400);
+        }, duration);
+    }
+
+    // ========== INISIALISASI ==========
+    
+    // Inisialisasi saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', function() {
+        checkAuthState();
     });
 </script>
 </body>
