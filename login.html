@@ -6,347 +6,364 @@
   <title>Login - CSS Admin Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-      <style>
-        :root {
-            --primary-color: #4361ee;
-            --primary-hover: #3a56d4;
-            --secondary-color: #6c757d;
-            --success-color: #2ed573;
-            --danger-color: #ff4757;
-            --light-color: #f8f9fa;
-            --dark-color: #212529;
-            --bg-gradient: linear-gradient(135deg, #0099ff 0%, #ffffff 100%);
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --text-color: #333;
-            --text-light: #6c757d;
-            --border-color: #dee2e6;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            --transition: all 0.3s ease;
-        }
+  
+  <style>
+    :root {
+        --primary-color: #4361ee;
+        --primary-hover: #3a56d4;
+        --secondary-color: #6c757d;
+        --success-color: #2ed573;
+        --danger-color: #ff4757;
+        --light-color: #f8f9fa;
+        --dark-color: #212529;
+        --bg-gradient: linear-gradient(135deg, #0099ff 0%, #ffffff 100%);
+        --card-bg: rgba(255, 255, 255, 0.95);
+        --text-color: #333;
+        --text-light: #6c757d;
+        --border-color: #dee2e6;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        --transition: all 0.3s ease;
+    }
 
-        [data-theme="dark"] {
-            --card-bg: rgba(30, 30, 30, 0.95);
-            --text-color: #e0e0e0;
-            --text-light: #9e9e9e;
-            --border-color: #333333;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
+    [data-theme="dark"] {
+        --card-bg: rgba(30, 30, 30, 0.95);
+        --text-color: #e0e0e0;
+        --text-light: #9e9e9e;
+        --border-color: #333333;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
 
-        body {
-            background: var(--bg-gradient);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
-        }
+    body {
+        background: var(--bg-gradient);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+    }
 
-        /* Background animation */
-        .bg-animation {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-        }
+    /* Background animation */
+    .bg-animation {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+    }
 
-        .bg-circle {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            animation: float 15s infinite linear;
-        }
+    .bg-circle {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        animation: float 15s infinite linear;
+    }
 
-        @keyframes float {
-            0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-1000px) rotate(720deg);
-                opacity: 0;
-            }
+    @keyframes float {
+        0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
         }
+        100% {
+            transform: translateY(-1000px) rotate(720deg);
+            opacity: 0;
+        }
+    }
 
+    .login-container {
+        width: 100%;
+        max-width: 420px;
+        background: var(--card-bg);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transform: translateY(0);
+        transition: var(--transition);
+        position: relative;
+        z-index: 1;
+    }
+
+    .login-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    }
+
+    .login-header {
+        background: linear-gradient(to right, #0f77ff, #2575fc);
+        color: white;
+        text-align: center;
+        padding: 30px 20px;
+        position: relative;
+    }
+
+    .login-header::after {
+        content: '';
+        position: absolute;
+        bottom: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 40px;
+        background: var(--card-bg);
+        border-radius: 50%;
+        z-index: 2;
+    }
+
+    .login-header::before {
+        content: '';
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(to right, #0f77ff, #2575fc);
+        opacity: 0.2;
+        border-radius: 50%;
+        z-index: 1;
+    }
+
+    .logo {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .logo i {
+        font-size: 36px;
+        color: white;
+    }
+
+    .login-header h1 {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .login-header p {
+        font-size: 14px;
+        opacity: 0.9;
+    }
+
+    .login-form {
+        padding: 40px 30px 30px;
+    }
+
+    .input-group {
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .input-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--text-color);
+        font-size: 14px;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 15px;
+        top: 42px;
+        color: var(--text-light);
+        font-size: 18px;
+    }
+
+    .input-group input {
+        width: 100%;
+        padding: 12px 15px 12px 45px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 16px;
+        transition: var(--transition);
+        background: transparent;
+        color: var(--text-color);
+    }
+
+    .input-group input:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .input-group input::placeholder {
+        color: var(--text-light);
+    }
+
+    .remember-forgot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .remember {
+        display: flex;
+        align-items: center;
+    }
+
+    .remember input {
+        margin-right: 8px;
+        accent-color: var(--primary-color);
+    }
+
+    .forgot-password {
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .forgot-password:hover {
+        text-decoration: underline;
+    }
+
+    .btn-login {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(to right, #0f77ff, #2575fc);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-login::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: 0.5s;
+    }
+
+    .btn-login:hover::before {
+        left: 100%;
+    }
+
+    .btn-login:hover {
+        opacity: 0.95;
+        transform: translateY(-2px);
+    }
+
+    .btn-login:active {
+        transform: translateY(0);
+    }
+
+    .error-message {
+        color: var(--danger-color);
+        font-size: 14px;
+        margin-top: 5px;
+        display: none;
+        text-align: center;
+        padding: 10px;
+        background-color: rgba(255, 71, 87, 0.1);
+        border-radius: 5px;
+        border-left: 4px solid var(--danger-color);
+    }
+
+    .success-message {
+        color: var(--success-color);
+        font-size: 14px;
+        margin-top: 5px;
+        display: none;
+        text-align: center;
+        padding: 10px;
+        background-color: rgba(46, 213, 115, 0.1);
+        border-radius: 5px;
+        border-left: 4px solid var(--success-color);
+    }
+
+    .login-footer {
+        text-align: center;
+        padding: 20px 0 10px;
+        color: var(--text-light);
+        font-size: 14px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .theme-toggle {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+        z-index: 10;
+    }
+
+    .theme-toggle:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    @media (max-width: 480px) {
         .login-container {
-            width: 100%;
-            max-width: 420px;
-            background: var(--card-bg);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transform: translateY(0);
-            transition: var(--transition);
-            position: relative;
-            z-index: 1;
+            max-width: 100%;
         }
-
-        .login-container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-        }
-
-        .login-header {
-            background: linear-gradient(to right, #0f77ff, #2575fc);
-            color: white;
-            text-align: center;
-            padding: 30px 20px;
-            position: relative;
-        }
-
-        .login-header::after {
-            content: '';
-            position: absolute;
-            bottom: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 40px;
-            background: var(--card-bg);
-            border-radius: 50%;
-            z-index: 2;
-        }
-
-        .login-header::before {
-            content: '';
-            position: absolute;
-            bottom: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(to right, #0f77ff, #2575fc);
-            opacity: 0.2;
-            border-radius: 50%;
-            z-index: 1;
-        }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 15px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .logo i {
-            font-size: 36px;
-            color: white;
-        }
-
-        .login-header h1 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .login-header p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
+        
         .login-form {
-            padding: 40px 30px 30px;
+            padding: 30px 20px 20px;
         }
-
-        .input-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text-color);
-            font-size: 14px;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 15px;
-            top: 42px;
-            color: var(--text-light);
-            font-size: 18px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 12px 15px 12px 45px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 16px;
-            transition: var(--transition);
-            background: transparent;
-            color: var(--text-color);
-        }
-
-        .input-group input:focus {
-            border-color: var(--primary-color);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-        }
-
-        .input-group input::placeholder {
-            color: var(--text-light);
-        }
-
+        
         .remember-forgot {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            font-size: 14px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
         }
+    }
 
-        .remember {
-            display: flex;
-            align-items: center;
-        }
+    /* Animasi */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-        .remember input {
-            margin-right: 8px;
-            accent-color: var(--primary-color);
-        }
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
 
-        .forgot-password {
-            color: var(--primary-color);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .forgot-password:hover {
-            text-decoration: underline;
-        }
-
-        .btn-login {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(to right, #0f77ff, #2575fc);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-login::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.5s;
-        }
-
-        .btn-login:hover::before {
-            left: 100%;
-        }
-
-        .btn-login:hover {
-            opacity: 0.95;
-            transform: translateY(-2px);
-        }
-
-        .btn-login:active {
-            transform: translateY(0);
-        }
-
-        .error-message {
-            color: var(--danger-color);
-            font-size: 14px;
-            margin-top: 5px;
-            display: none;
-            text-align: center;
-        }
-
-        .login-footer {
-            text-align: center;
-            padding: 20px 0 10px;
-            color: var(--text-light);
-            font-size: 14px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .theme-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            z-index: 10;
-        }
-
-        .theme-toggle:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        @media (max-width: 480px) {
-            .login-container {
-                max-width: 100%;
-            }
-            
-            .login-form {
-                padding: 30px 20px 20px;
-            }
-            
-            .remember-forgot {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-        }
-
-        /* Animasi */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.6s ease forwards;
-        }
-
-        .delay-1 { animation-delay: 0.2s; }
-        .delay-2 { animation-delay: 0.4s; }
-        .delay-3 { animation-delay: 0.6s; }
-    </style>
+    .delay-1 { animation-delay: 0.2s; }
+    .delay-2 { animation-delay: 0.4s; }
+    .delay-3 { animation-delay: 0.6s; }
+  </style>
 </head>
 <body>
-  <div class="bg-animation" id="bgAnimation"></div>
+ <div class="bg-animation" id="bgAnimation"></div>
 
   <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
 
@@ -359,43 +376,70 @@
 
     <div class="login-form">
       <div class="input-group">
-        <label for="username">Username</label>
-        <div class="input-icon"><i class="fas fa-user"></i></div>
-        <input type="text" id="username" placeholder="Username" autocomplete="username">
+        <label for="email">Email</label>
+        <div class="input-icon"><i class="fas fa-envelope"></i></div>
+        <input type="email" id="email" placeholder="Masukkan email Anda" autocomplete="email" value="admin@example.com">
       </div>
 
       <div class="input-group">
         <label for="password">Password</label>
         <div class="input-icon"><i class="fas fa-lock"></i></div>
-        <input type="password" id="password" placeholder="Password" autocomplete="current-password">
+        <input type="password" id="password" placeholder="Masukkan password Anda" autocomplete="current-password" value="password123">
       </div>
 
       <div class="remember-forgot">
         <label><input type="checkbox" id="remember"> Remember me</label>
-        <a href="#">Forgot Password?</a>
+        <a href="#" id="forgotPassword">Forgot Password?</a>
       </div>
 
       <button class="btn-login" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
-      <div class="error-message" id="loginError">Username atau password salah</div>
+      <div class="error-message" id="loginError"></div>
+      <div class="success-message" id="loginSuccess"></div>
     </div>
 
     <div class="login-footer">&copy; 2025 CSS Admin Dashboard. All rights reserved.</div>
   </div>
 
-  <script>
-    const users = [
-      { username: "admin", password: "admin123", displayName: "Bang Pengshui" },
-      { username: "", password: "", displayName: "" },
-      { username: "pengshui", password: "pengshui123", displayName: "Bang Pengshui" }
-    ];
+  <!-- Gunakan Firebase modular SDK seperti di index.html -->
+  <script type="module">
+    // ========== FIREBASE CONFIGURATION ==========
+    import { 
+      initializeApp 
+    } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      sendPasswordResetEmail,
+      createUserWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
+    const firebaseConfig = {
+      apiKey: "AIzaSyDUZka4FZyLi_cv6X_5D4zeRsfkpqOlBpY",
+      authDomain: "dashboard-css.firebaseapp.com",
+      databaseURL: "https://dashboard-css-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "dashboard-css",
+      storageBucket: "dashboard-css.appspot.com",
+      messagingSenderId: "771131792881",
+      appId: "1:771131792881:web:ad634424225bd7de847850",
+      measurementId: "G-3CYBC5B101"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // ========== DOM ELEMENTS ==========
     const loginBtn = document.getElementById("loginBtn");
-    const usernameInput = document.getElementById("username");
+    const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
     const loginError = document.getElementById("loginError");
+    const loginSuccess = document.getElementById("loginSuccess");
     const themeToggle = document.getElementById("themeToggle");
     const bgAnimation = document.getElementById("bgAnimation");
+    const forgotPassword = document.getElementById("forgotPassword");
 
+    // ========== BACKGROUND ANIMATION ==========
     function createCircles() {
       const colors = ["rgba(255,255,255,0.1)", "rgba(106,17,203,0.1)", "rgba(37,117,252,0.1)"];
       for (let i = 0; i < 12; i++) {
@@ -411,20 +455,167 @@
       }
     }
 
-    function handleLogin() {
-      const username = usernameInput.value.trim();
+    // ========== LOGIN FUNCTION ==========
+    async function handleLogin() {
+      const email = emailInput.value.trim();
       const password = passwordInput.value.trim();
-      const user = users.find(u => u.username === username && u.password === password);
 
-      if (user) {
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("username", user.username);
-        localStorage.setItem("displayName", user.displayName);
-        window.location.href = "index.html";
-      } else {
-        loginError.style.display = "block";
-        setTimeout(() => loginError.style.display = "none", 3000);
+      // Validasi input
+      if (!email || !password) {
+          showError("Email dan password harus diisi");
+          return;
       }
+
+      if (!isValidEmail(email)) {
+          showError("Format email tidak valid");
+          return;
+      }
+
+      try {
+          // Tampilkan loading state
+          loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+          loginBtn.disabled = true;
+
+          // Firebase Authentication menggunakan modular version
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+
+          // Tampilkan pesan sukses
+          showSuccess("Login berhasil! Mengarahkan...");
+
+          // Simpan info login jika remember me dicentang
+          if (document.getElementById("remember").checked) {
+              localStorage.setItem("rememberEmail", email);
+          } else {
+              localStorage.removeItem("rememberEmail");
+          }
+
+          // Simpan status login dan user data
+          sessionStorage.setItem("isLoggedIn", "true");
+          sessionStorage.setItem("user", JSON.stringify({
+            email: user.email,
+            displayName: "Administrator",
+            role: "admin",
+            uid: user.uid
+          }));
+
+          // Redirect ke halaman utama setelah delay singkat
+          setTimeout(() => {
+              window.location.href = "index.html";
+          }, 1500);
+
+      } catch (error) {
+          console.error("Login error:", error);
+
+          let errorMessage = "Terjadi kesalahan saat login. Silakan coba lagi.";
+
+          if (error.code) {
+              switch (error.code) {
+                  case "auth/user-not-found":
+                      errorMessage = "Email tidak terdaftar. Silakan daftar terlebih dahulu.";
+                      // Tawarkan pendaftaran otomatis
+                      if (confirm("Email tidak terdaftar. Ingin membuat akun baru dengan email ini?")) {
+                          await handleAutoRegister(email, password);
+                      }
+                      break;
+                  case "auth/wrong-password":
+                      errorMessage = "Password salah. Silakan coba lagi atau reset password.";
+                      break;
+                  case "auth/invalid-email":
+                      errorMessage = "Format email tidak valid";
+                      break;
+                  case "auth/user-disabled":
+                      errorMessage = "Akun dinonaktifkan";
+                      break;
+                  case "auth/too-many-requests":
+                      errorMessage = "Terlalu banyak percobaan gagal. Coba lagi nanti";
+                      break;
+                  case "auth/network-request-failed":
+                      errorMessage = "Koneksi jaringan bermasalah. Periksa koneksi internet Anda";
+                      break;
+                  default:
+                      errorMessage = error.message;
+              }
+          }
+
+          showError(errorMessage);
+
+          // Reset button state
+          loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+          loginBtn.disabled = false;
+      }
+    }
+
+    // ========== AUTO REGISTER IF USER NOT FOUND ==========
+    async function handleAutoRegister(email, password) {
+      try {
+        loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mendaftarkan...';
+        
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        
+        showSuccess("Akun berhasil dibuat! Silakan login.");
+        
+        // Isi email yang sudah didaftarkan
+        emailInput.value = email;
+        
+      } catch (error) {
+        console.error("Registration error:", error);
+        showError("Gagal membuat akun: " + error.message);
+      } finally {
+        loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+        loginBtn.disabled = false;
+      }
+    }
+
+    // ========== FORGOT PASSWORD ==========
+    async function handleForgotPassword() {
+      const email = emailInput.value.trim();
+      
+      if (!email) {
+          showError("Masukkan email untuk reset password");
+          return;
+      }
+      
+      if (!isValidEmail(email)) {
+          showError("Format email tidak valid");
+          return;
+      }
+      
+      try {
+          // Kirim email reset password
+          await sendPasswordResetEmail(auth, email);
+          showSuccess("Email reset password telah dikirim. Periksa inbox Anda.");
+      } catch (error) {
+          console.error("Password reset error:", error);
+          showError("Terjadi kesalahan saat mengirim email reset password: " + error.message);
+      }
+    }
+
+    // ========== HELPER FUNCTIONS ==========
+    function showError(message) {
+        loginError.textContent = message;
+        loginError.style.display = "block";
+        loginSuccess.style.display = "none";
+        
+        setTimeout(() => {
+            loginError.style.display = "none";
+        }, 5000);
+    }
+
+    function showSuccess(message) {
+        loginSuccess.textContent = message;
+        loginSuccess.style.display = "block";
+        loginError.style.display = "none";
+        
+        setTimeout(() => {
+            loginSuccess.style.display = "none";
+        }, 3000);
+    }
+
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
     }
 
     function toggleTheme() {
@@ -441,18 +632,38 @@
       themeToggle.querySelector("i").className = theme === "dark" ? "fas fa-sun" : "fas fa-moon";
     }
 
-    loginBtn.addEventListener("click", handleLogin);
-    passwordInput.addEventListener("keypress", e => { if (e.key === "Enter") handleLogin(); });
-    themeToggle.addEventListener("click", toggleTheme);
-
+    // ========== EVENT LISTENERS ==========
     document.addEventListener("DOMContentLoaded", () => {
-      if (localStorage.getItem("isLoggedIn") === "true") {
-        window.location.href = "index.html";
-      }
-      applySavedTheme();
-      createCircles();
+        console.log("DOM Content Loaded");
+        
+        // Terapkan tema yang disimpan
+        applySavedTheme();
+        
+        // Buat animasi background
+        createCircles();
+        
+        // Isi email jika remember me aktif
+        const rememberedEmail = localStorage.getItem("rememberEmail");
+        if (rememberedEmail) {
+            emailInput.value = rememberedEmail;
+            document.getElementById("remember").checked = true;
+        }
+
+        // Setup event listeners
+        loginBtn.addEventListener("click", handleLogin);
+        passwordInput.addEventListener("keypress", e => { 
+            if (e.key === "Enter") handleLogin(); 
+        });
+        
+        forgotPassword.addEventListener("click", function(e) {
+            e.preventDefault();
+            handleForgotPassword();
+        });
+        
+        themeToggle.addEventListener("click", toggleTheme);
+        
+        console.log("Event listeners attached");
     });
   </script>
 </body>
 </html>
-
