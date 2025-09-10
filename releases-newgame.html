@@ -8,8 +8,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="global.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.20.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.20.0/firebase-auth-compat.js"></script>
+    
     <style>
-        /* ========== VARIABEL CSS ========== */
+            /* ========== VARIABEL CSS ========== */
         :root {
             --primary-gradient: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
             --success-gradient: linear-gradient(135deg, #4cc9f0 0%, #4361ee 100%);
@@ -523,18 +529,24 @@
             background: var(--danger-dark);
             border-color: var(--danger-dark);
         }
-
-        /* ========== EMPTY STATE ========== */
-        .empty-state {
-            text-align: center;
-            padding: var(--space-xl) var(--space-lg);
-            background-color: var(--card-bg);
-            border-radius: var(--radius-lg);
-            border: 2px dashed var(--border-color);
-            margin: var(--space-lg) 0;
-            grid-column: 1 / -1;
-        }
-
+       /* ========== EMPTY STATE ========== */
+.empty-state {
+    text-align: center;
+    padding: var(--space-xl) var(--space-lg);
+    background-color: var(--card-bg);
+    border-radius: var(--radius-lg);
+    border: 2px dashed var(--border-color);
+    margin: var(--space-lg) 0;
+    grid-column: 1 / -1;
+}
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;  /* Vertical center */
+    align-items: center;      /* Horizontal center */
+    text-align: center;
+    height: 300px;            /* Atur tinggi sesuai kebutuhan */
+}
         .empty-state i {
             font-size: 3rem;
             color: var(--text-tertiary);
@@ -555,38 +567,28 @@
         }
 
         /* ========== MODAL STYLES ========== */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: var(--z-modal);
-            opacity: 0;
-            visibility: hidden;
-            transition: all var(--transition-normal);
-        }
+/* Tambahkan di bagian CSS */
+.modal-overlay {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
 
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
+.modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
 
-        .modal {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            width: 90%;
-            max-width: 800px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-xl);
-            transform: translateY(20px);
-            transition: transform var(--transition-normal);
-        }
+.modal {
+    transform: translateY(-20px);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active .modal {
+    transform: translateY(0);
+    opacity: 1;
+}
 
         .modal-overlay.active .modal {
             transform: translateY(0);
@@ -904,6 +906,22 @@
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
     </style>
 </head>
 <body>
@@ -1030,7 +1048,7 @@
                     <label class="filter-label">Status</label>
                     <select class="filter-select" id="statusFilter">
                         <option value="">All Status</option>
-                        <option value="active">Releases</option>
+                        <option value="released">Released</option>
                         <option value="upcoming">Upcoming</option>
                         <option value="disabled">Disabled</option>
                     </select>
@@ -1092,21 +1110,13 @@
                             <input type="date" class="filter-input" id="dateFrom" placeholder="From">
                             <input type="date" class="filter-input" id="dateTo" placeholder="To">
                         </div>
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label">Price Range</label>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <input type="number" class="filter-input" id="priceMin" min="0" placeholder="Min">
-                            <span>-</span>
-                            <input type="number" class="filter-input" id="priceMax" min="0" placeholder="Max">
-                        </div>
+
                     </div>
                     <div class="filter-group">
                         <label class="filter-label">Sort By</label>
                         <select class="filter-select" id="sortBy">
                             <option value="title">Name</option>
                             <option value="releaseDate">Release Date</option>
-                            <option value="price">Price</option>
                             <option value="rating">Rating</option>
                         </select>
                     </div>
@@ -1159,13 +1169,13 @@
         </div>
         
         <!-- Add Game Modal -->
-        <div class="modal-overlay" id="addGameModal">
-            <div class="modal">
-                <div class="modal-header">
-                    <h3 class="modal-title"><i class="fas fa-plus"></i> Add New Game</h3>
-                    <button class="modal-close" id="closeAddModal">&times;</button>
-                </div>
-                <div class="modal-body">
+<div class="modal-overlay" id="addGameModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-plus"></i> Add New Game</h3>
+            <button class="modal-close" id="closeAddModal">&times;</button>
+        </div>
+        <div class="modal-body">
                     <form id="gameForm">
                         <div class="form-grid">
                             <div class="form-group full-width">
@@ -1238,17 +1248,17 @@
                             </div>
                             
                             <div class="form-group full-width">
-                                <label class="form-label">Game Image</label>
-                                <div class="image-upload" id="imageUpload">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                    <p>Click to upload or drag and drop</p>
-                                    <p class="form-hint">JPG, PNG, GIF, WebP, SVG (semua format gambar didukung)</p>
-                                    <input type="file" id="gameImage" accept="image/jpeg, image/png, image/gif, image/webp, image/svg+xml, .jpg, .jpeg, .png, .gif, .webp, .svg">
-                                </div>
-                                <div class="image-preview" id="imagePreview">
-                                    <img src="" alt="Preview">
-                                </div>
-                            </div>
+    <label class="form-label">Game Image</label>
+    <div class="image-upload" id="imageUpload">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <p>Click to upload or drag and drop</p>
+        <p class="form-hint">JPG, PNG, GIF, WebP, SVG (semua format gambar didukung)</p>
+        <input type="file" id="gameImage" accept="image/*">
+    </div>
+    <div class="image-preview" id="imagePreview">
+        <img src="" alt="Preview">
+    </div>
+</div>
                         </div>
                     </form>
                 </div>
@@ -1287,132 +1297,209 @@
                     <p>Are you sure you want to delete <strong id="deleteGameName"></strong>? This action cannot be undone.</p>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-outline" id="cancelDelete">Cancel</button>
-                    <button class="btn btn-danger" id="confirmDelete">Delete Game</button>
-                </div>
-            </div>
+            <button class="btn btn-outline" id="cancelAddGame">Cancel</button>
+            <button class="btn btn-primary" id="saveGame" type="button">Save Game</button>
+        </div>
+    </div>
         </div>
     </div>
 <div class="notification-container" id="notificationContainer"></div>
 <script src="sidebar-loader.js"></script>
 <script src="user-profile.js"></script>
    <script src="notifications.js"></script>
-    <script>
-    // Mapping halaman untuk navigasi
-    const pageMapping = {
-        'Dashboard': 'index.html',
-        'Pending Reports': 'pending-reports.html',
-        'Solved Reports': 'solved-report.html',
-        'Pending': 'maintenance.html',
-        'Completed': 'completed-report.html',
-        'New Features': 'data-produk.html',
-        'New Games': 'releases-newgame.html',
-        'Ideas & Suggestions': 'statistik-penjualan.html',
-        'Research': 'statistik-penjualan.html',
-        'Chat Response': 'statistik-penjualan.html',
-        'Pending Discussions': 'pending-reports.html',
-        'Weekly Meetings': 'pending-reports.html',
-        'Domain List': 'data-produk.html',
-        'Shift Schedule': 'pengaturan.html',
-        'Phishing Alerts': 'pengaturan.html',
-        'Logout': 'login.html'
+   <script>
+    // ========== FIREBASE CONFIGURATION ==========
+    const firebaseConfig = {
+        apiKey: "AIzaSyDUZka4FZyLi_cv6X_5D4zeRsfkpqOlBpY",
+        authDomain: "dashboard-css.firebaseapp.com",
+        databaseURL: "https://dashboard-css-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "dashboard-css",
+        storageBucket: "dashboard-css.appspot.com",
+        messagingSenderId: "771131792881",
+        appId: "1:771131792881:web:ad634424225bd7de847850",
+        measurementId: "G-3CYBC5B101"
     };
 
-    // Function to navigate to page
-    function navigateToPage(pageName) {
-        const pageUrl = pageMapping[pageName];
-        if (pageUrl) {
-            if (pageName === 'Logout') {
-                localStorage.removeItem('isLoggedIn');
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Variabel global
+    let currentUser = null;
+    let games = [];
+    let filteredGames = [];
+    let unsubscribeGames = null;
+    let isEditing = false;
+    let currentEditId = null;
+    let currentImage = null;
+
+    // ========== FUNGSI NOTIFIKASI ==========
+    function showNotification(message, type = 'info') {
+        // Hapus notifikasi sebelumnya jika ada
+        const existingNotifications = document.querySelectorAll('.notification');
+        existingNotifications.forEach(notification => {
+            notification.remove();
+        });
+        
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            </div>
+            <button class="notification-close">&times;</button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Show the notification
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 100);
+        
+        // Add event listener to close button
+        notification.querySelector('.notification-close').addEventListener('click', () => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        });
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
             }
-            window.location.href = pageUrl;
-        } else {
-            console.warn(`No page mapping found for: ${pageName}`);
-            window.location.href = 'index.html';
+        }, 5000);
+    }
+
+    // ========== FIREBASE AUTHENTICATION ==========
+    function checkAuthState() {
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                console.log("User is signed in:", user.uid);
+                setupGamesListener();
+                setupEventListeners();
+                loadGames(); // Apply initial filters
+            } else {
+                console.log("User is signed out");
+                window.location.href = "login.html";
+            }
+        }, (error) => {
+            console.error("Auth state error:", error);
+            showNotification('Authentication error. Please try again.', 'error');
+        });
+    }
+
+    // ========== FIRESTORE OPERATIONS ==========
+    function setupGamesListener() {
+        if (unsubscribeGames) {
+            unsubscribeGames(); // Remove old listener if exists
+        }
+        
+        try {
+            unsubscribeGames = db.collection('newGame')
+                .where('userId', '==', currentUser.uid)
+                .onSnapshot(snapshot => {
+                    games = [];
+                    snapshot.forEach(doc => {
+                        const game = doc.data();
+                        game.id = doc.id;
+                        games.push(game);
+                    });
+                    
+                    console.log(`Found ${games.length} games`);
+                    filteredGames = [...games];
+                    renderGames();
+                    updateGameStats();
+                    
+                    if (games.length === 0) {
+                        document.getElementById('noGames').style.display = 'flex';
+                        showNotification('No games found. Add your first game!', 'info');
+                    } else {
+                        document.getElementById('noGames').style.display = 'none';
+                    }
+                }, error => {
+                    console.error("Error fetching games:", error);
+                    showNotification('Error loading games. Please refresh the page.', 'error');
+                });
+            
+        } catch (error) {
+            console.error("Error setting up listener:", error);
+            showNotification('Error setting up data connection.', 'error');
         }
     }
 
-    // Fungsi untuk menampilkan informasi file
-    function logFileInfo(file) {
-        console.log('File name:', file.name);
-        console.log('File type:', file.type);
-        console.log('File size:', file.size, 'bytes');
-        console.log('File extension: .' + file.name.split('.').pop().toLowerCase());
-    }
-
-    // Initialize sample game data if not exists
-    function initializeGameData() {
-        if (!localStorage.getItem('myGames')) {
-            const sampleGames = [
-                {
-                    id: 'G-' + Date.now() + '-001',
-                    title: "Fortune Tiger",
-                    category: "Slot",
-                    provider: "PG SOFT",
-                    releaseDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    price: 0.0,
-                    rating: 4.8,
-                    status: "active",
-                    platforms: ["windows", "android", "ios", "web"],
-                    description: "A popular slot game with tiger theme and big win potential.",
-                    image: "https://via.placeholder.com/300x180?text=Fortune+Tiger",
-                    dateCreated: new Date().toISOString()
-                },
-                {
-                    id: 'G-' + Date.now() + '-002',
-                    title: "Gates of Olympus",
-                    category: "Slot",
-                    provider: "PRAGMATIC PLAY",
-                    releaseDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    price: 0.0,
-                    rating: 4.9,
-                    status: "active",
-                    platforms: ["windows", "android", "ios", "web"],
-                    description: "Experience the power of Greek gods in this high volatility slot.",
-                    image: "https://via.placeholder.com/300x180?text=Gates+Of+Olympus",
-                    dateCreated: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString()
-                },
-                {
-                    id: 'G-' + Date.now() + '-003',
-                    title: "Sweet Bonanza",
-                    category: "Slot",
-                    provider: "PRAGMATIC PLAY",
-                    releaseDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    price: 0.0,
-                    rating: 4.7,
-                    status: "upcoming",
-                    platforms: ["windows", "android", "ios"],
-                    description: "A candy-themed slot with cluster pays and free spins feature.",
-                    image: "https://via.placeholder.com/300x180?text=Sweet+Bonanza",
-                    dateCreated: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
-                }
-            ];
-            localStorage.setItem('myGames', JSON.stringify(sampleGames));
+    // Add a new game to Firestore
+    async function addGame(gameData) {
+        try {
+            const newGame = {
+                ...gameData,
+                userId: currentUser.uid,
+                projectcss: "pengshui",
+                dateCreated: new Date(),
+                dateUpdated: new Date()
+            };
+            
+            await db.collection('newGame').add(newGame);
+            showNotification(`"${gameData.title}" has been added successfully!`, 'success');
+            return true;
+        } catch (error) {
+            console.error("Error adding game:", error);
+            showNotification('Error adding game. Please try again.', 'error');
+            throw error;
         }
     }
 
-    // Get all games
-    function getGames() {
-        initializeGameData();
-        const games = localStorage.getItem('myGames');
-        return games ? JSON.parse(games) : [];
+    // Update an existing game in Firestore
+    async function updateGame(id, gameData) {
+        try {
+            await db.collection('newGame').doc(id).update({
+                ...gameData,
+                dateUpdated: new Date()
+            });
+            
+            showNotification(`"${gameData.title}" has been updated successfully!`, 'success');
+            return true;
+        } catch (error) {
+            console.error("Error updating game:", error);
+            showNotification('Error updating game. Please try again.', 'error');
+            throw error;
+        }
     }
 
-    // Save games
-    function saveGames(games) {
-        localStorage.setItem('myGames', JSON.stringify(games));
+    // Delete a game from Firestore
+    async function deleteGame(id) {
+        const game = games.find(g => g.id === id);
+        if (!game) return;
+        
+        if (confirm(`Are you sure you want to delete "${game.title}"?`)) {
+            try {
+                await db.collection('newGame').doc(id).delete();
+                showNotification('Game deleted successfully!', 'success');
+            } catch (error) {
+                console.error("Error deleting game:", error);
+                showNotification('Error deleting game. Please try again.', 'error');
+            }
+        }
     }
 
+    // ========== GAME MANAGEMENT FUNCTIONS ==========
     // Format date for display
     function formatDisplayDate(dateString) {
+        if (!dateString) return 'N/A';
         const options = { year: 'numeric', month: 'short', day: 'numeric' };
         return new Date(dateString).toLocaleDateString('en-US', options);
     }
 
     // Update game statistics
     function updateGameStats() {
-        const games = getGames();
-        
         const totalCount = games.length;
         const upcomingCount = games.filter(game => game.status === 'upcoming').length;
         const popularCount = games.filter(game => game.rating >= 4.5).length;
@@ -1432,29 +1519,21 @@
         const file = event.target.files[0];
         if (!file) return;
         
-        // Panggil fungsi logFileInfo untuk debugging
-        logFileInfo(file);
+        console.log('File selected:', file.name, file.type, file.size);
         
-        // Daftar format MIME yang didukung
-        const supportedMimeTypes = [
-            'image/jpeg', 
-            'image/png', 
-            'image/gif', 
-            'image/webp', 
-            'image/svg+xml'
-        ];
+        // Validasi yang lebih sederhana dan toleran
+        const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        const validExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
         
-        // Daftar ekstensi file yang didukung
-        const supportedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
+        if (!validImageTypes.includes(file.type) && !validExtensions.includes(fileExtension)) {
+            showNotification('Please select a valid image file (JPG, PNG, GIF, WebP, or SVG).', 'error');
+            return;
+        }
         
-        // Dapatkan ekstensi file
-        const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
-        
-        // Check if the file is an image dengan validasi yang lebih komprehensif
-        if (!file.type.match('image.*') && 
-            !supportedMimeTypes.includes(file.type) &&
-            !supportedExtensions.includes(fileExtension)) {
-            showNotification('Format gambar tidak didukung. Gunakan JPG, PNG, GIF, WebP, atau SVG.', 'error');
+        // Batasi ukuran file (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            showNotification('Image size should be less than 5MB.', 'error');
             return;
         }
         
@@ -1462,59 +1541,66 @@
         
         reader.onload = function(e) {
             const imageUrl = e.target.result;
+            console.log('Image loaded successfully');
             callback(imageUrl);
         };
         
         reader.onerror = function() {
-            showNotification('Error membaca file gambar. Coba gunakan gambar yang berbeda.', 'error');
+            console.error('Error reading file:', reader.error);
+            showNotification('Error reading image file. Please try another image.', 'error');
         };
         
         reader.readAsDataURL(file);
     }
 
-    // Show notification
-    function showNotification(message, type = 'info') {
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.innerHTML = `
-            <div class="notification-content">
-                <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
-                <span>${message}</span>
-            </div>
-            <button class="notification-close">
-                <i class="fas fa-times"></i>
-            </button>
-        `;
+    // Setup image upload listeners
+    function setupImageUploadListeners() {
+        // Untuk modal Add Game
+        const imageUploadArea = document.getElementById('imageUpload');
+        const imageInput = document.getElementById('gameImage');
+        const imagePreview = document.getElementById('imagePreview');
         
-        // Add to notification container
-        const container = document.getElementById('notificationContainer');
-        container.appendChild(notification);
-        
-        // Animate in
-        setTimeout(() => {
-            notification.classList.add('show');
-        }, 10);
-        
-        // Set timeout to remove notification
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
+        if (imageUploadArea && imageInput) {
+            // Click pada area upload
+            imageUploadArea.addEventListener('click', () => {
+                imageInput.click();
+            });
+            
+            // Drag and drop
+            imageUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                imageUploadArea.style.borderColor = 'var(--primary)';
+                imageUploadArea.style.backgroundColor = 'var(--primary-light)';
+            });
+            
+            imageUploadArea.addEventListener('dragleave', () => {
+                imageUploadArea.style.borderColor = 'var(--border-color)';
+                imageUploadArea.style.backgroundColor = 'transparent';
+            });
+            
+            imageUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                imageUploadArea.style.borderColor = 'var(--border-color)';
+                imageUploadArea.style.backgroundColor = 'transparent';
+                
+                if (e.dataTransfer.files.length) {
+                    imageInput.files = e.dataTransfer.files;
+                    const event = new Event('change');
+                    imageInput.dispatchEvent(event);
                 }
-            }, 300);
-        }, 5000);
-        
-        // Close button event
-        notification.querySelector('.notification-close').addEventListener('click', () => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
-                }
-            }, 300);
-        });
+            });
+            
+            // Perubahan pada input file
+            imageInput.addEventListener('change', (e) => {
+                handleImageUpload(e, (imageUrl) => {
+                    if (imagePreview) {
+                        imagePreview.querySelector('img').src = imageUrl;
+                        imagePreview.style.display = 'block';
+                        currentImage = imageUrl;
+                    }
+                });
+            });
+        }
     }
 
     // Create game card element
@@ -1551,7 +1637,7 @@
         
         card.innerHTML = `
             <div class="game-image">
-                <img src="${game.image}" alt="${game.title}" onerror="this.src='https://via.placeholder.com/300x180?text=Game+Image'">
+                <img src="${game.image || 'https://via.placeholder.com/300x180?text=Game+Image'}" alt="${game.title}" onerror="this.src='https://via.placeholder.com/300x180?text=Game+Image'">
                 ${badge}
             </div>
             <div class="game-content">
@@ -1564,7 +1650,7 @@
                     </div>
                     <div class="game-rating">
                         <i class="fas fa-star"></i>
-                        <span>${game.rating}</span>
+                        <span>${game.rating || 'N/A'}</span>
                     </div>
                 </div>
                 
@@ -1582,8 +1668,8 @@
                         <span class="detail-value">${formatDisplayDate(game.releaseDate)}</span>
                     </div>
                     <div class="game-detail-item">
-                        <span class="detail-label">Price</span>
-                        <span class="detail-value">${game.price === 0 ? 'Free' : '$' + game.price}</span>
+                        <span class="detail-label">Status</span>
+                        <span class="detail-value">${game.status || 'active'}</span>
                     </div>
                 </div>
                 
@@ -1602,163 +1688,225 @@
         `;
         
         // Add event listeners to buttons
-        card.querySelector('.edit-game').addEventListener('click', () => openEditGameModal(game.id));
-        card.querySelector('.view-game').addEventListener('click', () => viewGame(game.id));
-        card.querySelector('.delete-game').addEventListener('click', () => openDeleteModal(game.id));
+        const editBtn = card.querySelector('.edit-game');
+        const viewBtn = card.querySelector('.view-game');
+        const deleteBtn = card.querySelector('.delete-game');
+        
+        if (editBtn) editBtn.addEventListener('click', () => openEditGameModal(game.id));
+        if (viewBtn) viewBtn.addEventListener('click', () => viewGame(game.id));
+        if (deleteBtn) deleteBtn.addEventListener('click', () => deleteGame(game.id));
         
         return card;
     }
 
     // Load games into the grid
-        // Load games into the grid
-    function loadGames() {
+    function renderGames() {
         const gamesGrid = document.getElementById('gamesGrid');
         const noGames = document.getElementById('noGames');
-        const statusFilter = document.getElementById('statusFilter').value;
-        const categoryFilter = document.getElementById('categoryFilter').value;
-        const providerFilter = document.getElementById('providerFilter').value;
-        const dateFrom = document.getElementById('dateFrom').value;
-        const dateTo = document.getElementById('dateTo').value;
-        const priceMin = document.getElementById('priceMin').value;
-        const priceMax = document.getElementById('priceMax').value;
-        const sortBy = document.getElementById('sortBy').value;
-        const sortOrder = document.getElementById('sortOrder').value;
-        const searchValue = document.getElementById('gamesSearch').value.toLowerCase();
         
-        let games = getGames();
-        // Apply filters
-        if (statusFilter) {
-            games = games.filter(game => game.status === statusFilter);
-        }
+        if (!gamesGrid) return;
         
-        if (categoryFilter) {
-            games = games.filter(game => game.category === categoryFilter);
-        }
-        
-        if (providerFilter) {
-            games = games.filter(game => game.provider === providerFilter);
-        }
-        
-        if (dateFrom) {
-            games = games.filter(game => new Date(game.releaseDate) >= new Date(dateFrom));
-        }
-        
-        if (dateTo) {
-            games = games.filter(game => new Date(game.releaseDate) <= new Date(dateTo));
-        }
-        
-        if (priceMin) {
-            games = games.filter(game => game.price >= parseFloat(priceMin));
-        }
-        
-        if (priceMax) {
-            games = games.filter(game => game.price <= parseFloat(priceMax));
-        }
-        
-        if (searchValue) {
-            games = games.filter(game => 
-                game.title.toLowerCase().includes(searchValue) || 
-                (game.description && game.description.toLowerCase().includes(searchValue)) ||
-                game.category.toLowerCase().includes(searchValue) ||
-                game.provider.toLowerCase().includes(searchValue)
-            );
-        }
-        
-        // Apply sorting - PRIORITAS: Game upcoming ditampilkan pertama
-        games.sort((a, b) => {
-            // Prioritaskan game dengan status 'upcoming'
-            if (a.status === 'upcoming' && b.status !== 'upcoming') return -1;
-            if (a.status !== 'upcoming' && b.status === 'upcoming') return 1;
-            
-            let aValue, bValue;
-            
-            if (sortBy === 'releaseDate') {
-                aValue = new Date(a[sortBy]);
-                bValue = new Date(b[sortBy]);
-            } else {
-                aValue = a[sortBy];
-                bValue = b[sortBy];
-            }
-            
-            if (sortOrder === 'asc') {
-                return aValue > bValue ? 1 : -1;
-            } else {
-                return aValue < bValue ? 1 : -1;
-            }
-        });
-        
-        // Display filtered games
-        gamesGrid.innerHTML = '';
-        
-        if (games.length === 0) {
-            noGames.style.display = 'block';
+        if (filteredGames.length === 0) {
+            gamesGrid.style.display = 'none';
+            if (noGames) noGames.style.display = 'flex';
             return;
         }
         
-        noGames.style.display = 'none';
+        gamesGrid.style.display = 'grid';
+        if (noGames) noGames.style.display = 'none';
         
-        games.forEach(game => {
+        // Clear the grid
+        gamesGrid.innerHTML = '';
+        
+        // Render each game
+        filteredGames.forEach(game => {
             const gameCard = createGameCard(game);
             gamesGrid.appendChild(gameCard);
         });
     }
 
-    // Reset all filters
-    function resetAllFilters() {
-        document.getElementById('statusFilter').value = '';
-        document.getElementById('categoryFilter').value = '';
-        document.getElementById('providerFilter').value = '';
-        document.getElementById('dateFrom').value = '';
-        document.getElementById('dateTo').value = '';
-        document.getElementById('priceMin').value = '';
-        document.getElementById('priceMax').value = '';
-        document.getElementById('sortBy').value = 'title';
-        document.getElementById('sortOrder').value = 'asc';
-        document.getElementById('gamesSearch').value = '';
+    // Load games with filters applied
+    function loadGames() {
+        const statusFilter = document.getElementById('statusFilter')?.value || '';
+        const categoryFilter = document.getElementById('categoryFilter')?.value || '';
+        const providerFilter = document.getElementById('providerFilter')?.value || '';
+        const dateFrom = document.getElementById('dateFrom')?.value || '';
+        const dateTo = document.getElementById('dateTo')?.value || '';
+        const sortBy = document.getElementById('sortBy')?.value || 'title';
+        const sortOrder = document.getElementById('sortOrder')?.value || 'asc';
+        const searchValue = document.getElementById('gamesSearch')?.value.toLowerCase() || '';
         
-        const advancedFilters = document.getElementById('advancedFilters');
-        if (advancedFilters.classList.contains('show')) {
-            advancedFilters.classList.remove('show');
-            const toggleButton = document.getElementById('toggleAdvancedFilters');
-            toggleButton.querySelector('i').className = 'fas fa-sliders-h';
-            toggleButton.innerHTML = '<i class="fas fa-sliders-h"></i> Advanced Filters';
+        let result = [...games];
+        
+        // Apply filters
+        if (statusFilter) {
+            result = result.filter(game => game.status === statusFilter);
         }
+        
+        if (categoryFilter) {
+            result = result.filter(game => game.category === categoryFilter);
+        }
+        
+        if (providerFilter) {
+            result = result.filter(game => game.provider === providerFilter);
+        }
+        
+        if (dateFrom) {
+            result = result.filter(game => new Date(game.releaseDate) >= new Date(dateFrom));
+        }
+        
+        if (dateTo) {
+            const toDate = new Date(dateTo);
+            toDate.setHours(23, 59, 59, 999); // Set to end of day
+            result = result.filter(game => new Date(game.releaseDate) <= toDate);
+        }
+        
+        if (searchValue) {
+            result = result.filter(game => 
+                game.title.toLowerCase().includes(searchValue) || 
+                (game.description && game.description.toLowerCase().includes(searchValue)) ||
+                (game.category && game.category.toLowerCase().includes(searchValue)) ||
+                (game.provider && game.provider.toLowerCase().includes(searchValue))
+            );
+        }
+        
+        // Apply sorting
+        result.sort((a, b) => {
+            let valueA, valueB;
+            
+            switch (sortBy) {
+                case 'title':
+                    valueA = a.title.toLowerCase();
+                    valueB = b.title.toLowerCase();
+                    break;
+                case 'releaseDate':
+                    valueA = new Date(a.releaseDate);
+                    valueB = new Date(b.releaseDate);
+                    break;
+                case 'rating':
+                    valueA = a.rating || 0;
+                    valueB = b.rating || 0;
+                    break;
+                default:
+                    valueA = a.title.toLowerCase();
+                    valueB = b.title.toLowerCase();
+            }
+            
+            if (sortOrder === 'asc') {
+                return valueA > valueB ? 1 : -1;
+            } else {
+                return valueA < valueB ? 1 : -1;
+            }
+        });
+        
+        filteredGames = result;
+        renderGames();
+    }
+
+    // Reset all filters
+    function resetFilters() {
+        const statusFilter = document.getElementById('statusFilter');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const providerFilter = document.getElementById('providerFilter');
+        const dateFrom = document.getElementById('dateFrom');
+        const dateTo = document.getElementById('dateTo');
+        const sortBy = document.getElementById('sortBy');
+        const sortOrder = document.getElementById('sortOrder');
+        const gamesSearch = document.getElementById('gamesSearch');
+        
+        if (statusFilter) statusFilter.value = '';
+        if (categoryFilter) categoryFilter.value = '';
+        if (providerFilter) providerFilter.value = '';
+        if (dateFrom) dateFrom.value = '';
+        if (dateTo) dateTo.value = '';
+        if (sortBy) sortBy.value = 'title';
+        if (sortOrder) sortOrder.value = 'asc';
+        if (gamesSearch) gamesSearch.value = '';
         
         loadGames();
     }
 
+    // Toggle advanced filters
+    function toggleAdvancedFilters() {
+        const advancedFilters = document.getElementById('advancedFilters');
+        if (advancedFilters) {
+            advancedFilters.classList.toggle('show');
+        }
+    }
+
+    // Toggle between grid and list view
+    function toggleView(isGridView) {
+        const gamesGrid = document.getElementById('gamesGrid');
+        const gridViewBtn = document.getElementById('gridViewBtn');
+        const listViewBtn = document.getElementById('listViewBtn');
+        
+        if (isGridView) {
+            gamesGrid.classList.remove('list-view');
+            gamesGrid.classList.add('grid-view');
+            if (gridViewBtn) gridViewBtn.classList.add('active');
+            if (listViewBtn) listViewBtn.classList.remove('active');
+        } else {
+            gamesGrid.classList.remove('grid-view');
+            gamesGrid.classList.add('list-view');
+            if (listViewBtn) listViewBtn.classList.add('active');
+            if (gridViewBtn) gridViewBtn.classList.remove('active');
+        }
+    }
+
+    // ========== MODAL FUNCTIONS ==========
     // Open add game modal
     function openAddGameModal() {
-        // Reset form
-        document.getElementById('gameForm').reset();
-        document.getElementById('imagePreview').style.display = 'none';
-        document.getElementById('imagePreview').querySelector('img').src = '';
-        
-        // Set default release date to today
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('gameReleaseDate').value = today;
-        
-        document.getElementById('addGameModal').classList.add('active');
+        console.log('Opening add game modal');
+        const modal = document.getElementById('addGameModal');
+        if (modal) {
+            modal.classList.add('active');
+            
+            // Reset form
+            document.getElementById('gameForm').reset();
+            document.getElementById('imagePreview').style.display = 'none';
+            currentImage = null;
+            
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            const releaseDateInput = document.getElementById('gameReleaseDate');
+            if (releaseDateInput) {
+                releaseDateInput.value = today;
+            }
+            
+            // Setup image upload listeners setelah modal terbuka
+            setTimeout(setupImageUploadListeners, 100);
+        } else {
+            console.error('Add game modal not found');
+        }
     }
 
     // Close add game modal
     function closeAddGameModal() {
-        document.getElementById('addGameModal').classList.remove('active');
+        const modal = document.getElementById('addGameModal');
+        if (modal) {
+            modal.classList.remove('active');
+        }
     }
 
     // Open edit game modal
     function openEditGameModal(gameId) {
-        const games = getGames();
         const game = games.find(g => g.id === gameId);
         if (!game) return;
         
-        const modalBody = document.querySelector('#editGameModal .modal-body');
-        modalBody.innerHTML = `
+        const modal = document.getElementById('editGameModal');
+        if (!modal) return;
+        
+        // Set modal title
+        modal.querySelector('.modal-title').innerHTML = `<i class="fas fa-edit"></i> Edit ${game.title}`;
+        
+        // Create form content
+        const formContent = document.createElement('div');
+        formContent.innerHTML = `
             <form id="editGameForm">
                 <div class="form-grid">
                     <div class="form-group full-width">
                         <label class="form-label required">Game Title</label>
-                        <input type="text" class="form-input" id="editGameTitle" value="${game.title}" required>
+                        <input type="text" class="form-input" id="editGameTitle" value="${game.title}" required placeholder="Enter game title">
                     </div>
                     
                     <div class="form-group">
@@ -1806,57 +1954,21 @@
                     <div class="form-group">
                         <label class="form-label required">Release Date</label>
                         <input type="date" class="form-input" id="editGameReleaseDate" value="${game.releaseDate}" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label required">Price (USD)</label>
-                        <input type="number" class="form-input" id="editGamePrice" value="${game.price}" min="0" step="0.01" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label required">Rating (1-5)</label>
-                        <input type="number" class="form-input" id="editGameRating" value="${game.rating}" min="1" max="5" step="0.1" required>
-                    </div>
+                    </div>   
                     
                     <div class="form-group">
                         <label class="form-label">Status</label>
                         <select class="form-select" id="editGameStatus">
                             <option value="active" ${game.status === 'active' ? 'selected' : ''}>Active</option>
-                            <option value="upcoming" ${game.status === 'upcoming' ? 'selected' : ''}>Upcoming</option>
                             <option value="released" ${game.status === 'released' ? 'selected' : ''}>Released</option>
+                            <option value="upcoming" ${game.status === 'upcoming' ? 'selected' : ''}>Upcoming</option>
                             <option value="disabled" ${game.status === 'disabled' ? 'selected' : ''}>Disabled</option>
                         </select>
                     </div>
                     
                     <div class="form-group full-width">
-                        <label class="form-label">Platforms</label>
-                        <div class="form-checkbox-group">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="editPlatformWindows" name="editPlatforms" value="windows" ${game.platforms.includes('windows') ? 'checked' : ''}>
-                                <label for="editPlatformWindows">Windows</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="editPlatformMac" name="editPlatforms" value="mac" ${game.platforms.includes('mac') ? 'checked' : ''}>
-                                <label for="editPlatformMac">Mac</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="editPlatformAndroid" name="editPlatforms" value="android" ${game.platforms.includes('android') ? 'checked' : ''}>
-                                <label for="editPlatformAndroid">Android</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="editPlatformiOS" name="editPlatforms" value="ios" ${game.platforms.includes('ios') ? 'checked' : ''}>
-                                <label for="editPlatformiOS">iOS</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="editPlatformWeb" name="editPlatforms" value="web" ${game.platforms.includes('web') ? 'checked' : ''}>
-                                <label for="editPlatformWeb">Web</label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group full-width">
                         <label class="form-label">Game Description</label>
-                        <textarea class="form-textarea" id="editGameDescription">${game.description || ''}</textarea>
+                        <textarea class="form-textarea" id="editGameDescription" placeholder="Enter game description">${game.description || ''}</textarea>
                     </div>
                     
                     <div class="form-group full-width">
@@ -1875,307 +1987,290 @@
             </form>
         `;
         
-        // Add event listener for image upload in edit modal
-        document.getElementById('editImageUpload').addEventListener('click', () => {
-            document.getElementById('editGameImage').click();
-        });
+        modal.querySelector('.modal-body').innerHTML = '';
+        modal.querySelector('.modal-body').appendChild(formContent);
         
-        document.getElementById('editGameImage').addEventListener('change', (e) => {
-            handleImageUpload(e, (imageUrl) => {
-                const preview = document.getElementById('editImagePreview');
-                preview.querySelector('img').src = imageUrl;
-                preview.style.display = 'block';
+        // Set current image
+        currentImage = game.image;
+        currentEditId = gameId;
+        
+        // Add event listener for image upload
+        const imageInput = document.getElementById('editGameImage');
+        const imageUploadArea = document.getElementById('editImageUpload');
+        
+        if (imageInput && imageUploadArea) {
+            imageUploadArea.addEventListener('click', () => {
+                imageInput.click();
             });
-        });
+            
+            imageInput.addEventListener('change', (e) => {
+                handleImageUpload(e, (imageUrl) => {
+                    const preview = document.getElementById('editImagePreview');
+                    if (preview) {
+                        preview.querySelector('img').src = imageUrl;
+                        preview.style.display = 'block';
+                        currentImage = imageUrl;
+                    }
+                });
+            });
+        }
         
-        // Store the game ID for the update
-        document.getElementById('editGameModal').dataset.gameId = gameId;
-        document.getElementById('editGameModal').classList.add('active');
+        modal.classList.add('active');
     }
 
     // Close edit game modal
     function closeEditGameModal() {
-        document.getElementById('editGameModal').classList.remove('active');
-    }
-
-    // Open delete confirmation modal
-    function openDeleteModal(gameId) {
-        const games = getGames();
-        const game = games.find(g => g.id === gameId);
-        if (!game) return;
-        
-        document.getElementById('deleteGameName').textContent = game.title;
-        document.getElementById('deleteModal').dataset.gameId = gameId;
-        document.getElementById('deleteModal').classList.add('active');
-    }
-
-    // Close delete confirmation modal
-    function closeDeleteModal() {
-        document.getElementById('deleteModal').classList.remove('active');
+        const modal = document.getElementById('editGameModal');
+        if (modal) {
+            modal.classList.remove('active');
+        }
     }
 
     // View game details
     function viewGame(gameId) {
-        const games = getGames();
         const game = games.find(g => g.id === gameId);
         if (!game) return;
         
-        alert(`Viewing: ${game.title}\n\nDescription: ${game.description}\n\nCategory: ${game.category}\nProvider: ${game.provider}\nRelease Date: ${formatDisplayDate(game.releaseDate)}\nPrice: ${game.price === 0 ? 'Free' : '$' + game.price}\nRating: ${game.rating}/5\nStatus: ${game.status}`);
+        // In a real app, you might open a detail view modal or navigate to a detail page
+        showNotification(`Viewing details for "${game.title}"`, 'info');
     }
 
     // Save new game
-    function saveGame() {
-        const title = document.getElementById('gameTitle').value;
-        const category = document.getElementById('gameCategory').value;
-        const provider = document.getElementById('gameProvider').value;
-        const releaseDate = document.getElementById('gameReleaseDate').value;
-        const status = document.getElementById('gameStatus').value;
-        const description = document.getElementById('gameDescription').value;
+    async function saveNewGame() {
+        const title = document.getElementById('gameTitle')?.value.trim();
+        const category = document.getElementById('gameCategory')?.value;
+        const provider = document.getElementById('gameProvider')?.value;
+        const releaseDate = document.getElementById('gameReleaseDate')?.value;
+        const status = document.getElementById('gameStatus')?.value;
+        const description = document.getElementById('gameDescription')?.value.trim();
         
-        // Validate required fields
+        console.log('Saving game:', { title, category, provider, releaseDate, status });
+        
+        // Basic validation
         if (!title || !category || !provider || !releaseDate) {
             showNotification('Please fill in all required fields.', 'error');
             return;
         }
         
-        // Get image
-        const imagePreview = document.getElementById('imagePreview');
-        let image = '';
-        
-        if (imagePreview.style.display === 'block') {
-            image = imagePreview.querySelector('img').src;
-        } else {
-            // Use a placeholder image if no image was uploaded
-            image = 'https://via.placeholder.com/300x180?text=' + encodeURIComponent(title);
+        try {
+            const gameData = {
+                title,
+                category,
+                provider,
+                releaseDate,
+                status: status || 'active',
+                description: description || '',
+                image: currentImage || 'https://via.placeholder.com/300x180?text=Game+Image',
+                rating: Math.random() * 2 + 3, // Random rating between 3 and 5
+                platforms: ['web'] // Default platform
+            };
+            
+            await addGame(gameData);
+            closeAddGameModal();
+            
+        } catch (error) {
+            console.error("Error saving game:", error);
+            // Error notification is handled in addGame function
         }
-        
-        // Create new game object with default values - PERBAIKAN
-        const newGame = {
-            id: 'G-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
-            title,
-            category,
-            provider,
-            releaseDate,
-            price: 0, // Set default value
-            rating: 4.5, // Set default value
-            status: status || "active", // Pastikan status tidak kosong
-            platforms: ["windows", "web"], // Default platforms yang lebih umum
-            description,
-            image,
-            dateCreated: new Date().toISOString()
-        };
-        
-        // Add to games array
-        const games = getGames();
-        games.push(newGame);
-        saveGames(games);
-        
-        // Update UI
-        loadGames();
-        updateGameStats();
-        closeAddGameModal();
-        
-        // Show success notification
-        showNotification(`"${title}" has been added successfully!`, 'success');
     }
 
     // Update existing game
-    function updateGame() {
-        const gameId = document.getElementById('editGameModal').dataset.gameId;
-        const games = getGames();
-        const gameIndex = games.findIndex(g => g.id === gameId);
+    async function updateExistingGame() {
+        if (!currentEditId) return;
         
-        if (gameIndex === -1) return;
+        const title = document.getElementById('editGameTitle')?.value.trim();
+        const category = document.getElementById('editGameCategory')?.value;
+        const provider = document.getElementById('editGameProvider')?.value;
+        const releaseDate = document.getElementById('editGameReleaseDate')?.value;
+        const status = document.getElementById('editGameStatus')?.value;
+        const description = document.getElementById('editGameDescription')?.value.trim();
         
-        const title = document.getElementById('editGameTitle').value;
-        const category = document.getElementById('editGameCategory').value;
-        const provider = document.getElementById('editGameProvider').value;
-        const releaseDate = document.getElementById('editGameReleaseDate').value;
-        const price = parseFloat(document.getElementById('editGamePrice').value);
-        const rating = parseFloat(document.getElementById('editGameRating').value);
-        const status = document.getElementById('editGameStatus').value;
-        const description = document.getElementById('editGameDescription').value;
-        
-        // Validate required fields
-        if (!title || !category || !provider || !releaseDate || isNaN(price) || isNaN(rating)) {
+        // Basic validation
+        if (!title || !category || !provider || !releaseDate) {
             showNotification('Please fill in all required fields.', 'error');
             return;
         }
         
-        // Validate rating
-        if (rating < 1 || rating > 5) {
-            showNotification('Rating must be between 1 and 5.', 'error');
-            return;
+        try {
+            const gameData = {
+                title,
+                category,
+                provider,
+                releaseDate,
+                status,
+                description,
+                image: currentImage || 'https://via.placeholder.com/300x180?text=Game+Image'
+            };
+            
+            await updateGame(currentEditId, gameData);
+            closeEditGameModal();
+            
+        } catch (error) {
+            console.error("Error updating game:", error);
+            // Error notification is handled in updateGame function
         }
-        
-        // Get selected platforms
-        const platformCheckboxes = document.querySelectorAll('input[name="editPlatforms"]:checked');
-        const platforms = Array.from(platformCheckboxes).map(cb => cb.value);
-        
-        // Get image
-        const imagePreview = document.getElementById('editImagePreview');
-        let image = games[gameIndex].image; // Keep the existing image by default
-        
-        if (imagePreview.style.display === 'block') {
-            image = imagePreview.querySelector('img').src;
-        }
-        
-        // Update game object
-        games[gameIndex] = {
-            ...games[gameIndex],
-            title,
-            category,
-            provider,
-            releaseDate,
-            price,
-            rating,
-            status,
-            platforms,
-            description,
-            image
-        };
-        
-        saveGames(games);
-        
-        // Update UI
-        loadGames();
-        updateGameStats();
-        closeEditGameModal();
-        
-        // Show success notification
-        showNotification(`"${title}" has been updated successfully!`, 'success');
     }
 
-    // Confirm deletion of game
-    function confirmDelete() {
-        const gameId = document.getElementById('deleteModal').dataset.gameId;
-        const games = getGames();
-        const gameIndex = games.findIndex(g => g.id === gameId);
-        
-        if (gameIndex === -1) return;
-        
-        const gameTitle = games[gameIndex].title;
-        
-        // Remove game from array
-        games.splice(gameIndex, 1);
-        saveGames(games);
-        
-        // Update UI
-        loadGames();
-        updateGameStats();
-        closeDeleteModal();
-        
-        // Show success notification
-        showNotification(`"${gameTitle}" has been deleted successfully!`, 'success');
-    }
-
-    // Refresh games list
-    function refreshGamesList() {
-        loadGames();
-        updateGameStats();
-        
-        // Show notification
-        showNotification('Games list refreshed successfully!', 'success');
-    }
-
-    // Initialize the page
-    function initGamePage() {
-        // Initialize data
-        initializeGameData();
-        
-        // Render the games and stats
-        loadGames();
-        updateGameStats();
-        
-        // Setup event listeners
-        setupEventListeners();
-    }
-
-    // Setup event listeners
+    // ========== EVENT LISTENERS SETUP ==========
     function setupEventListeners() {
-        // Filter events
-        document.getElementById('statusFilter').addEventListener('change', loadGames);
-        document.getElementById('categoryFilter').addEventListener('change', loadGames);
-        document.getElementById('providerFilter').addEventListener('change', loadGames);
-        document.getElementById('dateFrom').addEventListener('change', loadGames);
-        document.getElementById('dateTo').addEventListener('change', loadGames);
-        document.getElementById('priceMin').addEventListener('input', loadGames);
-        document.getElementById('priceMax').addEventListener('input', loadGames);
-        document.getElementById('sortBy').addEventListener('change', loadGames);
-        document.getElementById('sortOrder').addEventListener('change', loadGames);
-        document.getElementById('resetFilters').addEventListener('click', resetAllFilters);
-        document.getElementById('gamesSearch').addEventListener('input', loadGames);
+        // Filter event listeners
+        document.getElementById('statusFilter')?.addEventListener('change', loadGames);
+        document.getElementById('categoryFilter')?.addEventListener('change', loadGames);
+        document.getElementById('providerFilter')?.addEventListener('change', loadGames);
+        document.getElementById('dateFrom')?.addEventListener('change', loadGames);
+        document.getElementById('dateTo')?.addEventListener('change', loadGames);
+        document.getElementById('sortBy')?.addEventListener('change', loadGames);
+        document.getElementById('sortOrder')?.addEventListener('change', loadGames);
+        
+        // Search input with debounce
+        const searchInput = document.getElementById('gamesSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', debounce(loadGames, 300));
+        }
+        
+        // Reset filters
+        document.getElementById('resetFilters')?.addEventListener('click', resetFilters);
+        
+        // Toggle advanced filters
+        document.getElementById('toggleAdvancedFilters')?.addEventListener('click', toggleAdvancedFilters);
         
         // View toggle
-        document.getElementById('gridViewBtn').addEventListener('click', () => toggleView('grid'));
-        document.getElementById('listViewBtn').addEventListener('click', () => toggleView('list'));
+        document.getElementById('gridViewBtn')?.addEventListener('click', () => toggleView(true));
+        document.getElementById('listViewBtn')?.addEventListener('click', () => toggleView(false));
         
-        // Button events
-        document.getElementById('addGameBtn').addEventListener('click', openAddGameModal);
-        document.getElementById('refreshGames').addEventListener('click', refreshGamesList);
-        document.getElementById('quickAddGame').addEventListener('click', openAddGameModal);
-        document.getElementById('addFirstGame').addEventListener('click', openAddGameModal);
-        
-        // Advanced filters toggle
-        document.getElementById('toggleAdvancedFilters').addEventListener('click', () => {
-            const advancedFilters = document.getElementById('advancedFilters');
-            advancedFilters.classList.toggle('show');
-            const icon = document.getElementById('toggleAdvancedFilters').querySelector('i');
-            if (advancedFilters.classList.contains('show')) {
-                icon.className = 'fas fa-times';
-                document.getElementById('toggleAdvancedFilters').innerHTML = '<i class="fas fa-times"></i> Hide Filters';
-            } else {
-                icon.className = 'fas fa-sliders-h';
-                document.getElementById('toggleAdvancedFilters').innerHTML = '<i class="fas fa-sliders-h"></i> Advanced Filters';
-            }
+        // Refresh games
+        document.getElementById('refreshGames')?.addEventListener('click', () => {
+            loadGames();
+            showNotification('Games list refreshed', 'success');
         });
         
-        // Modal events
-        document.getElementById('closeAddModal').addEventListener('click', closeAddGameModal);
-        document.getElementById('closeEditModal').addEventListener('click', closeEditGameModal);
-        document.getElementById('closeDeleteModal').addEventListener('click', closeDeleteModal);
-        document.getElementById('cancelAddGame').addEventListener('click', closeAddGameModal);
-        document.getElementById('cancelEditGame').addEventListener('click', closeEditGameModal);
-        document.getElementById('cancelDelete').addEventListener('click', closeDeleteModal);
-        document.getElementById('saveGame').addEventListener('click', saveGame);
-        document.getElementById('updateGame').addEventListener('click', updateGame);
-        document.getElementById('confirmDelete').addEventListener('click', confirmDelete);
+        // Add game button
+        document.getElementById('addGameBtn')?.addEventListener('click', openAddGameModal);
+        document.getElementById('addFirstGame')?.addEventListener('click', openAddGameModal);
         
-        // Image upload
-        document.getElementById('imageUpload').addEventListener('click', () => {
-            document.getElementById('gameImage').click();
-        });
-
-        document.getElementById('gameImage').addEventListener('change', (e) => {
-            handleImageUpload(e, (imageUrl) => {
-                const preview = document.getElementById('imagePreview');
-                preview.querySelector('img').src = imageUrl;
-                preview.style.display = 'block';
+        // Quick actions
+        document.getElementById('quickAddGame')?.addEventListener('click', openAddGameModal);
+        
+        // Modal close buttons
+        document.getElementById('closeAddModal')?.addEventListener('click', closeAddGameModal);
+        document.getElementById('closeEditModal')?.addEventListener('click', closeEditGameModal);
+        document.getElementById('cancelAddGame')?.addEventListener('click', closeAddGameModal);
+        document.getElementById('cancelEditGame')?.addEventListener('click', closeEditGameModal);
+        
+        // Modal save/update buttons
+        document.getElementById('saveGame')?.addEventListener('click', saveNewGame);
+        document.getElementById('updateGame')?.addEventListener('click', updateExistingGame);
+        
+        // Image upload handling
+        const imageInput = document.getElementById('gameImage');
+        if (imageInput) {
+            imageInput.addEventListener('change', (e) => {
+                handleImageUpload(e, (imageUrl) => {
+                    const preview = document.getElementById('imagePreview');
+                    if (preview) {
+                        preview.querySelector('img').src = imageUrl;
+                        preview.style.display = 'block';
+                        currentImage = imageUrl;
+                    }
+                });
             });
+        }
+        
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            const addModal = document.getElementById('addGameModal');
+            const editModal = document.getElementById('editGameModal');
+            
+            if (e.target === addModal) closeAddGameModal();
+            if (e.target === editModal) closeEditGameModal();
+        });
+        
+        // Quick action buttons
+        document.getElementById('quickImport')?.addEventListener('click', () => {
+            showNotification('Import feature coming soon!', 'info');
+        });
+        
+        document.getElementById('quickExport')?.addEventListener('click', () => {
+            showNotification('Export feature coming soon!', 'info');
+        });
+        
+        document.getElementById('quickCategories')?.addEventListener('click', () => {
+            showNotification('Categories management feature coming soon!', 'info');
         });
     }
 
-    // Toggle between grid and list view
-    function toggleView(viewType) {
-        const gamesGrid = document.getElementById('gamesGrid');
-        const gridBtn = document.getElementById('gridViewBtn');
-        const listBtn = document.getElementById('listViewBtn');
+    // ========== UTILITY FUNCTIONS ==========
+    // Debounce function for search input
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // ========== INITIALIZATION ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, initializing...');
         
-        if (viewType === 'grid') {
-            gamesGrid.classList.remove('list-view');
-            gamesGrid.classList.add('grid-view');
-            gridBtn.classList.add('active');
-            listBtn.classList.remove('active');
-        } else {
-            gamesGrid.classList.remove('grid-view');
-            gamesGrid.classList.add('list-view');
-            listBtn.classList.add('active');
-            gridBtn.classList.remove('active');
+        // Initialize Firebase auth state listener
+        checkAuthState();
+        
+        // Set default view to grid
+        toggleView(true);
+        
+        // Add some sample data if needed (for demo purposes)
+        // addSampleData();
+    });
+
+    // Function to add sample data (for demo purposes)
+    function addSampleData() {
+        const sampleGames = [
+            {
+                title: "Fortune Tiger",
+                category: "Slot",
+                provider: "PG SOFT",
+                releaseDate: "2023-01-15",
+                status: "active",
+                description: "A thrilling slot game with tiger theme and big wins.",
+                image: "https://via.placeholder.com/300x180?text=Fortune+Tiger",
+                rating: 4.8
+            },
+            {
+                title: "Blackjack Pro",
+                category: "Casino",
+                provider: "PRAGMATIC PLAY",
+                releaseDate: "2023-03-22",
+                status: "active",
+                description: "Professional blackjack experience with live dealers.",
+                image: "https://via.placeholder.com/300x180?text=Blackjack+Pro",
+                rating: 4.6
+            },
+            {
+                title: "Soccer Mania",
+                category: "Sport",
+                provider: "JOKER",
+                releaseDate: "2023-05-10",
+                status: "upcoming",
+                description: "Exciting soccer-themed betting game with realistic gameplay.",
+                image: "https://via.placeholder.com/300x180?text=Soccer+Mania",
+                rating: 4.3
+            }
+        ];
+        
+        // Check if we need to add sample data
+        if (games.length === 0) {
+            sampleGames.forEach(game => {
+                addGame(game).catch(error => {
+                    console.error("Error adding sample game:", error);
+                });
+            });
         }
     }
-
-    // Initialize when DOM is loaded
-    document.addEventListener('DOMContentLoaded', initGamePage);
 </script>
 </body>
 </html>
