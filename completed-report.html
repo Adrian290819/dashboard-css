@@ -8,6 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css">
     <link rel="stylesheet" href="global.css">
+    <!-- Firebase App and Firestore SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <style>
             /* ========== VARIABEL CSS YANG DIPERLUKAN ========== */
         :root {
@@ -828,6 +832,23 @@
             outline: 2px solid var(--primary);
             outline-offset: 2px;
         }
+        /* Tambahkan di bagian CSS */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
     </style>
 </head>
 <body>
@@ -848,8 +869,6 @@
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Search completed tasks..." id="completedSearch">
                 </div>
-                
-                
                 
                 <div class="user-profile">
                     <img class="profile-img" src="https://iili.io/Fpiva7S.png" alt="Profile" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iMjAiIGZpbGw9IiM0MzYxRUUiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDExQzE0LjIwOTEgMTEgMTYgOS4yMDkxIDE2IDdDMTYgNC43OTA4NiAxNC4yMDkxIDMgMTIgM0M5Ljc5MDg2IDMgOCA0Ljc5MDg2IDggN0M4IDkuMjA5MSA5Ljc5MDg2IDExIDEyIDExWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTYgMTlDNiAxNi43OTA5IDcuNzkwODYgMTUgMTAgMTVIMTVDMTcuMjA5MSAxNSAxOSAxNi43OTA5IDE5IDE5VjIwQzE5IDIxLjEwNDYgMTguMTA0NiAyMiAxNyAyMkg4QzYuODk1NDMgMjIgNiAyMS4xMDQ2IDYgMjBWMTlaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+'">
@@ -896,15 +915,15 @@
             </div>
             
             <div class="maintenance-stat-card fade-in" style="animation-delay: 0.4s;">
-                <div class="stat-header">
-                    <h3 class="stat-title">Average Completion Time</h3>
-                     <div class="stat-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                </div>
-                <div class="stat-value" id="averageCompletionTime">0</div>
-                <div class="stat-description">Average days to complete</div>
-            </div>
+    <div class="stat-header">
+        <h3 class="stat-title">Average Completion Time</h3>
+        <div class="stat-icon">
+            <i class="fas fa-clock"></i>
+        </div>
+    </div>
+    <div class="stat-value" id="averageCompletionTime">N/A</div>
+    <div class="stat-description">Average days to complete</div>
+</div>
         </div>
         
         <!-- Chart Section -->
@@ -1171,379 +1190,256 @@
         </div>
     </div>
 
-<script src="sidebar-loader.js"></script>
-<script src="user-profile.js"></script>
-<script src="notifications.js"></script>
-
-<script>
-    // ========== KONSTAN DAN VARIABEL GLOBAL ==========
-    const TASKS_PER_PAGE = 10;
-    let currentPage = 1;
-    let currentTasks = [];
-    let currentView = 'table';
-
-    // Mapping halaman - DIPERBAIKI: Konsisten dengan maintenance.html
-    const pageMapping = {
-        'Dashboard': 'index.html',
-        'Pending Reports': 'pending-reports.html',
-        'Solved Reports': 'solved-report.html',
-        'Pending': 'maintenance.html',
-        'Completed': 'completed-report.html',
-        'New Features': 'data-produk.html',
-        'New Games': 'data-produk.html',
-        'Ideas & Suggestions': 'statistik-penjualan.html',
-        'Research': 'statistik-penjualan.html',
-        'Chat Response': 'statistik-penjualan.html',
-        'Pending Discussions': 'pending-reports.html',
-        'Weekly Meetings': 'pending-reports.html',
-        'Domain List': 'data-produk.html',
-        'Shift Schedule': 'pengaturan.html',
-        'Phishing Alerts': 'pengaturan.html',
-        'Logout': 'login.html'
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="sidebar-loader.js"></script>
+    <script src="user-profile.js"></script>
+    <script src="notifications.js"></script>
+    <script>
+    // Konfigurasi Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyDUZka4FZyLi_cv6X_5D4zeRsfkpqOlBpY",
+        authDomain: "dashboard-css.firebaseapp.com",
+        databaseURL: "https://dashboard-css-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "dashboard-css",
+        storageBucket: "dashboard-css.appspot.com",
+        messagingSenderId: "771131792881",
+        appId: "1:771131792881:web:ad634424225bd7de847850",
+        measurementId: "G-3CYBC5B101"
     };
 
-    // Inisialisasi data maintenance jika belum ada - DITAMBAHKAN
-    function initializeMaintenanceData() {
-        if (!localStorage.getItem('maintenanceTasks')) {
-            // Jika tidak ada data, buat array kosong
-            localStorage.setItem('maintenanceTasks', JSON.stringify([]));
-        }
+    // Inisialisasi Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // Deklarasi variabel global untuk solved maintenance
+    let solvedMaintenance = [];
+    let unsubscribeSolved = null;
+    let currentMaintenanceId = null;
+    let currentPage = 1;
+    const maintenancePerPage = 10;
+
+function setupSolvedMaintenanceListener() {
+    if (unsubscribeSolved) {
+        unsubscribeSolved();
     }
+    
+    console.log("Connecting to solvedMaintenance collection...");
+    
+    const maintenanceRef = db.collection('solvedMaintenance');
 
-    // Function to navigate to page - DIPERBAIKI
-    function navigateToPage(pageName) {
-        const pageUrl = pageMapping[pageName];
-        if (pageUrl) {
-            if (pageName === 'Logout') {
-                localStorage.removeItem('isLoggedIn');
-                // Jangan hapus maintenanceTasks agar data tetap tersedia
-            }
-            window.location.href = pageUrl;
-        } else {
-            console.warn(`No page mapping found for: ${pageName}`);
-            window.location.href = 'index.html';
-        }
-    }
-
-    // Get all maintenance tasks - DIPERBAIKI: Hapus inisialisasi data
-    function getMaintenanceTasks() {
-        initializeMaintenanceData(); // Pastikan data diinisialisasi
-        const tasks = localStorage.getItem('maintenanceTasks');
-        return tasks ? JSON.parse(tasks) : [];
-    }
-
-    // Inisialisasi halaman completed
-    function initCompletedPage() {
-        // Load sidebar
-        const sidebarLoader = new SidebarLoader();
-        sidebarLoader.load();
-
-        // Render UI components
-        renderCompletedTable();
-        updateCompletedStats();
-        renderCharts();
-
-        // Setup general event listeners
-        setupEventListeners();
-
-        // Toggle sidebar functionality
-        const menuToggle = document.querySelector('.menu-toggle');
-        const sidebar = document.querySelector('.sidebar');
-        const mainContent = document.querySelector('.main-content');
-
-        if (menuToggle && sidebar && mainContent) {
-            menuToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('sidebar-collapsed');
-            });
-        }
-    }
-
-    function setupEventListeners() {
-        // Add event listeners
-        document.getElementById('exportBtn').addEventListener('click', exportCompletedTasks);
-        document.getElementById('printBtn').addEventListener('click', printReport);
-        document.getElementById('refreshBtn').addEventListener('click', refreshData);
-        document.getElementById('closeViewBtn').addEventListener('click', closeViewModal);
-        document.getElementById('closeViewModal').addEventListener('click', closeViewModal);
-        document.getElementById('exportTaskBtn').addEventListener('click', exportTaskDetails);
-        
-        // Add event listeners to filters
-        document.getElementById('categoryFilter').addEventListener('change', renderCompletedTable);
-        document.getElementById('priorityFilter').addEventListener('change', renderCompletedTable);
-        document.getElementById('timeFilter').addEventListener('change', renderCompletedTable);
-        document.getElementById('sortFilter').addEventListener('change', renderCompletedTable);
-        
-        // Add event listener to search input
-        document.getElementById('completedSearch').addEventListener('input', renderCompletedTable);
-        
-        // Add event listener for view toggle
-        document.getElementById('tableViewBtn').addEventListener('click', () => switchView('table'));
-        document.getElementById('cardViewBtn').addEventListener('click', () => switchView('card'));
-        
-        // Close modal when clicking outside
-        document.getElementById('viewModal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('viewModal')) {
-                closeViewModal();
-            }
-        });
-        
-        // Pagination
-        document.getElementById('prevPage').addEventListener('click', goToPrevPage);
-        document.getElementById('nextPage').addEventListener('click', goToNextPage);
-    }
-
-    // Get only completed tasks
-    function getCompletedTasks() {
-        const tasks = getMaintenanceTasks();
-        return tasks.filter(task => task.status === 'completed');
-    }
-
-    // Format date for display
-    function formatDisplayDate(dateString) {
-        if (!dateString) return 'N/A';
-        const options = { year: 'numeric', month: 'short', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString('en-US', options);
-    }
-
-    // Format time for display
-    function formatDisplayTime(timeString) {
-        if (!timeString) return 'N/A';
-        return timeString;
-    }
-
-    // Calculate completion time in days
-    function getCompletionTimeInDays(dateCreated, dateCompleted) {
-        if (!dateCreated || !dateCompleted) return 0;
-        
-        const created = new Date(dateCreated);
-        const completed = new Date(dateCompleted);
-        const diffTime = Math.abs(completed - created);
-        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    }
-
-    // Update completed tasks statistics
-    function updateCompletedStats() {
-        const completedTasks = getCompletedTasks();
-        const now = new Date();
-        const startOfWeek = new Date(now);
-        startOfWeek.setDate(now.getDate() - now.getDay());
-        startOfWeek.setHours(0, 0, 0, 0);
-        
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        
-        // Calculate stats
-        const totalCompleted = completedTasks.length;
-        const completedThisWeek = completedTasks.filter(task => {
-            const completedDate = new Date(task.dateCompleted);
-            return completedDate >= startOfWeek;
-        }).length;
-        
-        const completedThisMonth = completedTasks.filter(task => {
-            const completedDate = new Date(task.dateCompleted);
-            return completedDate >= startOfMonth;
-        }).length;
-        
-        // Calculate average completion time
-        let totalCompletionDays = 0;
-        let tasksWithCompletionTime = 0;
-        
-        completedTasks.forEach(task => {
-            if (task.dateCreated && task.dateCompleted) {
-                totalCompletionDays += getCompletionTimeInDays(task.dateCreated, task.dateCompleted);
-                tasksWithCompletionTime++;
-            }
-        });
-        
-        const averageCompletionTime = tasksWithCompletionTime > 0 
-            ? (totalCompletionDays / tasksWithCompletionTime).toFixed(1) 
-            : 0;
-        
-        // Update DOM
-        document.getElementById('totalCompleted').textContent = totalCompleted;
-        document.getElementById('completedThisWeek').textContent = completedThisWeek;
-        document.getElementById('completedThisMonth').textContent = completedThisMonth;
-        document.getElementById('averageCompletionTime').textContent = averageCompletionTime;
-    }
-
-    // Render completed table
-    function renderCompletedTable() {
-        const tableBody = document.getElementById('completedTableBody');
-        const noTasks = document.getElementById('noTasks');
-        const tasksCount = document.getElementById('tasksCount');
-        const pagination = document.getElementById('pagination');
-        const categoryFilter = document.getElementById('categoryFilter').value;
-        const priorityFilter = document.getElementById('priorityFilter').value;
-        const timeFilter = document.getElementById('timeFilter').value;
-        const sortFilter = document.getElementById('sortFilter').value;
-        const searchTerm = document.getElementById('completedSearch').value.toLowerCase();
-        
-        let tasks = getCompletedTasks();
-        
-        // Apply filters
-        if (categoryFilter !== 'all') {
-            tasks = tasks.filter(task => task.category === categoryFilter);
-        }
-        
-        if (priorityFilter !== 'all') {
-            tasks = tasks.filter(task => task.priority === priorityFilter);
-        }
-        
-        // Apply time filter
-        if (timeFilter !== 'all') {
-            const now = new Date();
-            now.setHours(0, 0, 0, 0);
+    unsubscribeSolved = maintenanceRef
+        .orderBy('dateCompleted', 'desc')
+        .onSnapshot(snapshot => {
+            console.log("Received", snapshot.size, "documents from solvedMaintenance");
+            solvedMaintenance = [];
             
-            tasks = tasks.filter(task => {
-                const completedDate = new Date(task.dateCompleted);
-                completedDate.setHours(0, 0, 0, 0);
+            snapshot.forEach(doc => {
+                const maintenance = doc.data();
+                maintenance.id = doc.id;
                 
-                switch(timeFilter) {
-                    case 'today':
-                        return completedDate.getTime() === now.getTime();
-                    case 'week':
-                        const startOfWeek = new Date(now);
-                        startOfWeek.setDate(now.getDate() - now.getDay());
-                        return completedDate >= startOfWeek;
-                    case 'month':
-                        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-                        return completedDate >= startOfMonth;
-                    case 'quarter':
-                        const currentQuarter = Math.floor(now.getMonth() / 3);
-                        const startOfQuarter = new Date(now.getFullYear(), currentQuarter * 3, 1);
-                        return completedDate >= startOfQuarter;
-                    default:
-                        return true;
-                }
+                console.log("Document data:", maintenance);
+                
+                solvedMaintenance.push(maintenance);
             });
+
+            console.log("Total maintenance:", solvedMaintenance.length);
+            updateSolvedMaintenanceUI();
+            updateStatistics();
+            updateCharts();
+
+        }, error => {
+            console.error("Error fetching solved maintenance:", error);
+            showToast("Error loading solved maintenance", "error");
+        });
+}
+
+    // Ganti fungsi updateStatistics() yang ada dengan yang ini
+function updateStatistics() {
+    console.log("Updating statistics with", solvedMaintenance.length, "items");
+    
+    const now = new Date();
+    const startOfWeek = getStartOfWeek(now);
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    
+    let totalCompleted = 0;
+    let completedThisWeek = 0;
+    let completedThisMonth = 0;
+    let totalCompletionTime = 0;
+    let itemsWithCompletionTime = 0;
+
+    solvedMaintenance.forEach(maintenance => {
+        console.log("Processing maintenance:", maintenance.id, maintenance);
+        
+        // Hitung semua item di solvedMaintenance sebagai completed
+        totalCompleted++;
+        
+        // Periksa dateCompleted
+        if (maintenance.dateCompleted) {
+            const completedDate = convertToDate(maintenance.dateCompleted);
+            console.log("Completed date:", completedDate);
+            
+            // Hitung completed this week
+            if (completedDate >= startOfWeek) {
+                completedThisWeek++;
+            }
+            
+            // Hitung completed this month
+            if (completedDate >= startOfMonth) {
+                completedThisMonth++;
+            }
+            
+            // Hitung waktu penyelesaian jika ada dateCreated
+            if (maintenance.dateCreated) {
+                const createdDate = convertToDate(maintenance.dateCreated);
+                const completionTime = (completedDate - createdDate) / (1000 * 60 * 60 * 24); // dalam hari
+                totalCompletionTime += completionTime;
+                itemsWithCompletionTime++;
+                console.log("Completion time:", completionTime, "days");
+            }
         }
-        
-        // Apply search
-        if (searchTerm) {
-            tasks = tasks.filter(task => 
-                task.title.toLowerCase().includes(searchTerm) ||
-                task.description.toLowerCase().includes(searchTerm) ||
-                task.id.toLowerCase().includes(searchTerm) ||
-                task.assignedTo.toLowerCase().includes(searchTerm)
-            );
+    });
+
+    // Hitung rata-rata waktu penyelesaian
+    const averageCompletionTime = itemsWithCompletionTime > 0 
+        ? (totalCompletionTime / itemsWithCompletionTime).toFixed(1) 
+        : 0;
+
+    console.log("Final stats - Total:", totalCompleted, "Week:", completedThisWeek, 
+                "Month:", completedThisMonth, "Avg Time:", averageCompletionTime);
+
+    // Update UI
+    document.getElementById("totalCompleted").textContent = totalCompleted;
+    document.getElementById("completedThisWeek").textContent = completedThisWeek;
+    document.getElementById("completedThisMonth").textContent = completedThisMonth;
+    document.getElementById("averageCompletionTime").textContent = 
+        averageCompletionTime > 0 ? averageCompletionTime + " days" : "N/A";
+}
+
+// Tambahkan fungsi helper untuk mendapatkan awal minggu
+function getStartOfWeek(date) {
+    const d = new Date(date);
+    const day = d.getDay(); // 0 (Minggu) sampai 6 (Sabtu)
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust untuk mulai Senin
+    return new Date(d.setDate(diff));
+}
+
+// Pastikan fungsi convertToDate() ada
+function convertToDate(timestamp) {
+    console.log("Converting timestamp:", timestamp);
+    
+    if (!timestamp) {
+        console.log("No timestamp provided");
+        return new Date();
+    }
+    
+    if (typeof timestamp.toDate === 'function') {
+        return timestamp.toDate();
+    } else if (typeof timestamp === 'string') {
+        // Coba parsing berbagai format tanggal
+        const parsedDate = new Date(timestamp);
+        if (!isNaN(parsedDate.getTime())) {
+            return parsedDate;
         }
+    } else if (timestamp && typeof timestamp === 'object' && timestamp.seconds) {
+        return new Date(timestamp.seconds * 1000);
+    }
+    
+    console.log("Could not convert timestamp, using current date");
+    return new Date();
+}
+
+    function updateSolvedMaintenanceUI() {
+        const tableBody = document.getElementById('completedTableBody');
+        const tasksCount = document.getElementById('tasksCount');
+        const noTasks = document.getElementById('noTasks');
+        const pagination = document.getElementById('pagination');
         
-        // Apply sorting
-        switch(sortFilter) {
-            case 'newest':
-                tasks.sort((a, b) => new Date(b.dateCompleted) - new Date(a.dateCompleted));
-                break;
-            case 'oldest':
-                tasks.sort((a, b) => new Date(a.dateCompleted) - new Date(b.dateCompleted));
-                break;
-            case 'priority':
-                const priorityOrder = { 'high': 1, 'medium': 2, 'low': 3 };
-                tasks.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
-                break;
-            case 'category':
-                tasks.sort((a, b) => a.category.localeCompare(b.category));
-                break;
-        }
+        console.log("Updating UI with", solvedMaintenance.length, "maintenance tasks");
         
-        // Update tasks count
-        tasksCount.textContent = `${tasks.length} task${tasks.length !== 1 ? 's' : ''}`;
-        
-        // Store current tasks for pagination
-        currentTasks = tasks;
-        
-        if (tasks.length === 0) {
-            tableBody.innerHTML = '';
+        if (solvedMaintenance.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="empty-state">
+                        <i class="fas fa-database"></i>
+                        <h3>No Completed Maintenance Found</h3>
+                        <p>There are no completed maintenance tasks in the database yet.</p>
+                    </td>
+                </tr>
+            `;
             noTasks.style.display = 'block';
             pagination.style.display = 'none';
+            tasksCount.textContent = '0 tasks';
             return;
         }
         
         noTasks.style.display = 'none';
+        pagination.style.display = 'flex';
         
-        // Calculate pagination
-        const totalPages = Math.ceil(tasks.length / TASKS_PER_PAGE);
+        const filteredMaintenance = filterMaintenance(solvedMaintenance);
+        
+        tasksCount.textContent = `${filteredMaintenance.length} tasks`;
+        
+        // Pagination
+        const totalPages = Math.ceil(filteredMaintenance.length / maintenancePerPage);
+        document.getElementById('currentPage').textContent = currentPage;
         document.getElementById('totalPages').textContent = totalPages;
         
-        if (currentPage > totalPages) {
-            currentPage = totalPages > 0 ? totalPages : 1;
-        }
+        // Enable/disable pagination buttons
+        document.getElementById('prevPage').disabled = currentPage === 1;
+        document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
         
-        document.getElementById('currentPage').textContent = currentPage;
+        // Calculate start and end index for current page
+        const startIndex = (currentPage - 1) * maintenancePerPage;
+        const endIndex = Math.min(startIndex + maintenancePerPage, filteredMaintenance.length);
+        const currentPageMaintenance = filteredMaintenance.slice(startIndex, endIndex);
         
-        // Show/hide pagination
-        if (totalPages > 1) {
-            pagination.style.display = 'flex';
-            document.getElementById('prevPage').disabled = currentPage === 1;
-            document.getElementById('nextPage').disabled = currentPage === totalPages;
-        } else {
-            pagination.style.display = 'none';
-        }
-        
-        // Get tasks for current page
-        const startIndex = (currentPage - 1) * TASKS_PER_PAGE;
-        const endIndex = Math.min(startIndex + TASKS_PER_PAGE, tasks.length);
-        const pageTasks = tasks.slice(startIndex, endIndex);
-        
-        // Render table
+        // Clear table
         tableBody.innerHTML = '';
         
-        pageTasks.forEach(task => {
+        if (currentPageMaintenance.length === 0) {
+            const emptyRow = document.createElement('tr');
+            emptyRow.innerHTML = `
+                <td colspan="8" style="text-align: center; padding: 40px 20px;">
+                    <i class="fas fa-inbox" style="font-size: 3rem; color: var(--text-tertiary); margin-bottom: 15px; display: block;"></i>
+                    <h3 style="color: var(--text-secondary; margin-bottom: 10px;">No completed maintenance found</h3>
+                    <p style="color: var(--text-tertiary);">Try adjusting your filters or check back later.</p>
+                </td>
+            `;
+            tableBody.appendChild(emptyRow);
+            return;
+        }
+        
+        currentPageMaintenance.forEach(maintenance => {
             const row = document.createElement('tr');
             
-            // Get priority badge class
-            let priorityClass = '';
-            let priorityText = '';
-            switch(task.priority) {
-                case 'high':
-                    priorityClass = 'priority-high';
-                    priorityText = 'High';
-                    break;
-                case 'medium':
-                    priorityClass = 'priority-medium';
-                    priorityText = 'Medium';
-                    break;
-                case 'low':
-                    priorityClass = 'priority-low';
-                    priorityText = 'Low';
-                    break;
-            }
-            
-            // Format category text
-            let categoryText = '';
-            switch(task.category) {
-                case 'server':
-                    categoryText = 'Server Maintenance';
-                    break;
-                case 'database':
-                    categoryText = 'Database';
-                    break;
-                case 'application':
-                    categoryText = 'Application';
-                    break;
-                case 'security':
-                    categoryText = 'Security';
-                    break;
-                case 'hardware':
-                    categoryText = 'Hardware';
-                    break;
-                default:
-                    categoryText = task.category;
-            }
+            // Format dates - menggunakan field yang sesuai dengan solvedMaintenance
+            const createdDate = maintenance.dateCreated ? formatDate(convertToDate(maintenance.dateCreated)) : 'N/A';
+            const completedDate = maintenance.dateCompleted ? formatDate(convertToDate(maintenance.dateCompleted)) : 'N/A';
             
             // Calculate completion time
-            const completionTime = getCompletionTimeInDays(task.dateCreated, task.dateCompleted);
+            let completionTime = 'N/A';
+            if (maintenance.dateCreated && maintenance.dateCompleted) {
+                const created = convertToDate(maintenance.dateCreated);
+                const completed = convertToDate(maintenance.dateCompleted);
+                const diffDays = Math.floor((completed - created) / (1000 * 60 * 60 * 24));
+                const diffHours = Math.floor(((completed - created) % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                completionTime = `${diffDays}d ${diffHours}h`;
+            }
             
             row.innerHTML = `
-                <td>${task.id}</td>
-                <td>${task.title}</td>
-                <td>${categoryText}</td>
-                <td><span class="${priorityClass}">${priorityText}</span></td>
-                <td>${formatDisplayDate(task.dateCompleted)}</td>
-                <td>${completionTime} day${completionTime !== 1 ? 's' : ''}</td>
-                <td>${task.assignedTo}</td>
+                <td>${maintenance.id}</td>
+                <td>${maintenance.title || 'N/A'}</td>
+                <td>${maintenance.category || 'N/A'}</td>
+                <td><span class="priority-${maintenance.priority || 'medium'}">${maintenance.priority || 'Medium'}</span></td>
+                <td>${completedDate}</td>
+                <td>${completionTime}</td>
+                <td>${maintenance.assignedTo || 'N/A'}</td>
                 <td>
                     <div class="action-buttons">
-                        <button class="btn-icon view" data-id="${task.id}" title="View Details">
+                        <button class="btn-icon view" data-id="${maintenance.id}" title="View Details">
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
@@ -1553,351 +1449,461 @@
             tableBody.appendChild(row);
         });
         
-        // Add event listeners to action buttons
-        document.querySelectorAll('.btn-icon.view').forEach(btn => {
-            btn.addEventListener('click', () => viewTaskDetails(btn.dataset.id));
-        });
-    }
-
-    // View task details
-    function viewTaskDetails(taskId) {
-        const tasks = getMaintenanceTasks();
-        const task = tasks.find(t => t.id === taskId);
-        
-        if (task) {
-            // Format category text
-            let categoryText = '';
-            switch(task.category) {
-                case 'server':
-                    categoryText = 'Server Maintenance';
-                    break;
-                case 'database':
-                    categoryText = 'Database';
-                    break;
-                case 'application':
-                    categoryText = 'Application';
-                    break;
-                case 'security':
-                    categoryText = 'Security';
-                    break;
-                case 'hardware':
-                    categoryText = 'Hardware';
-                    break;
-                default:
-                    categoryText = task.category;
-            }
-            
-            // Format priority text
-            let priorityText = '';
-            switch(task.priority) {
-                case 'high':
-                    priorityText = 'High';
-                    break;
-                case 'medium':
-                    priorityText = 'Medium';
-                    break;
-                case 'low':
-                    priorityText = 'Low';
-                    break;
-            }
-            
-            // Calculate completion time
-            const completionTime = getCompletionTimeInDays(task.dateCreated, task.dateCompleted);
-            
-            // Calculate efficiency if estimated and actual time are available
-            let efficiency = 'N/A';
-            if (task.estimatedTime && task.actualTime) {
-                // Simple calculation for demonstration
-                const estimatedHours = parseFloat(task.estimatedTime);
-                const actualHours = parseFloat(task.actualTime);
-                
-                if (estimatedHours > 0 && actualHours > 0) {
-                    efficiency = Math.round((estimatedHours / actualHours) * 100) + '%';
-                }
-            }
-            
-            // Populate view modal
-            document.getElementById('viewTitle').textContent = task.title;
-            document.getElementById('viewCategory').textContent = categoryText;
-            document.getElementById('viewPriority').textContent = priorityText;
-            document.getElementById('viewDueDate').textContent = formatDisplayDate(task.dueDate);
-            document.getElementById('viewCompletedDate').textContent = formatDisplayDate(task.dateCompleted);
-            document.getElementById('viewCreatedDate').textContent = formatDisplayDate(task.dateCreated);
-            document.getElementById('viewAssignedTo').textContent = task.assignedTo;
-            document.getElementById('viewDescription').textContent = task.description || 'No description provided';
-            document.getElementById('viewNotes').textContent = task.notes || 'No notes provided';
-            document.getElementById('viewEstimatedTime').textContent = formatDisplayTime(task.estimatedTime);
-            document.getElementById('viewActualTime').textContent = formatDisplayTime(task.actualTime);
-            document.getElementById('viewEfficiency').textContent = efficiency;
-            
-            // Show the modal
-            document.getElementById('viewModal').classList.add('active');
-        }
-    }
-
-    // Close view modal
-    function closeViewModal() {
-        document.getElementById('viewModal').classList.remove('active');
-    }
-
-    // Switch between table and card view
-    function switchView(viewType) {
-        currentView = viewType;
-        
-        if (viewType === 'table') {
-            document.getElementById('tableViewBtn').classList.add('active');
-            document.getElementById('cardViewBtn').classList.remove('active');
-            // Implement table view
-        } else {
-            document.getElementById('tableViewBtn').classList.remove('active');
-            document.getElementById('cardViewBtn').classList.add('active');
-            // Implement card view
-        }
-        
-        renderCompletedTable();
-    }
-
-    // Go to previous page
-    function goToPrevPage() {
-        if (currentPage > 1) {
-            currentPage--;
-            renderCompletedTable();
-        }
-    }
-
-    // Go to next page
-    function goToNextPage() {
-        const totalPages = Math.ceil(currentTasks.length / TASKS_PER_PAGE);
-        if (currentPage < totalPages) {
-            currentPage++;
-            renderCompletedTable();
-        }
-    }
-
-    // Export completed tasks
-    function exportCompletedTasks() {
-        showNotification('Export functionality would be implemented here.', 'info');
-    }
-
-    // Print report
-    function printReport() {
-        window.print();
-    }
-
-    // Refresh data
-    function refreshData() {
-        renderCompletedTable();
-        updateCompletedStats();
-        renderCharts();
-        showNotification('Completed tasks refreshed.', 'success');
-    }
-
-    // Export task details
-    function exportTaskDetails() {
-        showNotification('Task export functionality would be implemented here.', 'info');
-    }
-
-    // Render charts with real data
-    function renderCharts() {
-        renderCompletionTrendsChart();
-        renderTasksByCategoryChart();
-    }
-
-    // Render completion trends chart with real data
-    function renderCompletionTrendsChart() {
-        const chartContainer = document.getElementById('completionTrendsChart');
-        const timeRange = document.getElementById('trendsTimeRange').value;
-        
-        // Get completed tasks
-        const completedTasks = getCompletedTasks();
-        
-        // Calculate tasks completed in the last 7 days
-        const now = new Date();
-        const dailyCounts = {};
-        
-        // Initialize last 7 days
-        for (let i = 6; i >= 0; i--) {
-            const date = new Date(now);
-            date.setDate(now.getDate() - i);
-            const dateKey = date.toISOString().split('T')[0];
-            dailyCounts[dateKey] = 0;
-        }
-        
-        // Count completed tasks by day
-        completedTasks.forEach(task => {
-            if (task.dateCompleted) {
-                const completedDate = new Date(task.dateCompleted);
-                const dateKey = completedDate.toISOString().split('T')[0];
-                
-                if (dailyCounts.hasOwnProperty(dateKey)) {
-                    dailyCounts[dateKey]++;
-                }
-            }
-        });
-        
-        // Prepare chart data
-        const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        const chartData = [];
-        
-        Object.keys(dailyCounts).forEach(dateKey => {
-            const date = new Date(dateKey);
-            const dayName = daysOfWeek[date.getDay()];
-            chartData.push({
-                label: dayName,
-                value: dailyCounts[dateKey]
+        // Add event listeners to view buttons
+        document.querySelectorAll('.btn-icon.view').forEach(button => {
+            button.addEventListener('click', function() {
+                const maintenanceId = this.getAttribute('data-id');
+                showMaintenanceDetails(maintenanceId);
             });
         });
+    }
+    
+    function filterMaintenance(maintenance) {
+        const categoryFilter = document.getElementById('categoryFilter').value;
+        const priorityFilter = document.getElementById('priorityFilter').value;
+        const timeFilter = document.getElementById('timeFilter').value;
+        const sortFilter = document.getElementById('sortFilter').value;
         
-        const maxValue = Math.max(...chartData.map(item => item.value), 1); // Ensure at least 1 to avoid division by zero
+        let filtered = maintenance.filter(item => {
+            // Filter by category
+            if (categoryFilter !== 'all' && item.category !== categoryFilter) {
+                return false;
+            }
+            
+            // Filter by priority
+            if (priorityFilter !== 'all' && item.priority !== priorityFilter) {
+                return false;
+            }
+            
+            // Filter by time
+            if (timeFilter !== 'all' && item.dateCompleted) {
+                const completedDate = convertToDate(item.dateCompleted);
+                const now = new Date();
+                
+                switch(timeFilter) {
+                    case 'today':
+                        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                        if (completedDate < today) return false;
+                        break;
+                    case 'week':
+                        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                        if (completedDate < weekAgo) return false;
+                        break;
+                    case 'month':
+                        const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+                        if (completedDate < monthAgo) return false;
+                        break;
+                    case 'quarter':
+                        const quarterAgo = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
+                        if (completedDate < quarterAgo) return false;
+                        break;
+                }
+            }
+            
+            return true;
+        });
         
+        // Sort the results
+        switch(sortFilter) {
+            case 'newest':
+                filtered.sort((a, b) => {
+                    const dateA = convertToDate(a.dateCompleted);
+                    const dateB = convertToDate(b.dateCompleted);
+                    return dateB - dateA;
+                });
+                break;
+            case 'oldest':
+                filtered.sort((a, b) => {
+                    const dateA = convertToDate(a.dateCompleted);
+                    const dateB = convertToDate(b.dateCompleted);
+                    return dateA - dateB;
+                });
+                break;
+            case 'priority':
+                const priorityOrder = {high: 3, medium: 2, low: 1};
+                filtered.sort((a, b) => {
+                    return (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0);
+                });
+                break;
+            case 'category':
+                filtered.sort((a, b) => {
+                    return (a.category || '').localeCompare(b.category || '');
+                });
+                break;
+        }
+        
+        return filtered;
+    }
+    
+    function updateCharts() {
+        updateCompletionTrendsChart();
+        updateTasksByCategoryChart();
+    }
+    
+    function updateCompletionTrendsChart() {
+        const chartContainer = document.getElementById('completionTrendsChart');
         chartContainer.innerHTML = '';
         
-        chartData.forEach(item => {
-            const barHeight = maxValue > 0 ? (item.value / maxValue) * 180 : 0;
+        // Get selected time range
+        const timeRange = document.getElementById('trendsTimeRange').value;
+        let daysToShow = 7;
+        
+        if (timeRange === 'Last 30 Days') daysToShow = 30;
+        if (timeRange === 'Last 90 Days') daysToShow = 90;
+        
+        // Prepare data for the chart
+        const now = new Date();
+        const dates = [];
+        const counts = [];
+        
+        for (let i = daysToShow - 1; i >= 0; i--) {
+            const date = new Date(now);
+            date.setDate(date.getDate() - i);
+            const dateString = date.toISOString().split('T')[0];
+            dates.push(dateString);
+            counts.push(0);
+        }
+        
+        // Count completions per day
+        solvedMaintenance.forEach(maintenance => {
+            if (maintenance.dateCompleted) {
+                const completedDate = convertToDate(maintenance.dateCompleted);
+                const completedDateString = completedDate.toISOString().split('T')[0];
+                
+                const index = dates.indexOf(completedDateString);
+                if (index !== -1) {
+                    counts[index]++;
+                }
+            }
+        });
+        
+        if (counts.every(count => count === 0)) {
+            chartContainer.innerHTML = '<div class="empty-chart">No data available</div>';
+            return;
+        }
+        
+        // Find max count for scaling
+        const maxCount = Math.max(...counts);
+        
+        // Create bars for each day
+        dates.forEach((date, index) => {
+            const count = counts[index];
+            const barHeight = Math.max(20, (count / maxCount) * 150); // Minimum height 20px
             
             const barContainer = document.createElement('div');
             barContainer.className = 'bar-container';
             
+            // Format date for display
+            const displayDate = new Date(date);
+            const formattedDate = displayDate.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+            
             barContainer.innerHTML = `
-                <div class="bar-value">${item.value}</div>
-                <div class="bar" style="height: ${barHeight}px"></div>
-                <div class="bar-label">${item.label}</div>
+                <div class="bar-value">${count}</div>
+                <div class="bar" style="height: ${barHeight}px;"></div>
+                <div class="bar-label">${formattedDate}</div>
             `;
             
             chartContainer.appendChild(barContainer);
         });
     }
-
-    // Render tasks by category chart with real data
-    function renderTasksByCategoryChart() {
+    
+    function updateTasksByCategoryChart() {
         const chartContainer = document.getElementById('tasksByCategoryChart');
         const legendContainer = document.getElementById('categoryLegend');
-        const timeRange = document.getElementById('categoryTimeRange').value;
-        
-        // Get completed tasks
-        const completedTasks = getCompletedTasks();
-        
-        // Count tasks by category
-        const categoryCounts = {};
-        completedTasks.forEach(task => {
-            if (!categoryCounts[task.category]) {
-                categoryCounts[task.category] = 0;
-            }
-            categoryCounts[task.category]++;
-        });
-        
-        // Define colors for categories
-        const categoryColors = {
-            'server': '#4361ee',
-            'database': '#3a0ca3',
-            'application': '#7209b7',
-            'security': '#f72585',
-            'hardware': '#4cc9f0',
-            'network': '#4895ef',
-            'backup': '#3f37c9'
-        };
-        
-        // Format category names
-        const categoryNames = {
-            'server': 'Server Maintenance',
-            'database': 'Database',
-            'application': 'Application',
-            'security': 'Security',
-            'hardware': 'Hardware',
-            'network': 'Network',
-            'backup': 'Backup'
-        };
-        
-        // Prepare chart data
-        const chartData = [];
-        Object.keys(categoryCounts).forEach(category => {
-            chartData.push({
-                category: categoryNames[category] || category,
-                value: categoryCounts[category],
-                color: categoryColors[category] || '#6c757d'
-            });
-        });
-        
-        const total = chartData.reduce((sum, item) => sum + item.value, 0);
-        
         chartContainer.innerHTML = '';
         legendContainer.innerHTML = '';
         
-        if (total === 0) {
+        // Get selected time range
+        const timeRange = document.getElementById('categoryTimeRange').value;
+        const now = new Date();
+        
+        // Filter maintenance by time range if needed
+        let filteredMaintenance = solvedMaintenance;
+        
+        if (timeRange !== 'All Time') {
+            filteredMaintenance = solvedMaintenance.filter(maintenance => {
+                if (!maintenance.dateCompleted) return false;
+                
+                const completedDate = convertToDate(maintenance.dateCompleted);
+                
+                if (timeRange === 'This Week') {
+                    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    return completedDate >= weekAgo;
+                } else if (timeRange === 'This Month') {
+                    return completedDate.getMonth() === now.getMonth() && 
+                           completedDate.getFullYear() === now.getFullYear();
+                }
+                
+                return true;
+            });
+        }
+        
+        // Count tasks by category
+        const categoryCounts = {};
+        filteredMaintenance.forEach(maintenance => {
+            const category = maintenance.category || 'Uncategorized';
+            categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+        });
+        
+        // Convert to array and sort by count
+        const categories = Object.entries(categoryCounts)
+            .sort((a, b) => b[1] - a[1]);
+        
+        if (categories.length === 0) {
             chartContainer.innerHTML = '<div class="empty-chart">No data available</div>';
             return;
         }
         
+        // Colors for pie chart segments
+        const colors = ['#4361ee', '#4cc9f0', '#3a0ca3', '#7209b7', '#f72585', '#4895ef', '#3f37c9'];
+        
+        // Calculate total for percentages
+        const total = categories.reduce((sum, [_, count]) => sum + count, 0);
+        
         // Create pie chart
         let cumulativePercentage = 0;
         
-        chartData.forEach(item => {
-            const percentage = (item.value / total) * 100;
-            const rotation = cumulativePercentage * 3.6;
-            
+        categories.forEach(([category, count], index) => {
+            const percentage = (count / total) * 100;
             const segment = document.createElement('div');
             segment.className = 'pie-segment';
-            segment.style.backgroundColor = item.color;
-            segment.style.transform = `rotate(${rotation}deg)`;
-            segment.style.clipPath = `polygon(50% 50%, 50% 0%, ${cumulativePercentage + percentage > 50 ? '100%' : '50%'} 0%, 100% 100%, 50% 100%)`;
+            segment.style.background = colors[index % colors.length];
+            segment.style.transform = `rotate(${cumulativePercentage * 3.6}deg)`;
+            
+            // Adjust clip-path based on percentage
+            if (percentage > 50) {
+                segment.style.clipPath = `polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%, 50% 100%)`;
+            } else {
+                segment.style.clipPath = `polygon(50% 50%, 50% 0%, ${50 + (percentage / 100) * 50}% 0%)`;
+            }
             
             chartContainer.appendChild(segment);
             cumulativePercentage += percentage;
-        });
-        
-        // Add center circle
-        const centerCircle = document.createElement('div');
-        centerCircle.className = 'pie-center';
-        centerCircle.textContent = `${total}`;
-        chartContainer.appendChild(centerCircle);
-        
-        // Create legend
-        chartData.forEach(item => {
+            
+            // Add legend item
             const legendItem = document.createElement('div');
             legendItem.className = 'legend-item';
-            
             legendItem.innerHTML = `
-                <div class="legend-color" style="background-color: ${item.color}"></div>
-                <span>${item.category}: ${item.value}</span>
+                <span class="legend-color" style="background: ${colors[index % colors.length]}"></span>
+                <span>${category}: ${count} (${Math.round(percentage)}%)</span>
             `;
             
             legendContainer.appendChild(legendItem);
         });
+        
+        // Add center text
+        const center = document.createElement('div');
+        center.className = 'pie-center';
+        center.textContent = `${total}`;
+        chartContainer.appendChild(center);
     }
-
-    // Show notification
-    function showNotification(message, type) {
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.innerHTML = `
-            <div class="notification-content">
-                <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
+    
+    function showMaintenanceDetails(maintenanceId) {
+        const maintenance = solvedMaintenance.find(m => m.id === maintenanceId);
+        
+        if (!maintenance) {
+            showToast("Maintenance details not found", "error");
+            return;
+        }
+        
+        // Populate modal with maintenance data
+        document.getElementById('viewTitle').textContent = maintenance.title || 'N/A';
+        document.getElementById('viewCategory').textContent = maintenance.category || 'N/A';
+        document.getElementById('viewPriority').textContent = maintenance.priority || 'N/A';
+        
+        // Format dates
+        const createdDate = maintenance.dateCreated ? formatDate(convertToDate(maintenance.dateCreated)) : 'N/A';
+        const dueDate = maintenance.dueDate ? formatDate(convertToDate(maintenance.dueDate)) : 'N/A';
+        const completedDate = maintenance.dateCompleted ? formatDate(convertToDate(maintenance.dateCompleted)) : 'N/A';
+        
+        document.getElementById('viewCreatedDate').textContent = createdDate;
+        document.getElementById('viewDueDate').textContent = dueDate;
+        document.getElementById('viewCompletedDate').textContent = completedDate;
+        
+        document.getElementById('viewAssignedTo').textContent = maintenance.assignedTo || 'N/A';
+        document.getElementById('viewDescription').textContent = maintenance.description || 'N/A';
+        document.getElementById('viewNotes').textContent = maintenance.notes || 'N/A';
+        
+        // Calculate and display time tracking
+        const estimatedTime = maintenance.estimatedTime || 'N/A';
+        const actualTime = maintenance.actualTime || 'N/A';
+        
+        document.getElementById('viewEstimatedTime').textContent = estimatedTime;
+        document.getElementById('viewActualTime').textContent = actualTime;
+        
+        // Calculate efficiency if both times are available
+        let efficiency = 'N/A';
+        if (estimatedTime !== 'N/A' && actualTime !== 'N/A') {
+            const estimatedHours = parseTimeToHours(estimatedTime);
+            const actualHours = parseTimeToHours(actualTime);
+            
+            if (estimatedHours > 0) {
+                const efficiencyPercent = ((estimatedHours - actualHours) / estimatedHours) * 100;
+                efficiency = `${efficiencyPercent.toFixed(1)}% ${efficiencyPercent >= 0 ? 'faster' : 'slower'}`;
+            }
+        }
+        
+        document.getElementById('viewEfficiency').textContent = efficiency;
+        
+        // Show the modal
+        document.getElementById('viewModal').style.display = 'flex';
+    }
+    
+    function parseTimeToHours(timeString) {
+        // Parse time strings like "2h 30m" or "3h" or "45m"
+        const hoursMatch = timeString.match(/(\d+)\s*h/);
+        const minutesMatch = timeString.match(/(\d+)\s*m/);
+        
+        const hours = hoursMatch ? parseInt(hoursMatch[1]) : 0;
+        const minutes = minutesMatch ? parseInt(minutesMatch[1]) : 0;
+        
+        return hours + (minutes / 60);
+    }
+    
+    function formatDate(date) {
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    }
+    
+    function showToast(message, type = 'info') {
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+            <div class="toast-content">
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
                 <span>${message}</span>
             </div>
         `;
         
-        // Add to the page
-        document.body.appendChild(notification);
+        // Add toast to the page
+        document.body.appendChild(toast);
         
-        // Show with animation
+        // Animate in
         setTimeout(() => {
-            notification.classList.add('show');
+            toast.classList.add('show');
         }, 10);
         
-        // Remove after 3 seconds
+        // Remove after delay
         setTimeout(() => {
-            notification.classList.remove('show');
+            toast.classList.remove('show');
             setTimeout(() => {
-                if (notification.parentNode) {
-                    document.body.removeChild(notification);
-                }
+                document.body.removeChild(toast);
             }, 300);
         }, 3000);
     }
-
-    // ========== INISIALISASI HALAMAN ==========
-    document.addEventListener('DOMContentLoaded', initCompletedPage);
-</script>
+    
+    // Initialize the page
+    // Initialize the page 
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM loaded, setting up listener...");
+    loadSidebar();
+    setupSolvedMaintenanceListener(); // PASTIKAN INI DIPANGGIL
+    
+    // Set up event listeners for filters 
+    document.getElementById('categoryFilter').addEventListener('change', function() {
+        currentPage = 1;
+        updateSolvedMaintenanceUI();
+    });
+    
+    document.getElementById('priorityFilter').addEventListener('change', function() {
+        currentPage = 1;
+        updateSolvedMaintenanceUI();
+    });
+    
+    document.getElementById('timeFilter').addEventListener('change', function() {
+        currentPage = 1;
+        updateSolvedMaintenanceUI();
+    });
+    
+    document.getElementById('sortFilter').addEventListener('change', function() {
+        currentPage = 1;
+        updateSolvedMaintenanceUI();
+    });
+    
+    // Set up chart time range filters
+    document.getElementById('trendsTimeRange').addEventListener('change', updateCharts);
+    document.getElementById('categoryTimeRange').addEventListener('change', updateCharts);
+    
+    // Set up pagination
+    document.getElementById('prevPage').addEventListener('click', function() {
+        if (currentPage > 1) {
+            currentPage--;
+            updateSolvedMaintenanceUI();
+        }
+    });
+    
+    document.getElementById('nextPage').addEventListener('click', function() {
+        const totalPages = Math.ceil(filterMaintenance(solvedMaintenance).length / maintenancePerPage);
+        if (currentPage < totalPages) {
+            currentPage++;
+            updateSolvedMaintenanceUI();
+        }
+    });
+    
+    // Set up modal close buttons
+    document.getElementById('closeViewModal').addEventListener('click', function() {
+        document.getElementById('viewModal').classList.remove('active');
+    });
+    
+    document.getElementById('closeViewBtn').addEventListener('click', function() {
+        document.getElementById('viewModal').classList.remove('active');
+    });
+    
+    document.getElementById('closeConfirmModal').addEventListener('click', function() {
+        document.getElementById('confirmModal').classList.remove('active');
+    });
+    
+    document.getElementById('cancelConfirmBtn').addEventListener('click', function() {
+        document.getElementById('confirmModal').classList.remove('active');
+    });
+    
+    // Close modals when clicking outside
+    window.addEventListener('click', function(event) {
+        if (event.target === document.getElementById('viewModal')) {
+            document.getElementById('viewModal').classList.remove('active');
+        }
+        if (event.target === document.getElementById('confirmModal')) {
+            document.getElementById('confirmModal').classList.remove('active');
+        }
+    });
+    
+    // Set up export and print buttons
+    document.getElementById('exportBtn').addEventListener('click', function() {
+        showToast("Export feature coming soon", "info");
+    });
+    
+    document.getElementById('printBtn').addEventListener('click', function() {
+        showToast("Print feature coming soon", "info");
+    });
+    
+    document.getElementById('refreshBtn').addEventListener('click', function() {
+        showToast("Refreshing data...", "info");
+        setupSolvedMaintenanceListener();
+    });
+    
+    // Set up view toggle buttons
+    document.getElementById('tableViewBtn').addEventListener('click', function() {
+        this.classList.add('active');
+        document.getElementById('cardViewBtn').classList.remove('active');
+        showToast("Table view enabled", "info");
+    });
+    
+    document.getElementById('cardViewBtn').addEventListener('click', function() {
+        this.classList.add('active');
+        document.getElementById('tableViewBtn').classList.remove('active');
+        showToast("Card view coming soon", "info");
+    });
+    
+    // Set up search functionality
+    document.getElementById('completedSearch').addEventListener('input', function() {
+        currentPage = 1;
+        updateSolvedMaintenanceUI();
+    });
+});
+    </script>
 </body>
 </html>
